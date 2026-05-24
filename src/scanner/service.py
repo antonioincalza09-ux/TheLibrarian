@@ -8,7 +8,7 @@ from src.models import FileRecord, Inventory
 from src.security import resolve_root
 
 
-SKIPPED_DIRECTORY_NAMES = {".git", ".the_librarian", "__pycache__"}
+SKIPPED_DIRECTORY_NAMES = {".git", ".the_librarian", ".thelibrarian", "__pycache__"}
 
 
 def scan_directory(root: str | Path) -> Inventory:

@@ -14,3 +14,6 @@
 - Chose metadata-only online provider behavior; file contents are never sent to model providers.
 - Chose a CLI-first local web app as the first desktop path, served from localhost against a single assigned root.
 - Chose explicit saved-plan confirmation for apply and explicit manifest confirmation for rollback.
+- Chose a filesystem-based Job Engine under `.thelibrarian/jobs/<job_id>/` instead of a database for the first autonomy step.
+- Chose synchronous checkpointed job runs before adding daemons, watchers, schedulers, or background threads.
+- Chose append-only NDJSON events and atomic `job.json` replacement to keep jobs auditable and simple to resume later.
