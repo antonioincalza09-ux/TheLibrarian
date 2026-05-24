@@ -11,7 +11,7 @@ This prints a report and writes a copy under `.thelibrarian/reports/`.
 ## Generate a Plan with Ollama
 
 ```bash
-thelibrarian plan C:\work\messy --provider ollama --model llama3.1 --output C:\work\messy\.thelibrarian\plan.json
+thelibrarian plan C:\work\messy --provider ollama --model llama3.1 --output C:\work\messy\.thelibrarian\plans\plan.json
 ```
 
 If the provider is unavailable, deterministic fallback is used.
@@ -32,3 +32,5 @@ thelibrarian serve C:\work\messy
 ```
 
 Open `http://127.0.0.1:8765`.
+
+Use the Save Plan button to write the current preview under `.thelibrarian/plans/`.

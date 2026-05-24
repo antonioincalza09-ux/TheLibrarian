@@ -7,7 +7,7 @@
 - Chose broad initial categories to keep the MVP understandable.
 - Decided that ambiguous files go to `Review/` instead of being forced into a category.
 - Chose to preserve each file's relative subpath beneath the target category to reduce collisions and keep rollback straightforward.
-- Chose to write rollback manifests under `.the_librarian/manifests/` inside the assigned root and exclude that operational folder from future scans.
+- Chose to write rollback manifests under `.thelibrarian/manifests/` inside the assigned root and exclude operational folders from future scans.
 - Chose to skip symlinks in the MVP so the organizer never follows a path that could escape the assigned root.
 - Chose `thelibrarian` as the standalone CLI entrypoint while keeping `python -m src.cli` and `python -m src.main` usable during development.
 - Chose a provider plugin architecture with deterministic classification as the mandatory fallback.
@@ -25,3 +25,9 @@
 - Chose to allow dashboard job-history deletion only inside `.thelibrarian/jobs/`, leaving user files and rollback manifests untouched.
 - Chose deterministic contextual destination planning for skill workspaces so related definitions, source scripts, references, tests, metadata, and loose skill markdown files are grouped under `Skills/<skill>/<function>/` instead of only by file extension.
 - Chose to split `Documents/` into deterministic context subfolders such as `Reports`, `Financial`, `Testing`, `Agents`, `Workflows`, `Knowledge`, `Protocols`, `Manuals`, `Notes`, `Presentations`, `Text`, and `General` to avoid an overly generic document bucket.
+
+## 2026-05-25
+
+- Chose explicit runtime artifact folders under `.thelibrarian/reports/`, `.thelibrarian/plans/`, `.thelibrarian/manifests/`, and `.thelibrarian/jobs/`.
+- Chose lightweight provider diagnostics: Ollama uses `/api/tags`, and OpenAI-compatible endpoints use `/models` after checking `OPENAI_API_KEY`.
+- Chose a server-side plan save endpoint for the web UI so apply can continue to require a saved plan path.

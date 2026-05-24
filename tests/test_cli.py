@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from src.cli import main
 
@@ -93,6 +94,42 @@ class CliTests(unittest.TestCase):
 
             self.assertEqual(exit_code, 0)
             self.assertTrue(any((root / ".thelibrarian" / "custom-reports").glob("run-*.txt")))
+
+    def test_doctor_outputs_installation_root_and_provider_checks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            with mock.patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"}, clear=True):
+                with mock.patch("src.providers.diagnostics.get_json", side_effect=[{"models": []}, {"data": []}]):
+                    exit_code, output, _ = run_cli(["doctor", str(root), "--format", "json"])
+
+            payload = json.loads(output)
+            checks = {check["name"]: check for check in payload["checks"]}
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn(payload["status"], {"ok", "warning"})
+            self.assertEqual(checks["root_writable"]["status"], "ok")
+            self.assertEqual(checks["config_provider"]["status"], "ok")
+
+    def test_providers_doctor_runs_ollama_reachability_probe(self) -> None:
+        with mock.patch("src.providers.diagnostics.get_json", return_value={"models": []}) as get_json:
+            exit_code, output, _ = run_cli(
+                [
+                    "providers",
+                    "doctor",
+                    "--provider",
+                    "ollama",
+                    "--endpoint",
+                    "http://ollama.test",
+                    "--format",
+                    "json",
+                ]
+            )
+
+        payload = json.loads(output)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(get_json.call_args.args[0], "http://ollama.test/api/tags")
 
 
 if __name__ == "__main__":

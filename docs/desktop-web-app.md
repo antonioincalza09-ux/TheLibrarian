@@ -13,6 +13,7 @@ The server exposes:
 - `/api/dashboard`: combined inventory, plan, job, policy, event, and manifest preview.
 - `/api/inventory`: inventory JSON.
 - `/api/plan`: plan JSON.
+- `/api/plan/save`: saves the current generated plan under `.thelibrarian/plans/`.
 - `/api/apply?confirm=true`: applies a saved plan path from JSON body.
 - `/api/jobs/create`: creates a checkpointed job record.
 - `/api/jobs/run`: runs a dry-run checkpointed job.

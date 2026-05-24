@@ -7,12 +7,14 @@ from datetime import datetime, timezone
 from typing import Any
 
 from src.config import load_config
+from src.doctor import build_doctor_report
 from src.executor import execute_plan, rollback_manifest
 from src.jobs import JobRunner, JobStore
 from src.jsonio import read_plan, write_inventory, write_plan
 from src.orchestrator import organize_directory
 from src.planner import build_plan
 from src.providers import ProviderContext, available_providers, get_provider
+from src.providers.diagnostics import diagnose_provider
 from src.reporter import render_plan_report, write_report
 from src.scanner import scan_directory
 from src.security import SafetyError, resolve_root
@@ -63,6 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
     doctor.add_argument("--provider", choices=available_providers(), default="deterministic")
     doctor.add_argument("--model")
     doctor.add_argument("--endpoint")
+    doctor.add_argument("--format", choices=("text", "json"), default="text")
 
     web = subcommands.add_parser("serve", help="Start the local preview web app.")
     web.add_argument("root")
@@ -123,6 +126,13 @@ def build_parser() -> argparse.ArgumentParser:
     job_rollback.add_argument("--confirm", action="store_true")
     job_rollback.add_argument("--format", choices=("text", "json"), default="text")
 
+    doctor_command = subcommands.add_parser("doctor", help="Check installation, root, config, and provider readiness.")
+    doctor_command.add_argument("root", nargs="?")
+    doctor_command.add_argument("--provider", choices=available_providers())
+    doctor_command.add_argument("--model")
+    doctor_command.add_argument("--endpoint")
+    doctor_command.add_argument("--format", choices=("text", "json"), default="text")
+
     return parser
 
 
@@ -136,6 +146,24 @@ def _config_overrides(args: argparse.Namespace) -> dict[str, Any]:
 
 def _print_json(payload: dict[str, Any]) -> None:
     print(json.dumps(payload, indent=2))
+
+
+def _overall_status(checks: list[dict[str, str]]) -> str:
+    if any(check["status"] == "error" for check in checks):
+        return "error"
+    if any(check["status"] == "warning" for check in checks):
+        return "warning"
+    return "ok"
+
+
+def _print_doctor_text(payload: dict[str, Any]) -> None:
+    print(f"Status: {payload['status']}")
+    for check in payload["checks"]:
+        print(f"[{check['status'].upper()}] {check['name']}: {check['detail']}")
+
+
+def _doctor_exit_code(payload: dict[str, Any]) -> int:
+    return 2 if payload["status"] == "error" else 0
 
 
 def _require_confirm(confirmed: bool, action: str) -> None:
@@ -228,18 +256,37 @@ def _handle_providers(args: argparse.Namespace) -> int:
         return 0
 
     config = load_config(overrides=_config_overrides(args))
-    provider = get_provider(config.provider)
-    print(f"Provider: {provider.name}")
-    print(f"Model: {config.model or '(default)'}")
-    print(f"Endpoint: {config.endpoint or '(default)'}")
-    print(f"Privacy: {config.privacy_mode}")
-    return 0
+    context = ProviderContext(model=config.model, endpoint=config.endpoint, privacy_mode=config.privacy_mode)
+    checks = [check.to_dict() for check in diagnose_provider(config.provider, context, required=True)]
+    payload = {
+        "status": _overall_status(checks),
+        "provider": config.provider,
+        "model": config.model,
+        "endpoint": config.endpoint,
+        "privacy_mode": config.privacy_mode,
+        "checks": checks,
+    }
+    if args.format == "json":
+        _print_json(payload)
+    else:
+        _print_doctor_text(payload)
+    return _doctor_exit_code(payload)
 
 
 def _handle_serve(args: argparse.Namespace) -> int:
     config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
     serve(args.root, host=args.host, port=args.port, config=config)
     return 0
+
+
+def _handle_doctor(args: argparse.Namespace) -> int:
+    config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
+    payload = build_doctor_report(args.root, config)
+    if args.format == "json":
+        _print_json(payload)
+    else:
+        _print_doctor_text(payload)
+    return _doctor_exit_code(payload)
 
 
 def _print_job(job) -> None:
@@ -345,6 +392,7 @@ def main(argv: list[str] | None = None) -> int:
         "providers": _handle_providers,
         "serve": _handle_serve,
         "job": _handle_job,
+        "doctor": _handle_doctor,
     }
     try:
         return handlers[args.command](args)

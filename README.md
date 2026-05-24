@@ -8,6 +8,12 @@ Build a local agent that can scan a target directory, classify files, propose an
 
 ## Quickstart
 
+Install for local development:
+
+```powershell
+python -m pip install -e .
+```
+
 Run a safe dry-run from the repository:
 
 ```powershell
@@ -58,11 +64,21 @@ thelibrarian plan "C:\path\to\target" --provider deterministic --output plan.jso
 thelibrarian apply "C:\path\to\target" --plan plan.json --confirm
 thelibrarian rollback "C:\path\to\target" --manifest rollback.json --confirm
 thelibrarian providers list
+thelibrarian providers doctor --provider ollama
+thelibrarian doctor "C:\path\to\target"
 thelibrarian serve "C:\path\to\target" --host 127.0.0.1 --port 8765
 thelibrarian job run "C:\path\to\target" --policy supervised_autonomy
 ```
 
 See `docs/cli.md` for the full command reference.
+
+## Safe Workflow
+
+1. Run `thelibrarian doctor C:\path\to\target`.
+2. Generate a plan with `thelibrarian plan C:\path\to\target --output C:\path\to\target\.thelibrarian\plans\plan.json`.
+3. Review the plan JSON or the local web preview.
+4. Apply only with `thelibrarian apply C:\path\to\target --plan C:\path\to\target\.thelibrarian\plans\plan.json --confirm`.
+5. Roll back with the manifest written under `.thelibrarian/manifests/` if needed.
 
 ## Core Safety Rules
 
@@ -78,6 +94,8 @@ See `docs/cli.md` for the full command reference.
 ## Providers
 
 The deterministic provider is always available. Optional providers can be configured for local Ollama or OpenAI-compatible APIs, while the deterministic rules remain the fallback.
+
+Use `thelibrarian providers doctor --provider PROVIDER` for provider-specific checks. Ollama diagnostics probe `/api/tags`; OpenAI-compatible diagnostics check `OPENAI_API_KEY` and probe `/models` without creating completions.
 
 ## Suggested First Milestone
 

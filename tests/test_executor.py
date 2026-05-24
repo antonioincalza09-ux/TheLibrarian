@@ -47,6 +47,7 @@ class ExecutorTests(unittest.TestCase):
 
             manifest_path = Path(execution.manifest_path or "")
             self.assertTrue(manifest_path.exists())
+            self.assertEqual(manifest_path.parent, root / ".thelibrarian" / "manifests")
 
             manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(manifest_payload["operations"][0]["source"], "inbox/report.pdf")
