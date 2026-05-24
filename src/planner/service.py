@@ -2,13 +2,43 @@ from __future__ import annotations
 
 from pathlib import PurePosixPath
 
-from src.models import DEFAULT_CATEGORY_DIRECTORIES, Inventory, OrganizationPlan, PlanEntry
+from src.models import DEFAULT_CATEGORY_DIRECTORIES, FileRecord, Inventory, OrganizationPlan, PlanEntry
 from src.providers.types import ClassificationProvider, ClassificationResult, ProviderContext, ProviderError
 
 
 AMBIGUOUS_EXTENSIONS = {".json", ".xml", ".yml", ".yaml"}
 KNOWN_CATEGORY_DIRECTORIES = set(DEFAULT_CATEGORY_DIRECTORIES)
 REVIEW_CATEGORY = "Review"
+SKILLS_CONTEXT_DIRECTORY = "Skills"
+SKILL_DEFINITION_NAMES = {"skill.md", "heartbeat.md"}
+SKILL_METADATA_NAMES = {"_meta.json", "origin.json", "manifest.json"}
+SKILL_CONTEXT_MARKERS = {".clawhub", "references", "scripts", "tests", "test", "assets", "templates"}
+BROAD_OR_CONTEXT_DIRECTORIES = KNOWN_CATEGORY_DIRECTORIES | {SKILLS_CONTEXT_DIRECTORY}
+DOCUMENT_CONTEXT_DIRECTORIES = {
+    "Agents",
+    "Financial",
+    "General",
+    "Knowledge",
+    "Manuals",
+    "Notes",
+    "Presentations",
+    "Protocols",
+    "Reports",
+    "Testing",
+    "Text",
+    "Workflows",
+}
+DOCUMENT_CONTEXT_KEYWORDS = (
+    ("Testing", ("test", "testing", "qa", "accessibility", "benchmark", "performance", "evidence", "reality-check")),
+    ("Financial", ("finance", "financial", "invoice", "receipt", "budget", "tax", "bank", "statement")),
+    ("Agents", ("agent", "orchestrator", "assistant")),
+    ("Workflows", ("workflow", "sequence", "sequencer", "pipeline", "process", "procedure", "operation")),
+    ("Knowledge", ("knowledge", "graph", "ontology", "registry", "mapping", "index")),
+    ("Protocols", ("protocol", "policy", "rules", "runbook")),
+    ("Manuals", ("manual", "guide", "how-to", "handbook", "readme")),
+    ("Reports", ("report", "summary", "analysis", "audit", "review")),
+    ("Notes", ("note", "notes", "memo", "meeting", "journal")),
+)
 
 CATEGORY_BY_EXTENSION = {
     ".pdf": "Documents",
@@ -104,6 +134,9 @@ def destination_for(source: str, category: str) -> str:
     source_path = PurePosixPath(source)
     parts = source_path.parts
 
+    if category == "Documents":
+        return document_destination_for(source)
+
     if parts and parts[0] in KNOWN_CATEGORY_DIRECTORIES:
         parts = parts[1:]
 
@@ -111,6 +144,174 @@ def destination_for(source: str, category: str) -> str:
         parts = (source_path.name,)
 
     return PurePosixPath(category, *parts).as_posix()
+
+
+def document_destination_for(source: str) -> str:
+    source_path = PurePosixPath(source)
+    parts = source_path.parts
+
+    if parts and parts[0] == "Documents":
+        stripped_parts = parts[1:]
+        if stripped_parts and stripped_parts[0] in DOCUMENT_CONTEXT_DIRECTORIES:
+            return source_path.as_posix()
+        parts = stripped_parts
+    elif parts and parts[0] in KNOWN_CATEGORY_DIRECTORIES:
+        parts = parts[1:]
+
+    if not parts:
+        parts = (source_path.name,)
+
+    context = _document_context_for(parts, source_path.suffix.lower())
+    return PurePosixPath("Documents", context, *parts).as_posix()
+
+
+def _document_context_for(parts: tuple[str, ...], extension: str) -> str:
+    searchable = " ".join(part.lower().replace("_", "-") for part in parts)
+
+    for context, keywords in DOCUMENT_CONTEXT_KEYWORDS:
+        if any(keyword in searchable for keyword in keywords):
+            return context
+
+    if extension in {".ppt", ".pptx"}:
+        return "Presentations"
+    if extension in {".txt", ".rtf"}:
+        return "Text"
+    if extension in {".md"}:
+        return "Notes"
+    return "General"
+
+
+def contextual_destination_for(
+    file_record: FileRecord,
+    category: str,
+    *,
+    skill_workspace: bool = False,
+    skill_names: set[str] | None = None,
+) -> tuple[str, str | None]:
+    source_path = PurePosixPath(file_record.relative_path)
+    parts = source_path.parts
+
+    if parts and parts[0] == SKILLS_CONTEXT_DIRECTORY:
+        return file_record.relative_path, "File is already inside the contextual Skills workspace."
+
+    context_parts = parts[1:] if parts and parts[0] in BROAD_OR_CONTEXT_DIRECTORIES else parts
+    known_skill_names = skill_names or set()
+    if not _looks_like_skill_context(
+        context_parts,
+        file_record,
+        skill_workspace=skill_workspace,
+        skill_names=known_skill_names,
+    ):
+        return destination_for(file_record.relative_path, category), None
+
+    skill_name, remainder = _skill_name_and_remainder(context_parts, file_record)
+    function_directory = _skill_function_directory(remainder, file_record, category)
+    destination_name = _contextual_destination_name(remainder, file_record)
+    destination = PurePosixPath(SKILLS_CONTEXT_DIRECTORY, skill_name, function_directory, destination_name).as_posix()
+    reason = f"Contextual skill workspace grouping under {SKILLS_CONTEXT_DIRECTORY}/{skill_name}/{function_directory}."
+    return destination, reason
+
+
+def _looks_like_skill_context(
+    parts: tuple[str, ...],
+    file_record: FileRecord,
+    *,
+    skill_workspace: bool,
+    skill_names: set[str],
+) -> bool:
+    normalized_name = file_record.name.lower()
+    lowered_parts = {part.lower() for part in parts}
+
+    if parts and parts[0] in skill_names:
+        return True
+    if normalized_name in SKILL_DEFINITION_NAMES or normalized_name in SKILL_METADATA_NAMES:
+        return True
+    if any(part in SKILL_CONTEXT_MARKERS for part in lowered_parts):
+        return True
+    if len(parts) >= 2 and any(part in {"references", "scripts", "tests", "test"} for part in lowered_parts):
+        return True
+    if skill_workspace and len(parts) == 1 and file_record.extension.lower() == ".md":
+        return True
+    return False
+
+
+def _inventory_looks_like_skill_workspace(inventory: Inventory) -> bool:
+    root_name = PurePosixPath(str(inventory.root).replace("\\", "/")).name.lower()
+    if root_name in {"skills", "skill"}:
+        return True
+    return any(
+        file_record.name.lower() in SKILL_DEFINITION_NAMES
+        or ".clawhub" in PurePosixPath(file_record.relative_path).parts
+        for file_record in inventory.files
+    )
+
+
+def _skill_context_names(inventory: Inventory) -> set[str]:
+    names: set[str] = set()
+
+    for file_record in inventory.files:
+        parts = PurePosixPath(file_record.relative_path).parts
+        context_parts = parts[1:] if parts and parts[0] in BROAD_OR_CONTEXT_DIRECTORIES else parts
+        if len(context_parts) >= 2 and file_record.name.lower() in SKILL_DEFINITION_NAMES:
+            names.add(context_parts[-2])
+        if ".clawhub" in context_parts:
+            marker_index = context_parts.index(".clawhub")
+            if marker_index > 0:
+                names.add(context_parts[marker_index - 1])
+
+    return names
+
+
+def _skill_name_and_remainder(parts: tuple[str, ...], file_record: FileRecord) -> tuple[str, tuple[str, ...]]:
+    normalized_name = file_record.name.lower()
+    if len(parts) == 1:
+        return PurePosixPath(file_record.name).stem, (file_record.name,)
+    if parts and parts[0].lower() in {"manuals", "docs", "documentation"}:
+        return parts[0], parts[1:] or (file_record.name,)
+    if normalized_name in SKILL_DEFINITION_NAMES and len(parts) >= 2:
+        return parts[-2], (file_record.name,)
+    return parts[0], parts[1:] or (file_record.name,)
+
+
+def _skill_function_directory(parts: tuple[str, ...], file_record: FileRecord, category: str) -> str:
+    lowered_parts = [part.lower() for part in parts]
+    normalized_name = file_record.name.lower()
+    extension = file_record.extension.lower()
+
+    if normalized_name in SKILL_DEFINITION_NAMES:
+        return "Definition"
+    if normalized_name in SKILL_METADATA_NAMES or ".clawhub" in lowered_parts:
+        return "Metadata"
+    if any(part in {"scripts", "src", "source"} for part in lowered_parts) or category == "Code":
+        return "Source"
+    if any(part in {"tests", "test"} for part in lowered_parts):
+        return "Tests"
+    if any(part in {"references", "reference", "manuals", "docs", "documentation"} for part in lowered_parts):
+        return "References"
+    if any(part in {"assets", "images", "media", "templates"} for part in lowered_parts) or category == "Media":
+        return "Assets"
+    if extension in {".json", ".toml", ".yml", ".yaml", ".ini", ".cfg"}:
+        return "Config"
+    return "Documentation" if extension == ".md" else "Artifacts"
+
+
+def _contextual_destination_name(parts: tuple[str, ...], file_record: FileRecord) -> str:
+    lowered_parts = [part.lower() for part in parts]
+
+    for marker in ("scripts", "src", "source", "references", "reference", "tests", "test", "assets", "images", "media", "templates"):
+        if marker in lowered_parts:
+            marker_index = lowered_parts.index(marker)
+            tail = parts[marker_index + 1 :]
+            if tail:
+                return PurePosixPath(*tail).as_posix()
+
+    if ".clawhub" in lowered_parts:
+        marker_index = lowered_parts.index(".clawhub")
+        tail = parts[marker_index + 1 :]
+        if tail:
+            return PurePosixPath(*tail).as_posix()
+
+    return file_record.name
 
 
 def _valid_provider_result(result: ClassificationResult, known_sources: set[str]) -> bool:
@@ -173,6 +374,8 @@ def build_plan(
     reserved_destinations: set[str] = set()
     entries: list[PlanEntry] = []
     classification_index, provider_warnings, provider_name = _classification_index(inventory, provider, context)
+    skill_workspace = _inventory_looks_like_skill_workspace(inventory)
+    skill_names = _skill_context_names(inventory)
     warnings: list[str] = list(provider_warnings)
 
     for file_record in inventory.files:
@@ -180,7 +383,14 @@ def build_plan(
         category = classification.category
         confidence = classification.confidence
         reason = classification.reason
-        destination = destination_for(file_record.relative_path, category)
+        destination, context_reason = contextual_destination_for(
+            file_record,
+            category,
+            skill_workspace=skill_workspace,
+            skill_names=skill_names,
+        )
+        if context_reason:
+            reason = f"{reason} {context_reason}"
         status = "planned"
         warning: str | None = None
 

@@ -66,7 +66,7 @@ class CliTests(unittest.TestCase):
             exit_code, _, _ = run_cli(["apply", str(root), "--plan", str(plan_path), "--confirm"])
 
             self.assertEqual(exit_code, 0)
-            self.assertTrue((root / "Documents" / "report.pdf").exists())
+            self.assertTrue((root / "Documents" / "Reports" / "report.pdf").exists())
 
     def test_run_defaults_to_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:

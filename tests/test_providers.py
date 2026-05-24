@@ -44,7 +44,7 @@ class ProviderTests(unittest.TestCase):
 
             plan = build_plan(inventory, provider=DeterministicProvider(), context=ProviderContext())
 
-            self.assertEqual(plan.entries[0].destination, "Documents/report.pdf")
+            self.assertEqual(plan.entries[0].destination, "Documents/Reports/report.pdf")
             self.assertEqual(plan.provider, "deterministic")
 
     def test_provider_failure_falls_back_to_deterministic(self) -> None:
@@ -55,7 +55,7 @@ class ProviderTests(unittest.TestCase):
 
             plan = build_plan(inventory, provider=BrokenProvider(), context=ProviderContext())
 
-            self.assertEqual(plan.entries[0].destination, "Documents/report.pdf")
+            self.assertEqual(plan.entries[0].destination, "Documents/Reports/report.pdf")
             self.assertIn("deterministic fallback", plan.warnings[0])
 
     def test_malformed_provider_response_routes_to_fallback(self) -> None:

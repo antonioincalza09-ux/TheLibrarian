@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 from pathlib import Path
 
 from src.jobs.models import JobEvent, JobPhase, JobRecord, JobStatus
@@ -112,6 +113,20 @@ class JobStore:
             handle.write(json.dumps(event.to_dict()) + "\n")
         return events_path
 
+    def write_json_artifact(self, job_id: str, filename: str, payload: dict[str, object]) -> Path:
+        path = self.artifact_path(job_id, filename)
+        self._atomic_write_json(path, payload)
+        return path
+
+    def read_json_artifact(self, job_id: str, filename: str) -> dict[str, object]:
+        path = self.artifact_path(job_id, filename)
+        if not path.exists():
+            raise SafetyError(f"Missing job artifact: {filename}")
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise SafetyError(f"Job artifact is not a JSON object: {filename}")
+        return payload
+
     def read_events(self, job_id: str) -> list[JobEvent]:
         events_path = self.artifact_path(job_id, "events.ndjson")
         if not events_path.exists():
@@ -122,6 +137,19 @@ class JobStore:
                 events.append(JobEvent.from_dict(json.loads(line)))
         return events
 
+    def delete(self, job_id: str) -> None:
+        job_directory = self.job_directory(job_id)
+        if not job_directory.exists():
+            raise SafetyError(f"Unknown job: {job_id}")
+        shutil.rmtree(job_directory)
+
+    def delete_all(self) -> int:
+        if not self.jobs_directory.exists():
+            return 0
+        count = len([path for path in self.jobs_directory.iterdir() if path.is_dir()])
+        shutil.rmtree(self.jobs_directory)
+        return count
+
     def _validate_job_id(self, job_id: str) -> str:
         if not job_id or "/" in job_id or "\\" in job_id or ".." in job_id or not _SAFE_JOB_ID.match(job_id):
             raise SafetyError(f"Invalid job id: {job_id}")
@@ -131,4 +159,3 @@ class JobStore:
         temporary_path = path.with_suffix(path.suffix + ".tmp")
         temporary_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         os.replace(temporary_path, path)
-

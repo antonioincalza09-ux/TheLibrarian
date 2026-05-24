@@ -80,6 +80,7 @@ def build_parser() -> argparse.ArgumentParser:
     job_create.add_argument("--provider", choices=available_providers())
     job_create.add_argument("--model")
     job_create.add_argument("--endpoint")
+    job_create.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"), default="dry_run_only")
     job_create.add_argument("--format", choices=("text", "json"), default="text")
 
     job_run = job_sub.add_parser("run", help="Create and run a dry-run checkpointed job.")
@@ -87,6 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
     job_run.add_argument("--provider", choices=available_providers())
     job_run.add_argument("--model")
     job_run.add_argument("--endpoint")
+    job_run.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"), default="dry_run_only")
     job_run.add_argument("--format", choices=("text", "json"), default="text")
 
     job_status = job_sub.add_parser("status", help="Show one job record.")
@@ -102,6 +104,24 @@ def build_parser() -> argparse.ArgumentParser:
     job_events.add_argument("job_id")
     job_events.add_argument("--root", required=True)
     job_events.add_argument("--format", choices=("text", "json"), default="text")
+
+    job_approve = job_sub.add_parser("approve", help="Manually approve policy decisions for one job.")
+    job_approve.add_argument("job_id")
+    job_approve.add_argument("--root", required=True)
+    job_approve.add_argument("--confirm", action="store_true")
+    job_approve.add_argument("--format", choices=("text", "json"), default="text")
+
+    job_apply = job_sub.add_parser("apply", help="Apply policy-approved entries for one job.")
+    job_apply.add_argument("job_id")
+    job_apply.add_argument("--root", required=True)
+    job_apply.add_argument("--confirm", action="store_true")
+    job_apply.add_argument("--format", choices=("text", "json"), default="text")
+
+    job_rollback = job_sub.add_parser("rollback", help="Rollback the manifest produced by one job.")
+    job_rollback.add_argument("job_id")
+    job_rollback.add_argument("--root", required=True)
+    job_rollback.add_argument("--confirm", action="store_true")
+    job_rollback.add_argument("--format", choices=("text", "json"), default="text")
 
     return parser
 
@@ -232,6 +252,8 @@ def _print_job(job) -> None:
         print(f"Inventory: {job.inventory_path}")
     if job.plan_path:
         print(f"Plan: {job.plan_path}")
+    if job.policy_path:
+        print(f"Policy: {job.policy_path}")
     if job.report_path:
         print(f"Report: {job.report_path}")
     if job.manifest_path:
@@ -245,9 +267,9 @@ def _handle_job(args: argparse.Namespace) -> int:
         config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
         runner = JobRunner(args.root, config=config)
         if args.job_command == "create":
-            job = runner.create_job(dry_run=True)
+            job = runner.create_job(dry_run=True, policy_name=args.policy)
         else:
-            job = runner.run(dry_run=True)
+            job = runner.run(dry_run=True, policy_name=args.policy)
 
         if args.format == "json":
             _print_json(job.to_dict())
@@ -279,6 +301,33 @@ def _handle_job(args: argparse.Namespace) -> int:
         else:
             for event in events:
                 print(f"{event.timestamp}\t{event.status.value}\t{event.phase.value}\t{event.message}")
+        return 0
+
+    if args.job_command == "approve":
+        _require_confirm(args.confirm, "Job approval")
+        job = JobRunner(args.root).approve(args.job_id)
+        if args.format == "json":
+            _print_json(job.to_dict())
+        else:
+            _print_job(job)
+        return 0
+
+    if args.job_command == "apply":
+        _require_confirm(args.confirm, "Job apply")
+        job = JobRunner(args.root).apply(args.job_id)
+        if args.format == "json":
+            _print_json(job.to_dict())
+        else:
+            _print_job(job)
+        return 0
+
+    if args.job_command == "rollback":
+        _require_confirm(args.confirm, "Job rollback")
+        job = JobRunner(args.root).rollback(args.job_id)
+        if args.format == "json":
+            _print_json(job.to_dict())
+        else:
+            _print_job(job)
         return 0
 
     raise ValueError(f"Unknown job command: {args.job_command}")

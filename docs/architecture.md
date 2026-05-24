@@ -6,11 +6,12 @@ TheLibrarian is organized around a small safety-first core.
 
 1. `scanner` reads metadata under the assigned root.
 2. `providers` optionally classify metadata.
-3. `planner` validates classification and builds destinations.
+3. `planner` validates classification and builds destinations, including deterministic contextual layouts for skill workspaces and document subfolders.
 4. `reporter` renders human-readable and JSON artifacts.
 5. `executor` applies saved plans and writes rollback manifests.
-6. `webapp` exposes local preview endpoints backed by the same core.
+6. `webapp` exposes a localhost operations dashboard backed by the same core.
 7. `jobs` records checkpointed scan/plan/report work under `.thelibrarian/jobs/<job_id>/`.
+8. `policies` evaluates plans before any job apply and records auditable decisions.
 
 ## Provider Interface
 
@@ -25,3 +26,4 @@ The planner rejects unknown sources, unknown categories, invalid confidence valu
 - Execution manifests include app version, root, operations, rollback paths, and skipped entries.
 - Job JSON uses `JobRecord.to_dict()` and is updated atomically by the filesystem `JobStore`.
 - Job events are append-only NDJSON lines in `events.ndjson`.
+- Policy decisions are saved as `policy_decision.json` and include status, reason, risk score, and manual approval state.

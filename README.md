@@ -8,29 +8,58 @@ Build a local agent that can scan a target directory, classify files, propose an
 
 ## Quickstart
 
-Run from the repository:
+Run a safe dry-run from the repository:
 
-```bash
-python -m src.cli run C:\path\to\target
+```powershell
+cd C:\Users\PC\Documents\TheLibrarian
+python -m src.cli run "C:\path\to\target"
 ```
 
 After installation, use the console command:
 
-```bash
-thelibrarian run C:\path\to\target
+```powershell
+thelibrarian run "C:\path\to\target"
 ```
 
 The default mode is always dry-run. The tool scans files, produces an inventory, builds a plan, writes a report under `.thelibrarian/reports/`, and does not move files unless an explicit saved plan is applied with confirmation.
 
+## Dashboard Workflow
+
+Start the local dashboard against the directory you want to organize:
+
+```powershell
+cd C:\Users\PC\Documents\TheLibrarian
+python -m src.cli serve "C:\path\to\target" --host 127.0.0.1 --port 8765
+```
+
+Open the browser at:
+
+```text
+http://127.0.0.1:8765
+```
+
+Recommended dashboard flow:
+
+1. Check `Target Root` in the sidebar. You can paste a different directory and press `Set Directory`.
+2. Press `Run Dry-Run Job` to scan, plan, evaluate policy, and write job artifacts without moving files.
+3. Review `Plan`, `Review`, `Warnings`, `Policy`, and `Events`.
+4. Use `Approve` only when you want to manually approve entries that require review.
+5. Use `Apply` only when the selected job looks correct. Apply uses confirmed, policy-approved job entries and writes a rollback manifest.
+6. Use `Rollback` to reverse an applied job when its manifest is available.
+7. Use `Delete Job` or `Delete All Jobs` to remove dashboard job history for the current root. This deletes only `.thelibrarian/jobs/...` artifacts, not user files.
+
+The dashboard never applies a freshly generated plan automatically. Apply, approval, rollback, root changes, and job deletion all require explicit confirmation.
+
 ## CLI Basics
 
-```bash
-thelibrarian scan C:\path\to\target --output inventory.json
-thelibrarian plan C:\path\to\target --provider deterministic --output plan.json
-thelibrarian apply C:\path\to\target --plan plan.json --confirm
-thelibrarian rollback C:\path\to\target --manifest rollback.json --confirm
+```powershell
+thelibrarian scan "C:\path\to\target" --output inventory.json
+thelibrarian plan "C:\path\to\target" --provider deterministic --output plan.json
+thelibrarian apply "C:\path\to\target" --plan plan.json --confirm
+thelibrarian rollback "C:\path\to\target" --manifest rollback.json --confirm
 thelibrarian providers list
-thelibrarian serve C:\path\to\target --host 127.0.0.1 --port 8765
+thelibrarian serve "C:\path\to\target" --host 127.0.0.1 --port 8765
+thelibrarian job run "C:\path\to\target" --policy supervised_autonomy
 ```
 
 See `docs/cli.md` for the full command reference.
@@ -58,7 +87,7 @@ The deterministic provider is always available. Optional providers can be config
 4. Apply the plan only after explicit confirmation.
 5. Produce a rollback manifest.
 
-## Initial Categories
+## Organization Categories
 
 - `Documents/`
 - `Media/`
@@ -67,3 +96,16 @@ The deterministic provider is always available. Optional providers can be config
 - `Data/`
 - `Apps/`
 - `Review/`
+- `Skills/` for contextual skill workspaces.
+
+`Documents/` is further split into contextual subfolders such as `Reports`, `Financial`, `Testing`, `Agents`, `Workflows`, `Knowledge`, `Protocols`, `Manuals`, `Notes`, `Presentations`, `Text`, and `General`.
+
+Skill workspaces are grouped by usage and function, for example:
+
+```text
+Skills/<skill>/Definition/SKILL.md
+Skills/<skill>/Documentation/*.md
+Skills/<skill>/Source/*.py
+Skills/<skill>/References/*.md
+Skills/<skill>/Metadata/*.json
+```
