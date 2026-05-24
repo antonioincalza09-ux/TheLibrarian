@@ -3,6 +3,8 @@
 .env.*
 .envrc
 *.log
+.thelibrarian/
+.the_librarian/
 manifests/
 reports/generated/
 
@@ -117,4 +119,3 @@ __marimo__/
 db.sqlite3
 db.sqlite3-journal
 local_settings.py
-
