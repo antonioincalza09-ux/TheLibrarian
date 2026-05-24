@@ -1,6 +1,6 @@
-# File Organizer Agent
+# TheLibrarian
 
-Agent project for safely organizing files inside an assigned directory according to usage logic, convenience, and traceable operations.
+TheLibrarian is a local agent project for safely organizing files inside an assigned directory according to usage logic, convenience, and traceable operations.
 
 ## Goal
 
