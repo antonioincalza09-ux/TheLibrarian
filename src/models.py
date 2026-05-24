@@ -32,6 +32,17 @@ class FileRecord:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "FileRecord":
+        return cls(
+            relative_path=str(payload["relative_path"]),
+            name=str(payload["name"]),
+            size_bytes=int(payload["size_bytes"]),
+            modified_at=str(payload["modified_at"]),
+            extension=str(payload["extension"]),
+            parent=str(payload["parent"]),
+        )
+
 
 @dataclass(slots=True)
 class Inventory:
@@ -63,6 +74,15 @@ class Inventory:
             "files": [item.to_dict() for item in self.files],
         }
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "Inventory":
+        return cls(
+            root=str(payload["root"]),
+            files=[FileRecord.from_dict(item) for item in payload.get("files", [])],
+            warnings=[str(item) for item in payload.get("warnings", [])],
+            scanned_at=str(payload.get("scanned_at", utc_now_iso())),
+        )
+
 
 @dataclass(slots=True)
 class PlanEntry:
@@ -79,6 +99,18 @@ class PlanEntry:
         payload["confidence"] = round(self.confidence, 2)
         return payload
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "PlanEntry":
+        return cls(
+            source=str(payload["source"]),
+            destination=str(payload["destination"]),
+            reason=str(payload["reason"]),
+            confidence=float(payload["confidence"]),
+            category=str(payload["category"]),
+            status=str(payload.get("status", "planned")),
+            warning=None if payload.get("warning") is None else str(payload["warning"]),
+        )
+
 
 @dataclass(slots=True)
 class OrganizationPlan:
@@ -86,6 +118,7 @@ class OrganizationPlan:
     entries: list[PlanEntry]
     warnings: list[str] = field(default_factory=list)
     generated_at: str = field(default_factory=utc_now_iso)
+    provider: str = "deterministic"
 
     @property
     def planned_entries(self) -> list[PlanEntry]:
@@ -107,9 +140,20 @@ class OrganizationPlan:
         return {
             "root": self.root,
             "generated_at": self.generated_at,
+            "provider": self.provider,
             "warnings": list(self.warnings),
             "entries": [entry.to_dict() for entry in self.entries],
         }
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "OrganizationPlan":
+        return cls(
+            root=str(payload["root"]),
+            entries=[PlanEntry.from_dict(item) for item in payload.get("entries", [])],
+            warnings=[str(item) for item in payload.get("warnings", [])],
+            generated_at=str(payload.get("generated_at", utc_now_iso())),
+            provider=str(payload.get("provider", "deterministic")),
+        )
 
 
 @dataclass(slots=True)
@@ -132,6 +176,18 @@ class ManifestOperation:
                 "destination": self.rollback_destination,
             },
         }
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "ManifestOperation":
+        rollback = payload.get("rollback", {})
+        return cls(
+            source=str(payload["source"]),
+            destination=str(payload["destination"]),
+            reason=str(payload["reason"]),
+            confidence=float(payload["confidence"]),
+            rollback_source=str(rollback["source"]),
+            rollback_destination=str(rollback["destination"]),
+        )
 
 
 @dataclass(slots=True)
@@ -166,4 +222,3 @@ class OrganizerRun:
     plan: OrganizationPlan
     execution: ExecutionResult
     report: str
-

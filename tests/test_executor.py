@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from src.executor import execute_plan
+from src.executor import execute_plan, rollback_manifest
 from src.planner import build_plan
 from src.scanner import scan_directory
 from src.security import SafetyError
@@ -72,7 +72,23 @@ class ExecutorTests(unittest.TestCase):
             with self.assertRaises(SafetyError):
                 execute_plan(root, plan, dry_run=False)
 
+    def test_rollback_manifest_reverses_applied_move(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "inbox" / "report.pdf"
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text("content", encoding="utf-8")
+
+            inventory = scan_directory(root)
+            plan = build_plan(inventory)
+            execution = execute_plan(root, plan, dry_run=False)
+
+            rollback_execution = rollback_manifest(root, execution.manifest_path or "", confirm=True)
+
+            self.assertTrue(source.exists())
+            self.assertFalse((root / "Documents" / "inbox" / "report.pdf").exists())
+            self.assertEqual(rollback_execution.applied_count, 1)
+
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -8,7 +8,7 @@ from src.models import FileRecord, Inventory
 from src.security import resolve_root
 
 
-SKIPPED_DIRECTORY_NAMES = {".git", ".the_librarian"}
+SKIPPED_DIRECTORY_NAMES = {".git", ".the_librarian", "__pycache__"}
 
 
 def scan_directory(root: str | Path) -> Inventory:
@@ -61,4 +61,3 @@ def scan_directory(root: str | Path) -> Inventory:
     files.sort(key=lambda item: item.relative_path)
     warnings.sort()
     return Inventory(root=str(resolved_root), files=files, warnings=warnings)
-

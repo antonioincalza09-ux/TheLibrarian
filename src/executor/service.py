@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import json
 from pathlib import Path
 
 from src.models import ExecutionResult, ManifestOperation, OrganizationPlan, PlanEntry
@@ -82,3 +83,54 @@ def execute_plan(
         manifest_path=manifest_path,
     )
 
+
+def rollback_manifest(
+    root: str | Path,
+    manifest_path: str | Path,
+    *,
+    confirm: bool = False,
+) -> ExecutionResult:
+    if not confirm:
+        raise SafetyError("Rollback requires explicit confirmation.")
+
+    resolved_root = resolve_root(root)
+    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    manifest_root = resolve_root(manifest["root"])
+    if manifest_root != resolved_root:
+        raise SafetyError("Manifest root does not match the assigned root.")
+
+    applied_operations: list[ManifestOperation] = []
+    warnings: list[str] = []
+
+    for row in reversed(manifest.get("operations", [])):
+        rollback = row.get("rollback", {})
+        source = str(rollback["source"])
+        destination = str(rollback["destination"])
+        source_path = resolve_relative_path(resolved_root, source, must_exist=True)
+        destination_path = resolve_relative_path(resolved_root, destination, must_exist=False)
+
+        if destination_path.exists():
+            warnings.append(f"Rollback destination already exists: {destination}")
+            continue
+
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(source_path), str(destination_path))
+        applied_operations.append(
+            ManifestOperation(
+                source=source,
+                destination=destination,
+                reason=f"Rollback for {row.get('destination', source)}",
+                confidence=float(row.get("confidence", 1.0)),
+                rollback_source=destination,
+                rollback_destination=source,
+            )
+        )
+
+    return ExecutionResult(
+        root=str(resolved_root),
+        dry_run=False,
+        applied_operations=applied_operations,
+        skipped_entries=[],
+        warnings=warnings,
+        manifest_path=None,
+    )
