@@ -12,6 +12,7 @@ TheLibrarian is organized around a small safety-first core.
 6. `webapp` exposes a localhost operations dashboard backed by the same core.
 7. `jobs` records checkpointed scan/plan/report work under `.thelibrarian/jobs/<job_id>/`.
 8. `policies` evaluates plans before any job apply and records auditable decisions.
+9. `doctor` runs install, config, root permission, and provider readiness checks.
 
 ## Provider Interface
 
@@ -27,3 +28,11 @@ The planner rejects unknown sources, unknown categories, invalid confidence valu
 - Job JSON uses `JobRecord.to_dict()` and is updated atomically by the filesystem `JobStore`.
 - Job events are append-only NDJSON lines in `events.ndjson`.
 - Policy decisions are saved as `policy_decision.json` and include status, reason, risk score, and manual approval state.
+
+## Runtime Directories
+
+- Reports are written under `.thelibrarian/reports/`.
+- Saved plans are written under `.thelibrarian/plans/`.
+- Rollback manifests are written under `.thelibrarian/manifests/`.
+- Jobs are written under `.thelibrarian/jobs/<job_id>/`.
+- The scanner skips both `.thelibrarian/` and the legacy `.the_librarian/` directory name.

@@ -12,6 +12,7 @@ from src.jobs import JobRunner, JobStore
 from src.jsonio import read_plan
 from src.planner import build_plan
 from src.providers import ProviderContext, get_provider
+from src.reporter import write_plan_artifact
 from src.scanner import scan_directory
 from src.security import SafetyError, resolve_root
 
@@ -75,14 +76,7 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
             return scan_directory(self._root()).to_dict()
 
         def _plan(self) -> dict[str, object]:
-            inventory = scan_directory(self._root())
-            provider = get_provider(config.provider)
-            context = ProviderContext(
-                model=config.model,
-                endpoint=config.endpoint,
-                privacy_mode=config.privacy_mode,
-            )
-            return build_plan(inventory, provider=provider, context=context).to_dict()
+            return _build_current_plan(self._root(), config).to_dict()
 
         def _dashboard(self) -> dict[str, object]:
             resolved_root = self._root()
@@ -203,6 +197,12 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     self._json(200, {"root": str(next_root)})
                     return
 
+                if parsed.path == "/api/plan/save":
+                    plan = _build_current_plan(self._root(), config)
+                    plan_path = write_plan_artifact(self._root(), plan)
+                    self._json(200, {"path": str(plan_path), "plan": plan.to_dict()})
+                    return
+
                 if parsed.path == "/api/apply":
                     self._confirm(query, "Apply")
                     plan_path = body.get("plan")
@@ -261,6 +261,17 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 self._json(400, {"error": str(exc)})
 
     return ThreadingHTTPServer((host, port), Handler)
+
+
+def _build_current_plan(root: Path, config: RuntimeConfig):
+    inventory = scan_directory(root)
+    provider = get_provider(config.provider)
+    context = ProviderContext(
+        model=config.model,
+        endpoint=config.endpoint,
+        privacy_mode=config.privacy_mode,
+    )
+    return build_plan(inventory, provider=provider, context=context)
 
 
 def serve(root: str | Path, *, host: str, port: int, config: RuntimeConfig) -> None:
@@ -653,6 +664,7 @@ def _page() -> str:
         </div>
         <div class="toolbar">
           <button type="button" id="refreshBtn">Refresh</button>
+          <button type="button" id="savePlanBtn">Save Plan</button>
           <button type="button" id="createJobBtn">Create Job</button>
           <button type="button" class="button-primary" id="runJobBtn">Run Dry-Run Job</button>
         </div>
@@ -962,6 +974,10 @@ def _page() -> str:
       return window.confirm(text);
     }
     $('#refreshBtn').addEventListener('click', () => runAction('Refresh', () => refresh({ silent: true }), { refreshAfter: false }));
+    $('#savePlanBtn').addEventListener('click', () => runAction('Save plan', async () => {
+      const saved = await api('/api/plan/save', { method: 'POST', body: '{}' });
+      setStatus(`Saved plan: ${saved.path}`);
+    }, { refreshAfter: false }));
     $('#setRootBtn').addEventListener('click', () => {
       const root = $('#rootInput').value.trim();
       if (!root || !confirmAction('Switch dashboard to this directory? Existing files will not be moved.')) return;

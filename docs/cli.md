@@ -9,8 +9,9 @@ The official command is `thelibrarian`. During local development, every command 
 - `run ROOT --provider PROVIDER --format text|json`: scans, plans, prints a report, and writes a report under `.thelibrarian/reports/`.
 - `apply ROOT --plan plan.json --confirm`: applies a saved plan and writes a rollback manifest.
 - `rollback ROOT --manifest manifest.json --confirm`: reverses operations recorded in a manifest when destinations are clear.
+- `doctor [ROOT] --provider PROVIDER --format text|json`: checks installation, config, root permissions, provider readiness, Ollama reachability, and `OPENAI_API_KEY` presence.
 - `providers list`: lists provider names.
-- `providers doctor --provider PROVIDER`: prints provider runtime configuration.
+- `providers doctor --provider PROVIDER --format text|json`: runs provider-specific readiness checks.
 - `serve ROOT --host 127.0.0.1 --port 8765`: starts the local browser preview app.
 - `job create ROOT`: creates a checkpointed job record without scanning.
 - `job run ROOT`: creates and runs a dry-run checkpointed job.
@@ -31,4 +32,13 @@ The official command is `thelibrarian`. During local development, every command 
 
 ## Output Formats
 
-`scan`, `plan`, `run`, `apply`, and `rollback` support JSON output where useful. Human-readable output is intended for operators; JSON output is intended for automation and tests.
+`scan`, `plan`, `run`, `apply`, `rollback`, `doctor`, and `providers doctor` support JSON output where useful. Human-readable output is intended for operators; JSON output is intended for automation and tests.
+
+## Diagnostics
+
+`doctor` returns a non-zero exit code when required checks fail. Optional checks can produce warnings, such as missing optional OpenAI credentials when the configured provider is deterministic.
+
+Provider diagnostics avoid generation calls:
+
+- Ollama: `GET /api/tags`.
+- OpenAI-compatible: presence of `OPENAI_API_KEY`, then `GET /models`.

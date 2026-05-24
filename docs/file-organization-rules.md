@@ -61,5 +61,5 @@ This contextual layout can also repair broad category layouts created by earlier
 - If a file appears to belong to multiple groups, choose the group that best preserves workflow convenience.
 - Preserve relative grouping when files appear related.
 - Preserve relative subpaths under top-level category folders to reduce collisions and simplify rollback.
-- Skip symlinks and operational directories such as `.the_librarian/` and `.thelibrarian/` to avoid self-organization and path escapes.
+- Skip symlinks and operational directories such as `.thelibrarian/` and the legacy `.the_librarian/` path to avoid self-organization and path escapes.
 - Treat structured text formats with dual use, such as `.json`, `.xml`, `.yml`, and `.yaml`, as `Review/` in the MVP.

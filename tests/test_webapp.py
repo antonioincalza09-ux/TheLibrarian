@@ -236,6 +236,28 @@ class WebAppTests(unittest.TestCase):
 
             self.assertEqual(error.exception.code, 403)
 
+    def test_plan_save_endpoint_writes_plan_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "report.pdf").write_text("content", encoding="utf-8")
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                request = Request(f"http://{host}:{port}/api/plan/save", data=b"{}", method="POST")
+                payload = json.loads(urlopen(request, timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            plan_path = Path(payload["path"])
+            self.assertTrue(plan_path.exists())
+            self.assertEqual(plan_path.parent, root / ".thelibrarian" / "plans")
+            self.assertEqual(payload["plan"]["entries"][0]["destination"], "Documents/Reports/report.pdf")
+
 
 if __name__ == "__main__":
     unittest.main()
