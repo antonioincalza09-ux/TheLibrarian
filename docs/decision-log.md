@@ -17,3 +17,11 @@
 - Chose a filesystem-based Job Engine under `.thelibrarian/jobs/<job_id>/` instead of a database for the first autonomy step.
 - Chose synchronous checkpointed job runs before adding daemons, watchers, schedulers, or background threads.
 - Chose append-only NDJSON events and atomic `job.json` replacement to keep jobs auditable and simple to resume later.
+- Chose a minimal policy gate with `dry_run_only` and `supervised_autonomy` before allowing job apply.
+- Chose `policy_decision.json` as the auditable bridge between planning, manual approval, and controlled apply.
+- Chose to keep `Code`, `Apps`, `Archives`, and `Review` out of supervised auto-apply.
+- Chose to evolve the localhost web app into a stdlib-only operations dashboard backed by the same job, policy, executor, and rollback APIs instead of adding a frontend framework for v1.
+- Chose explicit dashboard root switching by path, with confirmation, so the local UI can target a new assigned root without adding browser filesystem permissions.
+- Chose to allow dashboard job-history deletion only inside `.thelibrarian/jobs/`, leaving user files and rollback manifests untouched.
+- Chose deterministic contextual destination planning for skill workspaces so related definitions, source scripts, references, tests, metadata, and loose skill markdown files are grouped under `Skills/<skill>/<function>/` instead of only by file extension.
+- Chose to split `Documents/` into deterministic context subfolders such as `Reports`, `Financial`, `Testing`, `Agents`, `Workflows`, `Knowledge`, `Protocols`, `Manuals`, `Notes`, `Presentations`, `Text`, and `General` to avoid an overly generic document bucket.

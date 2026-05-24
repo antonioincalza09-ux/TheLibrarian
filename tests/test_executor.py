@@ -23,7 +23,7 @@ class ExecutorTests(unittest.TestCase):
             execution = execute_plan(root, plan)
 
             self.assertTrue(source.exists())
-            self.assertFalse((root / "Documents" / "report.pdf").exists())
+            self.assertFalse((root / "Documents" / "Reports" / "report.pdf").exists())
             self.assertTrue(execution.dry_run)
             self.assertIsNone(execution.manifest_path)
             self.assertEqual(execution.applied_count, 0)
@@ -38,7 +38,7 @@ class ExecutorTests(unittest.TestCase):
             inventory = scan_directory(root)
             plan = build_plan(inventory)
             execution = execute_plan(root, plan, dry_run=False)
-            destination = root / "Documents" / "inbox" / "report.pdf"
+            destination = root / "Documents" / "Reports" / "inbox" / "report.pdf"
 
             self.assertFalse(source.exists())
             self.assertTrue(destination.exists())
@@ -50,11 +50,11 @@ class ExecutorTests(unittest.TestCase):
 
             manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(manifest_payload["operations"][0]["source"], "inbox/report.pdf")
-            self.assertEqual(manifest_payload["operations"][0]["destination"], "Documents/inbox/report.pdf")
+            self.assertEqual(manifest_payload["operations"][0]["destination"], "Documents/Reports/inbox/report.pdf")
             self.assertEqual(
                 manifest_payload["operations"][0]["rollback"],
                 {
-                    "source": "Documents/inbox/report.pdf",
+                    "source": "Documents/Reports/inbox/report.pdf",
                     "destination": "inbox/report.pdf",
                 },
             )
@@ -86,7 +86,7 @@ class ExecutorTests(unittest.TestCase):
             rollback_execution = rollback_manifest(root, execution.manifest_path or "", confirm=True)
 
             self.assertTrue(source.exists())
-            self.assertFalse((root / "Documents" / "inbox" / "report.pdf").exists())
+            self.assertFalse((root / "Documents" / "Reports" / "inbox" / "report.pdf").exists())
             self.assertEqual(rollback_execution.applied_count, 1)
 
 

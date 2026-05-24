@@ -14,6 +14,9 @@ The official command is `thelibrarian`. During local development, every command 
 - `serve ROOT --host 127.0.0.1 --port 8765`: starts the local browser preview app.
 - `job create ROOT`: creates a checkpointed job record without scanning.
 - `job run ROOT`: creates and runs a dry-run checkpointed job.
+- `job approve JOB_ID --root ROOT --confirm`: manually approves decisions that require approval.
+- `job apply JOB_ID --root ROOT --confirm`: applies only policy-approved entries.
+- `job rollback JOB_ID --root ROOT --confirm`: rolls back a job manifest.
 - `job status JOB_ID --root ROOT`: prints one job record.
 - `job list ROOT`: lists jobs under a root.
 - `job events JOB_ID --root ROOT`: prints append-only job events.

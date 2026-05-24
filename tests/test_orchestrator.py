@@ -18,9 +18,8 @@ class OrchestratorTests(unittest.TestCase):
             self.assertIn("Files scanned: 1", result.report)
             self.assertIn("Planned moves: 1", result.report)
             self.assertIn("Dry run: True", result.report)
-            self.assertIn("notes.txt -> Documents/notes.txt", result.report)
+            self.assertIn("notes.txt -> Documents/Notes/notes.txt", result.report)
 
 
 if __name__ == "__main__":
     unittest.main()
-

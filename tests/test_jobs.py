@@ -98,10 +98,11 @@ class JobRunnerTests(unittest.TestCase):
             self.assertTrue((job_directory / "job.json").exists())
             self.assertTrue((job_directory / "inventory.json").exists())
             self.assertTrue((job_directory / "plan.json").exists())
+            self.assertTrue((job_directory / "policy_decision.json").exists())
             self.assertTrue((job_directory / "report.txt").exists())
             self.assertTrue((job_directory / "events.ndjson").exists())
             self.assertTrue(source.exists())
-            self.assertFalse((root / "Documents" / "report.pdf").exists())
+            self.assertFalse((root / "Documents" / "Reports" / "report.pdf").exists())
 
     def test_non_dry_run_without_allow_apply_awaits_approval(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
@@ -113,7 +114,55 @@ class JobRunnerTests(unittest.TestCase):
 
             self.assertEqual(job.status, JobStatus.AWAITING_APPROVAL)
             self.assertEqual(job.phase, JobPhase.AWAITING_APPROVAL)
+            self.assertIsNotNone(job.policy_path)
             self.assertTrue(source.exists())
+
+    def test_job_apply_uses_auto_approved_policy_entries_only(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            document = root / "report.pdf"
+            code = root / "script.py"
+            document.write_text("content", encoding="utf-8")
+            code.write_text("print('hello')", encoding="utf-8")
+
+            job = JobRunner(root).run(dry_run=True, policy_name="supervised_autonomy")
+            applied = JobRunner(root).apply(job.job_id)
+
+            self.assertEqual(applied.status, JobStatus.COMPLETED)
+            self.assertTrue((root / "Documents" / "Reports" / "report.pdf").exists())
+            self.assertTrue(code.exists())
+            self.assertFalse((root / "Code" / "script.py").exists())
+            self.assertIsNotNone(applied.manifest_path)
+            self.assertIsNotNone(applied.verification_path)
+
+    def test_job_approve_then_apply_moves_requires_approval_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            job = JobRunner(root).run(dry_run=True)
+            with self.assertRaises(SafetyError):
+                JobRunner(root).apply(job.job_id)
+            approved = JobRunner(root).approve(job.job_id)
+            applied = JobRunner(root).apply(approved.job_id)
+
+            self.assertEqual(applied.status, JobStatus.COMPLETED)
+            self.assertTrue((root / "Documents" / "Reports" / "report.pdf").exists())
+
+    def test_job_rollback_uses_job_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            job = JobRunner(root).run(dry_run=True, policy_name="supervised_autonomy")
+            applied = JobRunner(root).apply(job.job_id)
+            rolled_back = JobRunner(root).rollback(applied.job_id)
+
+            self.assertEqual(rolled_back.status, JobStatus.ROLLED_BACK)
+            self.assertTrue(source.exists())
+            self.assertFalse((root / "Documents" / "Reports" / "report.pdf").exists())
 
     def test_job_root_is_resolved_and_confined(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
@@ -154,6 +203,48 @@ class JobCliTests(unittest.TestCase):
             self.assertEqual(status_payload["status"], "completed")
             self.assertEqual(status_payload["job_id"], payload["job_id"])
 
+    def test_job_apply_requires_confirmation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "report.pdf").write_text("content", encoding="utf-8")
+            run_exit, run_output, _ = run_cli(["job", "run", str(root), "--policy", "supervised_autonomy", "--format", "json"])
+            payload = json.loads(run_output)
+
+            apply_exit, _, stderr = run_cli(["job", "apply", payload["job_id"], "--root", str(root)])
+
+            self.assertEqual(run_exit, 0)
+            self.assertEqual(apply_exit, 2)
+            self.assertIn("--confirm", stderr)
+
+    def test_job_approve_and_apply_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+            _, run_output, _ = run_cli(["job", "run", str(root), "--format", "json"])
+            payload = json.loads(run_output)
+
+            approve_exit, _, _ = run_cli(["job", "approve", payload["job_id"], "--root", str(root), "--confirm"])
+            apply_exit, _, _ = run_cli(["job", "apply", payload["job_id"], "--root", str(root), "--confirm"])
+
+            self.assertEqual(approve_exit, 0)
+            self.assertEqual(apply_exit, 0)
+            self.assertTrue((root / "Documents" / "Reports" / "report.pdf").exists())
+
+    def test_job_rollback_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+            _, run_output, _ = run_cli(["job", "run", str(root), "--policy", "supervised_autonomy", "--format", "json"])
+            payload = json.loads(run_output)
+            run_cli(["job", "apply", payload["job_id"], "--root", str(root), "--confirm"])
+
+            rollback_exit, _, _ = run_cli(["job", "rollback", payload["job_id"], "--root", str(root), "--confirm"])
+
+            self.assertEqual(rollback_exit, 0)
+            self.assertTrue(source.exists())
+
     def test_job_list_shows_created_job(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
@@ -172,4 +263,3 @@ def root_events_path(root: str | Path, job_id: str) -> Path:
 
 if __name__ == "__main__":
     unittest.main()
-

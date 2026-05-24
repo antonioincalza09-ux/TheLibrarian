@@ -13,6 +13,7 @@ TheLibrarian treats user files as valuable and avoids irreversible operations.
 - Existing destination files are never overwritten.
 - Ambiguous or low-confidence files go to `Review/`.
 - Symlinks and `.thelibrarian/` operational files are skipped during scanning.
+- Job apply requires policy approval plus explicit confirmation.
 
 ## Threat Model
 
@@ -21,3 +22,7 @@ Provider output is untrusted. A provider can suggest category, reason, and confi
 Online providers operate in metadata-only mode. They must not receive file contents, snippets, hashes intended to identify private content, or absolute paths.
 
 Execution rechecks every source and destination at apply time because the filesystem may have changed after planning.
+
+## Job Policy Gate
+
+Job autonomy is policy-driven. `dry_run_only` never auto-approves entries. `supervised_autonomy` auto-approves only high-confidence `Documents`, `Media`, and `Data` moves that avoid sensitive directories and collisions. `Code`, `Apps`, `Archives`, and `Review` require manual approval or are blocked.

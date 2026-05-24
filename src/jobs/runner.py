@@ -3,14 +3,18 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.config import RuntimeConfig
-from src.executor import execute_plan
+from src.executor import execute_plan, rollback_manifest
 from src.jobs.models import JobConfig, JobPhase, JobRecord, JobStatus
 from src.jobs.store import JobStore
-from src.jsonio import write_inventory, write_plan
+from src.jsonio import read_plan, write_inventory, write_plan
+from src.models import OrganizationPlan
+from src.policies import approve_required_decisions, default_policy, evaluate_policy, filter_plan_for_policy
+from src.policies.models import PolicyEvaluation
 from src.planner import build_plan
 from src.providers import ProviderContext, get_provider
 from src.reporter import render_plan_report
 from src.scanner import scan_directory
+from src.security import SafetyError
 
 
 class JobRunner:
@@ -74,6 +78,13 @@ class JobRunner:
             plan = build_plan(inventory, provider=provider, context=context)
             plan_path = self.store.artifact_path(active_job.job_id, "plan.json")
             write_plan(plan_path, plan)
+            policy = default_policy(job_config.policy_name)
+            policy_evaluation = evaluate_policy(active_job.root, inventory, plan, policy)
+            policy_path = self.store.write_json_artifact(
+                active_job.job_id,
+                "policy_decision.json",
+                policy_evaluation.to_dict(),
+            )
 
             counters.update(
                 {
@@ -93,6 +104,7 @@ class JobRunner:
                     phase=JobPhase.COMPLETED,
                     message="Dry-run job completed.",
                     plan_path=str(plan_path),
+                    policy_path=str(policy_path),
                     report_path=str(report_path),
                     counters=counters,
                 )
@@ -107,6 +119,7 @@ class JobRunner:
                     phase=JobPhase.AWAITING_APPROVAL,
                     message="Plan awaits explicit approval before apply.",
                     plan_path=str(plan_path),
+                    policy_path=str(policy_path),
                     report_path=str(report_path),
                     counters=counters,
                 )
@@ -117,13 +130,39 @@ class JobRunner:
                 phase=JobPhase.APPLYING,
                 message="Applying approved plan.",
                 plan_path=str(plan_path),
+                policy_path=str(policy_path),
                 counters=counters,
             )
-            execution = execute_plan(active_job.root, plan, dry_run=False)
+            approved_plan = filter_plan_for_policy(plan, policy_evaluation)
+            if not approved_plan.entries:
+                report = render_plan_report(inventory, plan)
+                report_path = self.store.artifact_path(active_job.job_id, "report.txt")
+                report_path.write_text(report, encoding="utf-8")
+                return self.store.update(
+                    active_job.job_id,
+                    status=JobStatus.AWAITING_APPROVAL,
+                    phase=JobPhase.AWAITING_APPROVAL,
+                    message="No policy-approved entries are available to apply.",
+                    plan_path=str(plan_path),
+                    policy_path=str(policy_path),
+                    report_path=str(report_path),
+                    counters=counters,
+                )
+            execution = execute_plan(active_job.root, approved_plan, dry_run=False)
             counters.update({"applied": execution.applied_count, "verified": execution.applied_count})
             report = render_plan_report(inventory, plan, execution)
             report_path = self.store.artifact_path(active_job.job_id, "report.txt")
             report_path.write_text(report, encoding="utf-8")
+            verification_path = self.store.write_json_artifact(
+                active_job.job_id,
+                "verification.json",
+                {
+                    "job_id": active_job.job_id,
+                    "manifest_path": execution.manifest_path,
+                    "applied": execution.applied_count,
+                    "warnings": list(execution.warnings),
+                },
+            )
             return self.store.update(
                 active_job.job_id,
                 status=JobStatus.COMPLETED,
@@ -131,6 +170,7 @@ class JobRunner:
                 message="Approved job completed.",
                 manifest_path=execution.manifest_path,
                 report_path=str(report_path),
+                verification_path=str(verification_path),
                 counters=counters,
             )
         except Exception as exc:
@@ -142,3 +182,94 @@ class JobRunner:
                 error=str(exc),
             )
 
+    def approve(self, job_id: str) -> JobRecord:
+        job = self.store.load(job_id)
+        evaluation = self._load_policy_evaluation(job)
+        approved = approve_required_decisions(evaluation)
+        policy_path = self.store.write_json_artifact(job.job_id, "policy_decision.json", approved.to_dict())
+        return self.store.update(
+            job.job_id,
+            status=JobStatus.AWAITING_APPROVAL,
+            phase=JobPhase.AWAITING_APPROVAL,
+            message="Policy decisions manually approved.",
+            policy_path=str(policy_path),
+        )
+
+    def apply(self, job_id: str) -> JobRecord:
+        job = self.store.load(job_id)
+        plan = self._load_plan(job)
+        evaluation = self._load_policy_evaluation(job)
+        approved_plan = filter_plan_for_policy(plan, evaluation)
+        if not approved_plan.entries:
+            raise SafetyError("No policy-approved entries are available to apply.")
+
+        self.store.update(
+            job.job_id,
+            status=JobStatus.APPLYING,
+            phase=JobPhase.APPLYING,
+            message="Applying policy-approved job entries.",
+        )
+        execution = execute_plan(job.root, approved_plan, dry_run=False)
+        counters = dict(job.counters)
+        counters.update({"applied": execution.applied_count, "verified": execution.applied_count})
+        verification_path = self.store.write_json_artifact(
+            job.job_id,
+            "verification.json",
+            {
+                "job_id": job.job_id,
+                "manifest_path": execution.manifest_path,
+                "applied": execution.applied_count,
+                "warnings": list(execution.warnings),
+            },
+        )
+        return self.store.update(
+            job.job_id,
+            status=JobStatus.COMPLETED,
+            phase=JobPhase.COMPLETED,
+            message="Policy-approved job apply completed.",
+            manifest_path=execution.manifest_path,
+            verification_path=str(verification_path),
+            counters=counters,
+        )
+
+    def rollback(self, job_id: str) -> JobRecord:
+        job = self.store.load(job_id)
+        if not job.manifest_path:
+            raise SafetyError("Job has no manifest to rollback.")
+
+        self.store.update(
+            job.job_id,
+            status=JobStatus.APPLYING,
+            phase=JobPhase.APPLYING,
+            message="Rolling back job manifest.",
+        )
+        execution = rollback_manifest(job.root, job.manifest_path, confirm=True)
+        counters = dict(job.counters)
+        counters.update({"applied": max(counters.get("applied", 0) - execution.applied_count, 0)})
+        verification_path = self.store.write_json_artifact(
+            job.job_id,
+            "rollback_verification.json",
+            {
+                "job_id": job.job_id,
+                "rolled_back": execution.applied_count,
+                "warnings": list(execution.warnings),
+            },
+        )
+        return self.store.update(
+            job.job_id,
+            status=JobStatus.ROLLED_BACK,
+            phase=JobPhase.ROLLED_BACK,
+            message="Job rollback completed.",
+            verification_path=str(verification_path),
+            counters=counters,
+        )
+
+    def _load_plan(self, job: JobRecord) -> OrganizationPlan:
+        if not job.plan_path:
+            raise SafetyError("Job has no plan artifact.")
+        return read_plan(job.plan_path)
+
+    def _load_policy_evaluation(self, job: JobRecord) -> PolicyEvaluation:
+        if not job.policy_path:
+            raise SafetyError("Job has no policy decision artifact.")
+        return PolicyEvaluation.from_dict(self.store.read_json_artifact(job.job_id, "policy_decision.json"))

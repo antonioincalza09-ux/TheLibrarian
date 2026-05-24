@@ -126,8 +126,10 @@ class JobRecord:
     policy_name: str | None = None
     inventory_path: str | None = None
     plan_path: str | None = None
+    policy_path: str | None = None
     manifest_path: str | None = None
     report_path: str | None = None
+    verification_path: str | None = None
     error: str | None = None
     counters: dict[str, int] = field(default_factory=dict)
 
@@ -144,8 +146,10 @@ class JobRecord:
             "policy_name": self.policy_name,
             "inventory_path": self.inventory_path,
             "plan_path": self.plan_path,
+            "policy_path": self.policy_path,
             "manifest_path": self.manifest_path,
             "report_path": self.report_path,
+            "verification_path": self.verification_path,
             "error": self.error,
             "counters": dict(self.counters),
         }
@@ -186,9 +190,10 @@ class JobRecord:
             policy_name=None if payload.get("policy_name") is None else str(payload["policy_name"]),
             inventory_path=None if payload.get("inventory_path") is None else str(payload["inventory_path"]),
             plan_path=None if payload.get("plan_path") is None else str(payload["plan_path"]),
+            policy_path=None if payload.get("policy_path") is None else str(payload["policy_path"]),
             manifest_path=None if payload.get("manifest_path") is None else str(payload["manifest_path"]),
             report_path=None if payload.get("report_path") is None else str(payload["report_path"]),
+            verification_path=None if payload.get("verification_path") is None else str(payload["verification_path"]),
             error=None if payload.get("error") is None else str(payload["error"]),
             counters={str(key): int(value) for key, value in dict(payload.get("counters", {})).items()},
         )
-
