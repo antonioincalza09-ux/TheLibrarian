@@ -10,6 +10,7 @@ TheLibrarian is organized around a small safety-first core.
 4. `reporter` renders human-readable and JSON artifacts.
 5. `executor` applies saved plans and writes rollback manifests.
 6. `webapp` exposes local preview endpoints backed by the same core.
+7. `jobs` records checkpointed scan/plan/report work under `.thelibrarian/jobs/<job_id>/`.
 
 ## Provider Interface
 
@@ -22,3 +23,5 @@ The planner rejects unknown sources, unknown categories, invalid confidence valu
 - Inventory JSON uses `Inventory.to_dict()`.
 - Plan JSON uses `OrganizationPlan.to_dict()` and includes `provider`.
 - Execution manifests include app version, root, operations, rollback paths, and skipped entries.
+- Job JSON uses `JobRecord.to_dict()` and is updated atomically by the filesystem `JobStore`.
+- Job events are append-only NDJSON lines in `events.ndjson`.

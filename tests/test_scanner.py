@@ -15,6 +15,8 @@ class ScannerTests(unittest.TestCase):
             (root / "inbox" / "report.pdf").write_text("content", encoding="utf-8")
             (root / ".the_librarian" / "manifests").mkdir(parents=True, exist_ok=True)
             (root / ".the_librarian" / "manifests" / "rollback.json").write_text("{}", encoding="utf-8")
+            (root / ".thelibrarian" / "jobs" / "example").mkdir(parents=True, exist_ok=True)
+            (root / ".thelibrarian" / "jobs" / "example" / "job.json").write_text("{}", encoding="utf-8")
 
             inventory = scan_directory(root)
 
