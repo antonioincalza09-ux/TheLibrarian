@@ -7,7 +7,7 @@ from src.policy_packs.models import PolicyPack, PolicyPackRule
 def builtin_policy_packs() -> list[PolicyPack]:
     return [
         PolicyPack(
-            pack_id="local_safe_review",
+            id="local_safe_review",
             name="Local Safe Review",
             version="0.1.0",
             description="Strict local pack that keeps all planned moves human-reviewed.",
@@ -28,7 +28,7 @@ def builtin_policy_packs() -> list[PolicyPack]:
             created_at="2026-05-25T00:00:00+00:00",
         ),
         PolicyPack(
-            pack_id="supervised_documents",
+            id="supervised_documents",
             name="Supervised Documents",
             version="0.1.0",
             description="Local supervised-autonomy pack for high-confidence Documents, Media, and Data moves.",

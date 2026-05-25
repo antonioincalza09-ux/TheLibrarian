@@ -38,6 +38,34 @@ def diagnose_provider(
     if normalized == "openai-compatible":
         return _diagnose_openai_compatible(active_context, required=required)
 
+    if normalized == "remote-compatible":
+        return _diagnose_remote(
+            active_context,
+            required=required,
+            provider_label="remote-compatible",
+            default_endpoint="",
+            default_model="",
+            default_api_key_env="THELIBRARIAN_REMOTE_API_KEY",
+            endpoint_env="THELIBRARIAN_REMOTE_ENDPOINT",
+            model_env="THELIBRARIAN_REMOTE_MODEL",
+            api_key_env_env="THELIBRARIAN_REMOTE_API_KEY_ENV",
+            timeout_env="THELIBRARIAN_REMOTE_TIMEOUT_SECONDS",
+        )
+
+    if normalized == "antonio-managed":
+        return _diagnose_remote(
+            active_context,
+            required=required,
+            provider_label="antonio-managed",
+            default_endpoint="https://api.thelibrarian.example/v1",
+            default_model="managed-classifier",
+            default_api_key_env="THELIBRARIAN_MANAGED_API_KEY",
+            endpoint_env="THELIBRARIAN_MANAGED_ENDPOINT",
+            model_env="THELIBRARIAN_MANAGED_MODEL",
+            api_key_env_env="THELIBRARIAN_MANAGED_API_KEY_ENV",
+            timeout_env="THELIBRARIAN_MANAGED_TIMEOUT_SECONDS",
+        )
+
     return [DiagnosticCheck("provider", "error", f"unknown provider: {provider_name}")]
 
 
@@ -131,4 +159,49 @@ def _diagnose_openai_compatible(context: ProviderContext, *, required: bool) -> 
                 "OpenAI-compatible endpoint responded, but /models did not return a data list.",
             )
         )
+    return checks
+
+
+def _diagnose_remote(
+    context: ProviderContext,
+    *,
+    required: bool,
+    provider_label: str,
+    default_endpoint: str,
+    default_model: str,
+    default_api_key_env: str,
+    endpoint_env: str,
+    model_env: str,
+    api_key_env_env: str,
+    timeout_env: str,
+) -> list[DiagnosticCheck]:
+    endpoint = context.endpoint or os.getenv(endpoint_env, default_endpoint)
+    model = context.model or os.getenv(model_env, default_model)
+    api_key_env = os.getenv(api_key_env_env) or default_api_key_env
+    api_key = os.getenv(api_key_env) or os.getenv("OPENAI_API_KEY")
+    timeout = os.getenv(timeout_env, "20")
+    checks = [
+        DiagnosticCheck("provider", "ok", f"{provider_label} provider is available."),
+        DiagnosticCheck("privacy", "ok", "metadata-only payload is enforced; file contents and absolute paths are not sent."),
+    ]
+
+    checks.append(
+        DiagnosticCheck("endpoint", "ok" if endpoint else _failure_status(required), endpoint or f"{endpoint_env} is not set.")
+    )
+    checks.append(DiagnosticCheck("model", "ok" if model else _failure_status(required), model or f"{model_env} is not set."))
+    checks.append(DiagnosticCheck("api_key_env", "ok", api_key_env))
+    checks.append(
+        DiagnosticCheck(
+            "api_key",
+            "ok" if api_key else _failure_status(required),
+            "API key is present." if api_key else f"{api_key_env} is not set.",
+        )
+    )
+    try:
+        seconds = int(timeout)
+        timeout_status = "ok" if seconds > 0 else _failure_status(required)
+    except ValueError:
+        timeout_status = _failure_status(required)
+    checks.append(DiagnosticCheck("timeout", timeout_status, f"{timeout} second(s)"))
+    checks.append(DiagnosticCheck("reachability", "warning", "Remote reachability is not checked by doctor to avoid mandatory cloud calls."))
     return checks

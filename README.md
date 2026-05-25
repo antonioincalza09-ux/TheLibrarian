@@ -66,6 +66,10 @@ thelibrarian apply "C:\path\to\target" --plan plan.json --confirm
 thelibrarian rollback "C:\path\to\target" --manifest rollback.json --confirm
 thelibrarian providers list
 thelibrarian providers doctor --provider ollama
+thelibrarian packs list
+thelibrarian packs show studio_legale
+thelibrarian job run "C:\path\to\target" --pack studio_legale --provider deterministic
+thelibrarian managed start "C:\path\to\target" --client "Acme SRL" --operator "Antonio" --pack studio_legale
 thelibrarian doctor "C:\path\to\target"
 thelibrarian serve "C:\path\to\target" --host 127.0.0.1 --port 8765
 thelibrarian job run "C:\path\to\target" --policy supervised_autonomy
@@ -96,9 +100,28 @@ See `docs/cli.md` for the full command reference.
 
 ## Providers
 
-The deterministic provider is always available. Optional providers can be configured for local Ollama or OpenAI-compatible APIs, while the deterministic rules remain the fallback.
+The deterministic provider is always available. Optional providers can be configured for local Ollama, OpenAI-compatible APIs, generic remote-compatible APIs, or the future `antonio-managed` service stub. The deterministic rules remain the fallback.
 
-Use `thelibrarian providers doctor --provider PROVIDER` for provider-specific checks. Ollama diagnostics probe `/api/tags`; OpenAI-compatible diagnostics check `OPENAI_API_KEY` and probe `/models` without creating completions.
+Use `thelibrarian providers doctor --provider PROVIDER` for provider-specific checks. Ollama diagnostics probe `/api/tags`; OpenAI-compatible diagnostics check `OPENAI_API_KEY` and probe `/models`; remote diagnostics validate endpoint, model, API-key environment name, timeout, and metadata-only posture without requiring a cloud call.
+
+## Policy Packs And Managed Cleanup
+
+Policy packs live in `data/policy_packs/` as JSON. They define vertical templates, recommended policy mode, KPI targets, and managed-service recommendations without hardcoding industries in Python.
+
+```powershell
+thelibrarian packs list
+thelibrarian packs recommend --industry healthcare
+thelibrarian packs export studio_legale --output studio_legale.json
+thelibrarian packs validate studio_legale.json
+```
+
+Managed cleanup creates a dry-run job, saves `policy_pack.json`, calculates KPI, and writes a client-readable report under `.thelibrarian/managed/<session_id>/`. It does not move files.
+
+```powershell
+thelibrarian managed start "C:\path\to\target" --client "Acme SRL" --operator "Antonio" --pack studio_legale
+thelibrarian managed list "C:\path\to\target"
+thelibrarian managed show SESSION_ID --root "C:\path\to\target"
+```
 
 ## Suggested First Milestone
 

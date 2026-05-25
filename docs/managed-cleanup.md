@@ -1,41 +1,58 @@
 # Managed Cleanup
 
-Managed Cleanup is a local, file-based foundation for future managed cleanup service workflows. It is not a beta service and does not call external infrastructure.
+Managed Cleanup is the filesystem-based foundation for offering TheLibrarian as an assisted cleanup service. It remains local and dry-run first.
 
-## Preview Command
+## Managed Session Workflow
 
-```bash
-thelibrarian cleanup preview C:\target --policy-pack supervised_documents
+```powershell
+thelibrarian managed start ROOT --client "Acme SRL" --operator "Antonio" --pack studio_legale
+thelibrarian managed list ROOT
+thelibrarian managed show SESSION_ID --root ROOT
+thelibrarian managed report SESSION_ID --root ROOT
 ```
 
-The command scans the root, builds a plan, evaluates the selected Policy Pack, computes KPI, and writes a human-readable report. It is dry-run only and does not move files.
+`managed start` creates a dry-run job, attaches a policy pack, calculates KPI, and writes reports. It never moves user files.
 
-## Artifacts
+Managed sessions are stored under:
 
-Each session is written under:
+```text
+.thelibrarian/managed/<session_id>/
+  session.json
+  report.json
+  report.md
+```
+
+The related job remains under `.thelibrarian/jobs/<job_id>/` and contains inventory, plan, policy decision, policy pack, report, and events.
+
+## Cleanup Preview Compatibility
+
+The earlier local cleanup preview workflow remains available:
+
+```powershell
+thelibrarian cleanup preview ROOT --policy-pack supervised_documents
+thelibrarian cleanup list ROOT
+thelibrarian cleanup status SESSION_ID --root ROOT
+thelibrarian cleanup report SESSION_ID --root ROOT
+```
+
+Cleanup preview sessions are written under:
 
 ```text
 .thelibrarian/managed-cleanups/<session_id>/
 ```
 
-Artifacts:
-
-- `cleanup_session.json`: session state and artifact paths.
-- `inventory.json`: metadata-only scan result.
-- `plan.json`: generated organization plan.
-- `policy_decision.json`: policy gate output.
-- `kpi.json`: operational KPI snapshot.
-- `policy_pack.json`: policy pack used for the run.
-- `report.txt`: operator-readable summary.
+They include `cleanup_session.json`, `inventory.json`, `plan.json`, `policy_decision.json`, `kpi.json`, `policy_pack.json`, and `report.txt`.
 
 ## KPI
 
-Current KPI include scanned files, total bytes, planned entries, review entries, conflicts, auto-approved entries, entries requiring approval, blocked entries, and rates for auto approval, review, and blocking.
+The managed KPI includes files scanned, bytes scanned, planned moves, auto-approved moves, manual review moves, blocked moves, conflicts, already-organized count, applied moves, verified moves, rollback availability, safety score, organization score, automation score, risk score, and estimated minutes saved.
 
-## Limits
+Scores are deterministic and model-free. They are meant for operational triage and client reporting, not legal/compliance guarantees.
 
-- No cloud service.
-- No telemetry.
-- No authentication or billing.
-- No background daemon.
-- No apply behavior. Use existing job/apply workflows when explicit confirmed apply is needed.
+## Safety
+
+- Managed sessions are dry-run only in this version.
+- No file contents are modified.
+- No file contents are sent to providers.
+- Apply still uses the existing explicit confirmation and rollback manifest workflow.
+- Session IDs are validated to block path traversal.

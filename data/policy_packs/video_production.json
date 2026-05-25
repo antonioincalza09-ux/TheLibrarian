@@ -1,0 +1,17 @@
+{
+  "id": "video_production",
+  "name": "Video Production",
+  "version": "0.1.0",
+  "industry": "creative",
+  "description": "Policy pack for video projects, footage, scripts, and exports.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Projects", "Raw footage", "Edited media", "Exports", "Scripts"],
+  "categories": ["Media", "Documents", "Archives", "Review"],
+  "folder_templates": ["Media/Projects/", "Media/RawFootage/", "Media/Edited/", "Media/Exports/", "Documents/Scripts/", "Documents/Clients/", "Documents/Contracts/", "Archives/CompletedProjects/", "Review/Unsorted/"],
+  "naming_conventions": [{"name": "Video asset", "pattern": "{client}_{project}_{asset_type}_{yyyy-mm-dd}", "example": "acme_launch_export_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 65, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "real_estate_agency",
+  "name": "Real Estate Agency",
+  "version": "0.1.0",
+  "industry": "real_estate",
+  "description": "Policy pack for property, client, and deal documentation.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Properties", "Clients", "Contracts", "Inspections", "Closed deals"],
+  "categories": ["Documents", "Media", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Properties/", "Documents/Clients/", "Documents/Contracts/", "Documents/Inspections/", "Documents/Mortgages/", "Media/PropertyPhotos/", "Data/Listings/", "Archives/ClosedDeals/", "Review/NeedsHumanReview/"],
+  "naming_conventions": [{"name": "Property document", "pattern": "{property}_{document_type}_{yyyy-mm-dd}", "example": "via_roma_10_contract_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 65, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

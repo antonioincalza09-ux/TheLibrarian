@@ -11,10 +11,26 @@ POLICY_PACK_DIRECTORY = Path(".thelibrarian") / "policy-packs"
 
 
 def load_policy_pack(path: str | Path) -> PolicyPack:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    pack_path = Path(path)
+    try:
+        payload = json.loads(pack_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Invalid policy pack JSON: {pack_path}") from exc
     if not isinstance(payload, dict):
-        raise ValueError("Policy pack file must contain a JSON object.")
-    return PolicyPack.from_dict(payload)
+        raise ValueError(f"Policy pack must be a JSON object: {pack_path}")
+    try:
+        return PolicyPack.from_dict(payload)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"Malformed policy pack {pack_path}: {exc}") from exc
+
+
+def load_policy_packs_from_directory(path: str | Path) -> list[PolicyPack]:
+    directory = Path(path)
+    if not directory.exists():
+        raise ValueError(f"Policy pack directory does not exist: {directory}")
+    if not directory.is_dir():
+        raise ValueError(f"Policy pack path is not a directory: {directory}")
+    return [load_policy_pack(pack_path) for pack_path in sorted(directory.glob("*.json"))]
 
 
 def load_local_policy_packs(root: str | Path | None = None) -> list[PolicyPack]:
@@ -31,20 +47,8 @@ def load_local_policy_packs(root: str | Path | None = None) -> list[PolicyPack]:
             pack = load_policy_pack(path)
         except (json.JSONDecodeError, KeyError, TypeError, ValueError):
             continue
-        packs.append(
-            PolicyPack(
-                pack_id=pack.pack_id,
-                name=pack.name,
-                version=pack.version,
-                description=pack.description,
-                policy=pack.policy,
-                tags=pack.tags,
-                rules=pack.rules,
-                kpi_targets=pack.kpi_targets,
-                source="local",
-                created_at=pack.created_at,
-            )
-        )
+        pack.source = "local"
+        packs.append(pack)
     return packs
 
 

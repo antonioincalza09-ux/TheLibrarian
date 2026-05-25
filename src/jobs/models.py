@@ -42,6 +42,7 @@ class JobConfig:
     model: str = ""
     endpoint: str = ""
     policy_name: str | None = None
+    pack_id: str | None = None
     privacy_mode: str = "metadata-only"
 
     def to_dict(self) -> dict[str, Any]:
@@ -52,6 +53,7 @@ class JobConfig:
             "model": self.model,
             "endpoint": self.endpoint,
             "policy_name": self.policy_name,
+            "pack_id": self.pack_id,
             "privacy_mode": self.privacy_mode,
         }
 
@@ -64,6 +66,7 @@ class JobConfig:
             model=str(payload.get("model", "")),
             endpoint=str(payload.get("endpoint", "")),
             policy_name=None if payload.get("policy_name") is None else str(payload["policy_name"]),
+            pack_id=None if payload.get("pack_id") is None else str(payload["pack_id"]),
             privacy_mode=str(payload.get("privacy_mode", "metadata-only")),
         )
 
@@ -124,6 +127,7 @@ class JobRecord:
     dry_run: bool
     provider: str
     policy_name: str | None = None
+    pack_id: str | None = None
     inventory_path: str | None = None
     plan_path: str | None = None
     policy_path: str | None = None
@@ -144,6 +148,7 @@ class JobRecord:
             "dry_run": self.dry_run,
             "provider": self.provider,
             "policy_name": self.policy_name,
+            "pack_id": self.pack_id,
             "inventory_path": self.inventory_path,
             "plan_path": self.plan_path,
             "policy_path": self.policy_path,
@@ -155,7 +160,15 @@ class JobRecord:
         }
 
     @classmethod
-    def create(cls, *, root: str, dry_run: bool = True, provider: str = "deterministic", policy_name: str | None = None) -> "JobRecord":
+    def create(
+        cls,
+        *,
+        root: str,
+        dry_run: bool = True,
+        provider: str = "deterministic",
+        policy_name: str | None = None,
+        pack_id: str | None = None,
+    ) -> "JobRecord":
         now = utc_now_iso()
         return cls(
             job_id=uuid4().hex,
@@ -167,6 +180,7 @@ class JobRecord:
             dry_run=dry_run,
             provider=provider,
             policy_name=policy_name,
+            pack_id=pack_id,
             counters={
                 "scanned": 0,
                 "planned": 0,
@@ -188,6 +202,7 @@ class JobRecord:
             dry_run=bool(payload.get("dry_run", True)),
             provider=str(payload.get("provider", "deterministic")),
             policy_name=None if payload.get("policy_name") is None else str(payload["policy_name"]),
+            pack_id=None if payload.get("pack_id") is None else str(payload["pack_id"]),
             inventory_path=None if payload.get("inventory_path") is None else str(payload["inventory_path"]),
             plan_path=None if payload.get("plan_path") is None else str(payload["plan_path"]),
             policy_path=None if payload.get("policy_path") is None else str(payload["policy_path"]),

@@ -1,0 +1,17 @@
+{
+  "id": "medical_clinic",
+  "name": "Medical Clinic",
+  "version": "0.1.0",
+  "industry": "healthcare",
+  "description": "Policy pack for healthcare clinics with sensitive patient workflows.",
+  "tier": "managed_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Patients", "Appointments", "Billing", "Insurance", "Compliance"],
+  "categories": ["Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Patients/", "Documents/Appointments/", "Documents/Billing/", "Documents/Insurance/", "Documents/Compliance/", "Data/MedicalExports/", "Archives/OldRecords/", "Review/SensitiveReview/"],
+  "naming_conventions": [{"name": "Patient document", "pattern": "{patient_id}_{document_type}_{yyyy-mm-dd}", "example": "p12345_insurance_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 15, "target_automation_percent": 50, "risk_tolerance": "low"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

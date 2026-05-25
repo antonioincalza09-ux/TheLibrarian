@@ -10,8 +10,11 @@ from src.config import RuntimeConfig
 from src.executor import execute_plan
 from src.jobs import JobRunner, JobStore
 from src.jsonio import read_plan
+from src.managed import load_managed_session, list_managed_sessions, start_managed_cleanup
+from src.policy_packs import get_policy_pack, list_policy_packs, recommend_policy_packs
 from src.planner import build_plan
-from src.providers import ProviderContext, get_provider
+from src.providers import ProviderContext, available_providers, get_provider
+from src.providers.diagnostics import diagnose_provider
 from src.reporter import write_plan_artifact
 from src.scanner import scan_directory
 from src.security import SafetyError, resolve_root
@@ -116,6 +119,9 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 "active_policy": active_policy,
                 "active_events": active_events,
                 "active_manifest": active_manifest,
+                "packs": [pack.to_dict() for pack in list_policy_packs()],
+                "managed_sessions": [session.to_dict() for session in list_managed_sessions(resolved_root)],
+                "providers": _providers_payload(config),
             }
 
         def _read_root_artifact(self, artifact_path: str) -> dict[str, object]:
@@ -156,6 +162,35 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     return
                 if parsed.path == "/api/plan":
                     self._json(200, self._plan())
+                    return
+                if parsed.path == "/api/packs":
+                    self._json(200, {"packs": [pack.to_dict() for pack in list_policy_packs()]})
+                    return
+                if parsed.path.startswith("/api/packs/recommend"):
+                    query = parse_qs(parsed.query)
+                    industry = query.get("industry", [""])[0]
+                    self._json(200, {"industry": industry, "packs": [pack.to_dict() for pack in recommend_policy_packs(industry)]})
+                    return
+                if parsed.path.startswith("/api/packs/"):
+                    pack_id = parsed.path.removeprefix("/api/packs/").strip("/")
+                    self._json(200, get_policy_pack(pack_id).to_dict())
+                    return
+                if parsed.path == "/api/managed":
+                    self._json(200, {"sessions": [session.to_dict() for session in list_managed_sessions(self._root())]})
+                    return
+                if parsed.path.startswith("/api/managed/"):
+                    session_id = parsed.path.removeprefix("/api/managed/").strip("/")
+                    self._json(200, load_managed_session(self._root(), session_id).to_dict())
+                    return
+                if parsed.path == "/api/providers":
+                    self._json(200, _providers_payload(config))
+                    return
+                if parsed.path == "/api/providers/doctor":
+                    query = parse_qs(parsed.query)
+                    provider_name = query.get("provider", [config.provider])[0]
+                    context = ProviderContext(model=config.model, endpoint=config.endpoint, privacy_mode=config.privacy_mode)
+                    checks = [check.to_dict() for check in diagnose_provider(provider_name, context, required=False)]
+                    self._json(200, {"provider": provider_name, "checks": checks})
                     return
                 if parsed.path == "/api/jobs":
                     self._json(200, {"jobs": [job.to_dict() for job in JobStore(self._root()).list()]})
@@ -216,14 +251,36 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
 
                 if parsed.path == "/api/jobs/create":
                     policy = str(body.get("policy", "dry_run_only"))
-                    job = JobRunner(self._root(), config=config).create_job(dry_run=True, policy_name=policy)
+                    pack_id = body.get("pack")
+                    job = JobRunner(self._root(), config=config).create_job(
+                        dry_run=True,
+                        policy_name=policy,
+                        pack_id=str(pack_id) if pack_id else None,
+                    )
                     self._json(200, job.to_dict())
                     return
 
                 if parsed.path == "/api/jobs/run":
                     policy = str(body.get("policy", "dry_run_only"))
-                    job = JobRunner(self._root(), config=config).run(dry_run=True, policy_name=policy)
+                    pack_id = body.get("pack")
+                    job = JobRunner(self._root(), config=config).run(
+                        dry_run=True,
+                        policy_name=policy,
+                        pack_id=str(pack_id) if pack_id else None,
+                    )
                     self._json(200, job.to_dict())
+                    return
+
+                if parsed.path == "/api/managed/start":
+                    self._confirm(query, "Managed cleanup start")
+                    session = start_managed_cleanup(
+                        self._root(),
+                        client_name=str(body.get("client_name", "Client")),
+                        operator_name=str(body.get("operator_name", "Operator")),
+                        pack_id=str(body.get("pack_id", "general_office")),
+                        config=config,
+                    )
+                    self._json(200, session.to_dict())
                     return
 
                 if parsed.path == "/api/jobs/delete-all":
@@ -272,6 +329,17 @@ def _build_current_plan(root: Path, config: RuntimeConfig):
         privacy_mode=config.privacy_mode,
     )
     return build_plan(inventory, provider=provider, context=context)
+
+
+def _providers_payload(config: RuntimeConfig) -> dict[str, object]:
+    return {
+        "active": config.provider,
+        "model": config.model,
+        "endpoint": config.endpoint,
+        "privacy_mode": config.privacy_mode,
+        "available": available_providers(),
+        "notice": "No file contents are sent. Online providers receive metadata only.",
+    }
 
 
 def serve(root: str | Path, *, host: str, port: int, config: RuntimeConfig) -> None:
@@ -655,6 +723,9 @@ def _page() -> str:
         <button type="button" data-view="review">Review</button>
         <button type="button" data-view="warnings">Warnings</button>
         <button type="button" data-view="jobs">Jobs</button>
+        <button type="button" data-view="packs">Policy Packs</button>
+        <button type="button" data-view="managed">Managed Cleanup</button>
+        <button type="button" data-view="providers">Providers</button>
         <button type="button" data-view="policy">Policy</button>
         <button type="button" data-view="events">Events</button>
         <button type="button" data-view="manifest">Manifest</button>
@@ -671,6 +742,8 @@ def _page() -> str:
           <option value="dry_run_only">dry_run_only</option>
           <option value="supervised_autonomy">supervised_autonomy</option>
         </select>
+        <h3 style="margin-top:14px">Policy Pack</h3>
+        <select id="packSelect" aria-label="Policy pack"></select>
         <p class="subtle" style="margin:10px 0 0">Dry-run remains the default. Apply and rollback always require confirmation.</p>
       </div>
     </aside>
@@ -751,6 +824,40 @@ def _page() -> str:
             <div class="panel-header"><div><h2>Job Record</h2><p class="subtle">Selected job JSON.</p></div></div>
             <pre id="jobJson">{}</pre>
           </div>
+        </div>
+      </section>
+      <section class="view" data-view-panel="packs">
+        <div class="panel">
+          <div class="panel-header">
+            <div><h2>Policy Packs</h2><p class="subtle">Data-driven vertical packs. Select one before creating a job or managed cleanup session.</p></div>
+          </div>
+          <div class="table-wrap"><table id="packsTable"></table></div>
+        </div>
+      </section>
+      <section class="view" data-view-panel="managed">
+        <div class="layout">
+          <div class="panel">
+            <div class="panel-header">
+              <div><h2>Managed Cleanup</h2><p class="subtle">Dry-run service sessions with KPI and client-readable reports.</p></div>
+              <div class="panel-actions"><button type="button" class="button-primary" id="startManagedBtn">Start Managed Session</button></div>
+            </div>
+            <div class="kv"><strong>Client</strong><input id="managedClientInput" type="text" value="Demo Client"></div>
+            <div class="kv"><strong>Operator</strong><input id="managedOperatorInput" type="text" value="Antonio"></div>
+            <p class="subtle">No file contents are sent. This action creates a dry-run job and report artifacts only.</p>
+            <div class="table-wrap"><table id="managedTable"></table></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><h2>KPI</h2><p class="subtle">Latest managed session metrics.</p></div></div>
+            <pre id="managedKpiJson">{}</pre>
+          </div>
+        </div>
+      </section>
+      <section class="view" data-view-panel="providers">
+        <div class="panel">
+          <div class="panel-header">
+            <div><h2>Providers</h2><p class="subtle" id="providerNotice">No file contents are sent.</p></div>
+          </div>
+          <div class="table-wrap"><table id="providersTable"></table></div>
         </div>
       </section>
       <section class="view" data-view-panel="review">
@@ -922,6 +1029,9 @@ def _page() -> str:
       renderPlanTables(plan);
       renderInventory(inventory);
       renderJobs(jobs, selected);
+      renderPacks(dashboard.packs || []);
+      renderManaged(dashboard.managed_sessions || []);
+      renderProviders(dashboard.providers || {});
       renderReview(plan);
       renderWarnings(inventory, plan);
       renderPolicy();
@@ -969,6 +1079,42 @@ def _page() -> str:
         render();
       }));
       $('#jobJson').textContent = selected ? JSON.stringify(selected, null, 2) : '{}';
+    }
+    function renderPacks(packs) {
+      const select = $('#packSelect');
+      const selected = select.value || 'general_office';
+      select.innerHTML = packs.map(pack => `<option value="${escapeHtml(pack.id)}">${escapeHtml(pack.name)} (${escapeHtml(pack.industry)})</option>`).join('');
+      if (packs.some(pack => pack.id === selected)) select.value = selected;
+      const rows = packs.map(pack => [
+        escapeHtml(pack.id),
+        escapeHtml(pack.industry),
+        badge(pack.tier),
+        escapeHtml(pack.name),
+        escapeHtml(pack.recommended_policy),
+      ]);
+      $('#packsTable').innerHTML = table(['Pack', 'Industry', 'Tier', 'Name', 'Policy'], rows);
+    }
+    function renderManaged(sessions) {
+      const rows = sessions.map(session => [
+        escapeHtml(session.session_id),
+        badge(session.stage),
+        escapeHtml(session.client_name),
+        escapeHtml(session.pack_id),
+        escapeHtml(session.job_id),
+        escapeHtml(session.updated_at),
+      ]);
+      $('#managedTable').innerHTML = table(['Session', 'Stage', 'Client', 'Pack', 'Job', 'Updated'], rows);
+      $('#managedKpiJson').textContent = sessions[0] ? JSON.stringify(sessions[0].kpi, null, 2) : '{}';
+    }
+    function renderProviders(providers) {
+      $('#providerNotice').textContent = providers.notice || 'No file contents are sent.';
+      const available = providers.available || [];
+      const rows = available.map(name => [
+        escapeHtml(name),
+        name === providers.active ? badge('active') : badge('available'),
+        escapeHtml(providers.privacy_mode || 'metadata-only'),
+      ]);
+      $('#providersTable').innerHTML = table(['Provider', 'Status', 'Privacy'], rows);
     }
     function renderReview(plan) {
       const reviewEntries = plan.entries.filter(reviewCandidate);
@@ -1073,14 +1219,30 @@ def _page() -> str:
     });
     $('#createJobBtn').addEventListener('click', () => runAction('Create job', async () => {
       const policy = $('#policySelect').value;
-      const job = await api('/api/jobs/create', { method: 'POST', body: JSON.stringify({ policy }) });
+      const pack = $('#packSelect').value;
+      const job = await api('/api/jobs/create', { method: 'POST', body: JSON.stringify({ policy, pack }) });
       state.selectedJobId = job.job_id;
     }));
     $('#runJobBtn').addEventListener('click', () => runAction('Dry-run job', async () => {
       const policy = $('#policySelect').value;
-      const job = await api('/api/jobs/run', { method: 'POST', body: JSON.stringify({ policy }) });
+      const pack = $('#packSelect').value;
+      const job = await api('/api/jobs/run', { method: 'POST', body: JSON.stringify({ policy, pack }) });
       state.selectedJobId = job.job_id;
     }));
+    $('#startManagedBtn').addEventListener('click', () => {
+      if (!confirmAction('Start a managed cleanup dry-run session? No user files will be moved.')) return;
+      runAction('Managed cleanup', async () => {
+        const session = await api('/api/managed/start?confirm=true', {
+          method: 'POST',
+          body: JSON.stringify({
+            client_name: $('#managedClientInput').value || 'Client',
+            operator_name: $('#managedOperatorInput').value || 'Operator',
+            pack_id: $('#packSelect').value || 'general_office',
+          }),
+        });
+        state.selectedJobId = session.job_id;
+      });
+    });
     $('#approveJobBtn').addEventListener('click', () => {
       const job = activeJob();
       if (!job || !confirmAction('Approve all review-required policy decisions for this job?')) return;

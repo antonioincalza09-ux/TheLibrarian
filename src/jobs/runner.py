@@ -8,6 +8,7 @@ from src.jobs.models import JobConfig, JobPhase, JobRecord, JobStatus
 from src.jobs.store import JobStore
 from src.jsonio import read_plan, write_inventory, write_plan
 from src.models import OrganizationPlan
+from src.policy_packs import get_policy_pack
 from src.policies import approve_required_decisions, default_policy, evaluate_policy, filter_plan_for_policy
 from src.policies.models import PolicyEvaluation
 from src.planner import build_plan
@@ -22,8 +23,21 @@ class JobRunner:
         self.store = JobStore(root)
         self.config = config or RuntimeConfig()
 
-    def create_job(self, *, dry_run: bool = True, policy_name: str | None = None) -> JobRecord:
-        return self.store.create(dry_run=dry_run, provider=self.config.provider, policy_name=policy_name)
+    def create_job(
+        self,
+        *,
+        dry_run: bool = True,
+        policy_name: str | None = None,
+        pack_id: str | None = None,
+    ) -> JobRecord:
+        if pack_id:
+            get_policy_pack(pack_id)
+        return self.store.create(
+            dry_run=dry_run,
+            provider=self.config.provider,
+            policy_name=policy_name,
+            pack_id=pack_id,
+        )
 
     def run(
         self,
@@ -32,8 +46,10 @@ class JobRunner:
         dry_run: bool = True,
         allow_apply: bool = False,
         policy_name: str | None = None,
+        pack_id: str | None = None,
     ) -> JobRecord:
-        active_job = job or self.create_job(dry_run=dry_run, policy_name=policy_name)
+        resolved_pack_id = pack_id or (job.pack_id if job else None)
+        active_job = job or self.create_job(dry_run=dry_run, policy_name=policy_name, pack_id=resolved_pack_id)
         job_config = JobConfig(
             root=active_job.root,
             dry_run=dry_run,
@@ -41,10 +57,19 @@ class JobRunner:
             model=self.config.model,
             endpoint=self.config.endpoint,
             policy_name=policy_name or active_job.policy_name,
+            pack_id=resolved_pack_id,
             privacy_mode=self.config.privacy_mode,
         )
+        policy_pack_path = None
 
         try:
+            if job_config.pack_id:
+                policy_pack = get_policy_pack(job_config.pack_id)
+                policy_pack_path = self.store.write_json_artifact(
+                    active_job.job_id,
+                    "policy_pack.json",
+                    policy_pack.to_dict(),
+                )
             self.store.update(
                 active_job.job_id,
                 status=JobStatus.SCANNING,
@@ -53,6 +78,7 @@ class JobRunner:
                 provider=job_config.provider,
                 dry_run=job_config.dry_run,
                 policy_name=job_config.policy_name,
+                pack_id=job_config.pack_id,
             )
             inventory = scan_directory(active_job.root)
             inventory_path = self.store.artifact_path(active_job.job_id, "inventory.json")

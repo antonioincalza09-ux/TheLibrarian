@@ -1,0 +1,17 @@
+{
+  "id": "insurance_broker",
+  "name": "Insurance Broker",
+  "version": "0.1.0",
+  "industry": "insurance",
+  "description": "Policy pack for insurance policies, claims, and client portfolios.",
+  "tier": "managed_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Clients", "Policies", "Claims", "Contracts", "Compliance"],
+  "categories": ["Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Clients/", "Documents/Policies/", "Documents/Claims/", "Documents/Contracts/", "Documents/Compliance/", "Data/PortfolioExports/", "Archives/ClosedClaims/", "Review/SensitiveReview/"],
+  "naming_conventions": [{"name": "Insurance document", "pattern": "{client}_{policy}_{document_type}", "example": "rossi_auto_claim"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 15, "target_automation_percent": 55, "risk_tolerance": "low"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

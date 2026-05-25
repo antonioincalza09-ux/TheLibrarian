@@ -1,0 +1,17 @@
+{
+  "id": "architecture_studio",
+  "name": "Architecture Studio",
+  "version": "0.1.0",
+  "industry": "architecture",
+  "description": "Policy pack for architecture studio project and design files.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Clients", "Projects", "Permits", "Presentations", "Renders"],
+  "categories": ["Documents", "Media", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Clients/", "Documents/Projects/", "Documents/Permits/", "Documents/Presentations/", "Media/Renders/", "Data/Measurements/", "Archives/CompletedProjects/", "Review/Unsorted/"],
+  "naming_conventions": [{"name": "Architecture document", "pattern": "{client}_{project}_{document_type}", "example": "rossi_villa_render"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 60, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

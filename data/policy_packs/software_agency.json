@@ -1,0 +1,17 @@
+{
+  "id": "software_agency",
+  "name": "Software Agency",
+  "version": "0.1.0",
+  "industry": "software",
+  "description": "Policy pack for software studios and project delivery folders.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Code projects", "Specifications", "Client documents", "Reports", "Releases"],
+  "categories": ["Code", "Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Code/Projects/", "Documents/Specs/", "Documents/Clients/", "Documents/Reports/", "Data/Exports/", "Archives/Releases/", "Review/Unknown/"],
+  "naming_conventions": [{"name": "Project document", "pattern": "{client}_{project}_{document_type}", "example": "acme_portal_spec"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 55, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

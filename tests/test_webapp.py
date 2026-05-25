@@ -261,6 +261,69 @@ class WebAppTests(unittest.TestCase):
             self.assertEqual(plan_path.parent, root / ".thelibrarian" / "plans")
             self.assertEqual(payload["plan"]["entries"][0]["destination"], "Documents/Reports/report.pdf")
 
+    def test_policy_pack_and_provider_api_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                packs = json.loads(urlopen(f"http://{host}:{port}/api/packs", timeout=5).read())
+                pack = json.loads(urlopen(f"http://{host}:{port}/api/packs/studio_legale", timeout=5).read())
+                recommended = json.loads(urlopen(f"http://{host}:{port}/api/packs/recommend?industry=healthcare", timeout=5).read())
+                providers = json.loads(urlopen(f"http://{host}:{port}/api/providers", timeout=5).read())
+                doctor = json.loads(urlopen(f"http://{host}:{port}/api/providers/doctor?provider=remote-compatible", timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+        self.assertEqual(len([pack for pack in packs["packs"] if pack.get("industry")]), 25)
+        self.assertEqual(pack["id"], "studio_legale")
+        self.assertIn("medical_clinic", {item["id"] for item in recommended["packs"]})
+        self.assertIn("remote-compatible", providers["available"])
+        self.assertEqual(doctor["provider"], "remote-compatible")
+        self.assertNotIn("secret", json.dumps(doctor).lower())
+
+    def test_managed_start_endpoint_requires_confirm_and_creates_report(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "contract.pdf"
+            source.write_text("content", encoding="utf-8")
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                request = Request(
+                    f"http://{host}:{port}/api/managed/start?confirm=true",
+                    data=json.dumps(
+                        {
+                            "client_name": "Acme SRL",
+                            "operator_name": "Antonio",
+                            "pack_id": "studio_legale",
+                        }
+                    ).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                session = json.loads(urlopen(request, timeout=5).read())
+                sessions = json.loads(urlopen(f"http://{host}:{port}/api/managed", timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            session_directory = root / ".thelibrarian" / "managed" / session["session_id"]
+            self.assertTrue(source.exists())
+            self.assertTrue((session_directory / "session.json").exists())
+            self.assertTrue((session_directory / "report.json").exists())
+            self.assertTrue((session_directory / "report.md").exists())
+            self.assertEqual(sessions["sessions"][0]["session_id"], session["session_id"])
+
 
 if __name__ == "__main__":
     unittest.main()
