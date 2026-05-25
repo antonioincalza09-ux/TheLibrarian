@@ -9,8 +9,9 @@ from src.jobs.store import JobStore
 from src.jsonio import read_plan, write_inventory, write_plan
 from src.models import OrganizationPlan
 from src.policy_packs import get_policy_pack
+from src.policy_packs.models import PolicyPack
 from src.policies import approve_required_decisions, default_policy, evaluate_policy, filter_plan_for_policy
-from src.policies.models import PolicyEvaluation
+from src.policies.models import PolicyConfig, PolicyEvaluation
 from src.planner import build_plan
 from src.providers import ProviderContext, get_provider
 from src.reporter import render_plan_report
@@ -30,12 +31,12 @@ class JobRunner:
         policy_name: str | None = None,
         pack_id: str | None = None,
     ) -> JobRecord:
-        if pack_id:
-            get_policy_pack(pack_id)
+        policy_pack = self._load_policy_pack(pack_id)
+        resolved_policy_name = self._resolve_policy_name(policy_name, policy_pack)
         return self.store.create(
             dry_run=dry_run,
             provider=self.config.provider,
-            policy_name=policy_name,
+            policy_name=resolved_policy_name,
             pack_id=pack_id,
         )
 
@@ -49,22 +50,27 @@ class JobRunner:
         pack_id: str | None = None,
     ) -> JobRecord:
         resolved_pack_id = pack_id or (job.pack_id if job else None)
-        active_job = job or self.create_job(dry_run=dry_run, policy_name=policy_name, pack_id=resolved_pack_id)
+        policy_pack = self._load_policy_pack(resolved_pack_id)
+        resolved_policy_name = self._resolve_policy_name(policy_name or (job.policy_name if job else None), policy_pack)
+        active_job = job or self.create_job(
+            dry_run=dry_run,
+            policy_name=resolved_policy_name,
+            pack_id=resolved_pack_id,
+        )
         job_config = JobConfig(
             root=active_job.root,
             dry_run=dry_run,
             provider=self.config.provider,
             model=self.config.model,
             endpoint=self.config.endpoint,
-            policy_name=policy_name or active_job.policy_name,
+            policy_name=resolved_policy_name,
             pack_id=resolved_pack_id,
             privacy_mode=self.config.privacy_mode,
         )
         policy_pack_path = None
 
         try:
-            if job_config.pack_id:
-                policy_pack = get_policy_pack(job_config.pack_id)
+            if policy_pack is not None:
                 policy_pack_path = self.store.write_json_artifact(
                     active_job.job_id,
                     "policy_pack.json",
@@ -104,7 +110,7 @@ class JobRunner:
             plan = build_plan(inventory, provider=provider, context=context)
             plan_path = self.store.artifact_path(active_job.job_id, "plan.json")
             write_plan(plan_path, plan)
-            policy = default_policy(job_config.policy_name)
+            policy = self._policy_for_job(job_config.policy_name, policy_pack)
             policy_evaluation = evaluate_policy(active_job.root, inventory, plan, policy)
             policy_path = self.store.write_json_artifact(
                 active_job.job_id,
@@ -299,3 +305,20 @@ class JobRunner:
         if not job.policy_path:
             raise SafetyError("Job has no policy decision artifact.")
         return PolicyEvaluation.from_dict(self.store.read_json_artifact(job.job_id, "policy_decision.json"))
+
+    def _load_policy_pack(self, pack_id: str | None) -> PolicyPack | None:
+        if not pack_id:
+            return None
+        return get_policy_pack(pack_id, self.store.root)
+
+    def _resolve_policy_name(self, policy_name: str | None, policy_pack: PolicyPack | None) -> str | None:
+        if policy_name:
+            return policy_name
+        if policy_pack is not None and policy_pack.policy is not None:
+            return policy_pack.policy.name
+        return None
+
+    def _policy_for_job(self, policy_name: str | None, policy_pack: PolicyPack | None) -> PolicyConfig:
+        if policy_pack is not None and policy_pack.policy is not None and policy_name == policy_pack.policy.name:
+            return policy_pack.policy
+        return default_policy(policy_name)

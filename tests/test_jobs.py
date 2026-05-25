@@ -200,6 +200,23 @@ class JobCliTests(unittest.TestCase):
             self.assertTrue(source.exists())
             self.assertFalse((root / "Documents").exists())
 
+    def test_job_create_cli_with_policy_pack_records_pack_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            exit_code, output, _ = run_cli(
+                ["job", "create", str(root), "--policy-pack", "supervised_documents", "--format", "json"]
+            )
+            payload = json.loads(output)
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(payload["pack_id"], "supervised_documents")
+            self.assertEqual(payload["policy_name"], "supervised_autonomy")
+            self.assertTrue(source.exists())
+            self.assertFalse((root / ".thelibrarian" / "jobs" / payload["job_id"] / "inventory.json").exists())
+
     def test_job_run_and_status_are_consistent(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
@@ -232,6 +249,68 @@ class JobCliTests(unittest.TestCase):
             self.assertEqual(payload["pack_id"], "studio_legale")
             self.assertTrue((root / ".thelibrarian" / "jobs" / payload["job_id"] / "policy_pack.json").exists())
             self.assertTrue(source.exists())
+
+    def test_job_pack_aliases_must_match(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+
+            exit_code, _, stderr = run_cli(
+                [
+                    "job",
+                    "run",
+                    str(root),
+                    "--pack",
+                    "studio_legale",
+                    "--policy-pack",
+                    "supervised_documents",
+                ]
+            )
+
+            self.assertEqual(exit_code, 2)
+            self.assertIn("--pack and --policy-pack refer to different packs", stderr)
+
+    def test_job_run_cli_with_policy_pack_uses_pack_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "report.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            run_exit, run_output, _ = run_cli(
+                ["job", "run", str(root), "--policy-pack", "supervised_documents", "--format", "json"]
+            )
+            payload = json.loads(run_output)
+            policy_payload = json.loads(Path(payload["policy_path"]).read_text(encoding="utf-8"))
+
+            self.assertEqual(run_exit, 0)
+            self.assertEqual(payload["pack_id"], "supervised_documents")
+            self.assertEqual(payload["policy_name"], "supervised_autonomy")
+            self.assertEqual(policy_payload["policy"]["mode"], "supervised_autonomy")
+            self.assertTrue(source.exists())
+
+    def test_job_policy_flag_overrides_policy_pack_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "report.pdf").write_text("content", encoding="utf-8")
+
+            run_exit, run_output, _ = run_cli(
+                [
+                    "job",
+                    "run",
+                    str(root),
+                    "--policy-pack",
+                    "supervised_documents",
+                    "--policy",
+                    "dry_run_only",
+                    "--format",
+                    "json",
+                ]
+            )
+            payload = json.loads(run_output)
+            policy_payload = json.loads(Path(payload["policy_path"]).read_text(encoding="utf-8"))
+
+            self.assertEqual(run_exit, 0)
+            self.assertEqual(payload["pack_id"], "supervised_documents")
+            self.assertEqual(policy_payload["policy"]["mode"], "dry_run_only")
 
     def test_job_apply_requires_confirmation(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
