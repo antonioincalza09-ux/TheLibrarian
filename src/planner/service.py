@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
 from pathlib import PurePosixPath
 
 from src.models import DEFAULT_CATEGORY_DIRECTORIES, FileRecord, Inventory, OrganizationPlan, PlanEntry
+from src.policy_packs.models import PolicyPack
 from src.providers.types import ClassificationProvider, ClassificationResult, ProviderContext, ProviderError
 
 
@@ -39,6 +41,7 @@ DOCUMENT_CONTEXT_KEYWORDS = (
     ("Reports", ("report", "summary", "analysis", "audit", "review")),
     ("Notes", ("note", "notes", "memo", "meeting", "journal")),
 )
+_WORD_PATTERN = re.compile(r"[a-z0-9]+")
 
 CATEGORY_BY_EXTENSION = {
     ".pdf": "Documents",
@@ -212,6 +215,107 @@ def contextual_destination_for(
     return destination, reason
 
 
+def policy_pack_destination_for(
+    file_record: FileRecord,
+    category: str,
+    destination: str,
+    policy_pack: PolicyPack | None,
+) -> tuple[str, str | None]:
+    if policy_pack is None:
+        return destination, None
+
+    template_parts = _matching_policy_pack_template(file_record, category, policy_pack)
+    if template_parts is None:
+        return destination, None
+
+    source_parts = PurePosixPath(file_record.relative_path).parts
+    if _starts_with_parts(source_parts, template_parts):
+        return file_record.relative_path, f"Policy pack '{policy_pack.name}' template already matched."
+
+    if source_parts and source_parts[0] in KNOWN_CATEGORY_DIRECTORIES:
+        source_parts = source_parts[1:] or (file_record.name,)
+
+    next_destination = PurePosixPath(*template_parts, *source_parts).as_posix()
+    template = PurePosixPath(*template_parts).as_posix()
+    reason = f"Policy pack '{policy_pack.name}' matched folder template {template}."
+    return next_destination, reason
+
+
+def _matching_policy_pack_template(
+    file_record: FileRecord,
+    category: str,
+    policy_pack: PolicyPack,
+) -> tuple[str, ...] | None:
+    templates = [_normalize_template(template) for template in policy_pack.folder_templates]
+    templates = [template for template in templates if template]
+    if not templates:
+        return None
+
+    if category == REVIEW_CATEGORY:
+        review_templates = [template for template in templates if template[0] == REVIEW_CATEGORY]
+        return _longest_template(review_templates)
+
+    candidates = [template for template in templates if template[0] == category]
+    if not candidates:
+        return None
+
+    searchable = _words(file_record.relative_path)
+    scored: list[tuple[int, tuple[str, ...]]] = []
+    for template in candidates:
+        tokens = set()
+        for part in template[1:]:
+            tokens.update(_template_tokens(part))
+        matches = [token for token in tokens if token in searchable]
+        if matches:
+            scored.append((max(len(token) for token in matches), template))
+
+    if not scored:
+        return None
+    scored.sort(key=lambda item: (item[0], len(item[1])), reverse=True)
+    return scored[0][1]
+
+
+def _normalize_template(template: str) -> tuple[str, ...] | None:
+    normalized = PurePosixPath(template.replace("\\", "/").strip("/"))
+    parts = tuple(part for part in normalized.parts if part)
+    if not parts or normalized.is_absolute() or ".." in parts:
+        return None
+    if parts[0] not in KNOWN_CATEGORY_DIRECTORIES:
+        return None
+    return parts
+
+
+def _longest_template(templates: list[tuple[str, ...]]) -> tuple[str, ...] | None:
+    if not templates:
+        return None
+    return sorted(templates, key=len, reverse=True)[0]
+
+
+def _starts_with_parts(parts: tuple[str, ...], prefix: tuple[str, ...]) -> bool:
+    return len(parts) >= len(prefix) and parts[: len(prefix)] == prefix
+
+
+def _words(value: str) -> set[str]:
+    return set(_WORD_PATTERN.findall(_split_compound(value).lower()))
+
+
+def _template_tokens(value: str) -> set[str]:
+    tokens = _words(value)
+    expanded = set(tokens)
+    for token in tokens:
+        if token.endswith("ies") and len(token) > 4:
+            expanded.add(token[:-3] + "y")
+        if token.endswith("es") and len(token) > 3:
+            expanded.add(token[:-2])
+        if token.endswith("s") and len(token) > 3:
+            expanded.add(token[:-1])
+    return expanded
+
+
+def _split_compound(value: str) -> str:
+    return re.sub(r"([a-z])([A-Z])", r"\1 \2", value.replace("_", " ").replace("-", " "))
+
+
 def _looks_like_skill_context(
     parts: tuple[str, ...],
     file_record: FileRecord,
@@ -369,6 +473,7 @@ def build_plan(
     inventory: Inventory,
     provider: ClassificationProvider | None = None,
     context: ProviderContext | None = None,
+    policy_pack: PolicyPack | None = None,
 ) -> OrganizationPlan:
     occupied_paths = set(inventory.path_index())
     reserved_destinations: set[str] = set()
@@ -391,6 +496,9 @@ def build_plan(
         )
         if context_reason:
             reason = f"{reason} {context_reason}"
+        destination, pack_reason = policy_pack_destination_for(file_record, category, destination, policy_pack)
+        if pack_reason:
+            reason = f"{reason} {pack_reason}"
         status = "planned"
         warning: str | None = None
 

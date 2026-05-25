@@ -117,6 +117,8 @@ class JobRunnerTests(unittest.TestCase):
             self.assertEqual(job.pack_id, "studio_legale")
             self.assertEqual(pack_payload["id"], "studio_legale")
             self.assertTrue(source.exists())
+            plan_payload = json.loads((job_directory / "plan.json").read_text(encoding="utf-8"))
+            self.assertEqual(plan_payload["entries"][0]["destination"], "Documents/Contracts/contract.pdf")
 
     def test_non_dry_run_without_allow_apply_awaits_approval(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:

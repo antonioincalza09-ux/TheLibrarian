@@ -34,7 +34,10 @@ from src.webapp import serve
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="thelibrarian", description="Safety-first local file organizer.")
+    parser = argparse.ArgumentParser(
+        prog="thelibrarian",
+        description="Privacy-first file organization copilot for professionals and small businesses.",
+    )
     parser.add_argument("--config", help="Optional TOML config file.")
     subcommands = parser.add_subparsers(dest="command", required=True)
 

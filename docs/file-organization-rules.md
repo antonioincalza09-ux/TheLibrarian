@@ -54,6 +54,17 @@ Examples:
 
 This contextual layout can also repair broad category layouts created by earlier runs, such as `Documents/<skill>/SKILL.md`, `Code/<skill>/scripts/...`, and `Review/<skill>/_meta.json`.
 
+## Policy Pack Folder Templates
+
+Policy packs can refine destinations during pack-aware jobs and dashboard previews. They do not replace classification; they only map already-classified files into safer vertical templates when the source path or filename matches clear tokens.
+
+Examples:
+
+- `contract.pdf` with `studio_legale` -> `Documents/Contracts/contract.pdf`
+- `unknown.json` with `studio_legale` -> `Review/NeedsHumanReview/unknown.json`
+
+If no folder template matches, keep the default destination.
+
 ## Safety Behavior
 
 - If source and destination conflict, do not overwrite automatically.

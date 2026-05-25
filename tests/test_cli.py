@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from src.cli import main
+from src.cli import build_parser, main
 
 
 def run_cli(args: list[str]) -> tuple[int, str, str]:
@@ -20,6 +20,11 @@ def run_cli(args: list[str]) -> tuple[int, str, str]:
 
 
 class CliTests(unittest.TestCase):
+    def test_help_uses_product_positioning(self) -> None:
+        output = build_parser().format_help()
+
+        self.assertIn("Privacy-first file organization copilot", output)
+
     def test_scan_outputs_inventory_json(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)

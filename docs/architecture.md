@@ -1,53 +1,77 @@
 # Architecture
 
-TheLibrarian is organized around a small safety-first core.
+TheLibrarian is a local-first file organization system built around safety, auditability, and product packaging for professionals and small businesses.
+
+## System Boundaries
+
+The current implementation is a Python application with no database and no required cloud service. Runtime state is stored under the assigned root in `.thelibrarian/`.
+
+The major subsystems are:
+
+- Core Engine: scanner, planner, executor, reporter, and shared models.
+- CLI: operator interface exposed through `thelibrarian` and `python -m src.cli`.
+- Local Web UI: stdlib HTTP dashboard served from `src.webapp`.
+- Job Engine: checkpointed filesystem jobs under `.thelibrarian/jobs/<job_id>/`.
+- Policy Engine: policy evaluation, approval status, risk scoring, and apply filtering.
+- Policy Packs: JSON vertical templates from `data/policy_packs/` plus local template compatibility.
+- Managed Service Foundation: dry-run service sessions, KPI, and client-readable reports under `.thelibrarian/managed/<session_id>/`.
+- Provider Adapters: deterministic, Ollama, OpenAI-compatible, remote-compatible, and `antonio-managed` provider interfaces.
 
 ## Data Flow
 
-1. `scanner` reads metadata under the assigned root.
-2. `providers` optionally classify metadata.
-3. `planner` validates classification and builds destinations, including deterministic contextual layouts for skill workspaces and document subfolders.
-4. `reporter` renders human-readable and JSON artifacts.
-5. `executor` applies saved plans and writes rollback manifests.
-6. `webapp` exposes a localhost operations dashboard backed by the same core.
-7. `jobs` records checkpointed scan/plan/report work under `.thelibrarian/jobs/<job_id>/`.
-8. `policies` evaluates plans before any job apply and records auditable decisions.
-9. `doctor` runs install, config, root permission, and provider readiness checks.
-10. `policy_packs` loads vertical JSON packs from `data/policy_packs/` and keeps compatibility with local reusable policy templates.
-11. `managed` creates dry-run service sessions, KPI, and client reports.
-12. `managed_cleanup` preserves the earlier local dry-run cleanup preview workflow.
+1. `scanner` reads file metadata under the assigned root and skips operational directories.
+2. `providers` optionally classify metadata. Remote-capable providers must remain metadata-only.
+3. `planner` validates provider output, applies deterministic fallback when needed, and builds relative destinations.
+   When a policy pack is attached, the planner may refine destinations with matching folder templates while staying inside known relative category roots.
+4. `policies` evaluate planned entries before any job apply.
+5. `reporter` writes human-readable reports, plans, and rollback manifests.
+6. `executor` applies only confirmed plans and writes rollback artifacts.
+7. `jobs` record checkpointed scan, plan, policy, report, and event artifacts.
+8. `managed` creates dry-run client sessions from jobs and policy packs.
+9. `webapp` exposes local dashboard endpoints over localhost.
 
-## Provider Interface
+## Runtime Directories
 
-Providers receive an `Inventory` and `ProviderContext`, then return per-file `source`, `category`, `reason`, and `confidence`.
+- `.thelibrarian/reports/`: operator reports.
+- `.thelibrarian/plans/`: saved organization plans.
+- `.thelibrarian/manifests/`: rollback manifests.
+- `.thelibrarian/jobs/<job_id>/`: job state, events, inventory, plan, policy decision, policy pack copy, and job report.
+- `.thelibrarian/managed/<session_id>/`: managed service session, report JSON, and report Markdown.
+- `.thelibrarian/managed-cleanups/<session_id>/`: compatibility cleanup preview artifacts.
+- `.thelibrarian/policy-packs/`: exported local policy pack templates.
 
-The planner rejects unknown sources, unknown categories, invalid confidence values, and empty reasons. Invalid provider rows fall back to deterministic classification.
+The scanner skips `.thelibrarian/` and the legacy `.the_librarian/` directory name.
 
 ## Artifact Types
 
 - Inventory JSON uses `Inventory.to_dict()`.
-- Plan JSON uses `OrganizationPlan.to_dict()` and includes `provider`.
+- Plan JSON uses `OrganizationPlan.to_dict()` and includes provider metadata.
 - Execution manifests include app version, root, operations, rollback paths, and skipped entries.
-- Job JSON uses `JobRecord.to_dict()` and is updated atomically by the filesystem `JobStore`.
-- Job events are append-only NDJSON lines in `events.ndjson`.
-- Policy decisions are saved as `policy_decision.json` and include status, reason, risk score, and manual approval state.
+- Job JSON uses `JobRecord.to_dict()` and is updated atomically by `JobStore`.
+- Job events are append-only NDJSON lines.
+- Policy decisions include status, reason, risk score, and manual approval state.
 - Policy packs are copied into jobs as `policy_pack.json` for auditability.
-- Managed sessions write `session.json`, `report.json`, and `report.md`.
-- Legacy cleanup preview sessions write `cleanup_session.json`, `inventory.json`, `plan.json`, `policy_decision.json`, `kpi.json`, `policy_pack.json`, and `report.txt`.
+- Managed sessions write `session.json`, `report.json`, `report.md`, and `report.html`.
 
-## Runtime Directories
+## Product Architecture
 
-- Reports are written under `.thelibrarian/reports/`.
-- Saved plans are written under `.thelibrarian/plans/`.
-- Rollback manifests are written under `.thelibrarian/manifests/`.
-- Jobs are written under `.thelibrarian/jobs/<job_id>/`.
-- Local policy pack exports are written under `.thelibrarian/policy-packs/`.
-- Managed cleanup sessions are written under `.thelibrarian/managed/<session_id>/`.
-- Cleanup preview sessions are written under `.thelibrarian/managed-cleanups/<session_id>/`.
-- The scanner skips both `.thelibrarian/` and the legacy `.the_librarian/` directory name.
+The product has four intended packaging layers:
 
-## Vertical Packs And Managed Cleanup
+- Free Local: local CLI/dashboard, deterministic provider, dry-run planning, explicit apply/rollback.
+- Pro Local: future local-only packaging for richer UI, advanced packs, professional exports, and batch workflows.
+- Managed Service: operator-led cleanup sessions with KPI and client-readable reports.
+- Team/Enterprise: future SaaS-ready architecture for shared templates, admin controls, licensing, SSO, billing, support, and optional metadata sync.
 
-Policy packs are data-driven JSON files. They describe industry templates, recommended policy mode, KPI targets, and service recommendations. Jobs can attach a pack with `--pack`, but v1 does not yet let packs alter classification.
+Only the local and managed-service foundations exist today. Billing, authentication, hosted dashboards, marketplace, and team administration are future architecture, not runtime features.
 
-Managed cleanup builds on jobs: it creates a dry-run job, computes KPI from inventory, plan, policy decision, and job counters, then writes client-readable reports. It never applies changes automatically.
+## Managed Vs Managed Cleanup
+
+`src.managed` is the current product path for managed cleanup sessions. It builds on the job engine, policy packs, KPI, and client-facing reports.
+
+`src.managed_cleanup` is a compatibility preview workflow from an earlier iteration. It remains available for existing commands, but new product work should prefer `managed`.
+
+## Provider Trust Boundary
+
+Provider output is never trusted as an execution command. Providers may suggest category, reason, and confidence. The planner validates those suggestions and the executor revalidates paths at apply time.
+
+Remote-capable providers must not receive file contents, snippets, absolute paths, usernames, hashes intended to identify private files, API keys, or secrets. Malformed provider responses fall back to deterministic behavior and warnings.
