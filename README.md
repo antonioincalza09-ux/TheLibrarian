@@ -49,10 +49,11 @@ Recommended dashboard flow:
 1. Check `Target Root` in the sidebar. You can paste a different directory and press `Set Directory`.
 2. Press `Run Dry-Run Job` to scan, plan, evaluate policy, and write job artifacts without moving files.
 3. Review `Plan`, `Review`, `Warnings`, `Policy`, and `Events`.
-4. Use `Approve` only when you want to manually approve entries that require review.
-5. Use `Apply` only when the selected job looks correct. Apply uses confirmed, policy-approved job entries and writes a rollback manifest.
-6. Use `Rollback` to reverse an applied job when its manifest is available.
-7. Use `Delete Job` or `Delete All Jobs` to remove dashboard job history for the current root. This deletes only `.thelibrarian/jobs/...` artifacts, not user files.
+4. Filter or search `Plan` and `Review` when the plan is large. Use `Download JSON` for a browser export or `Save Plan` to write the current plan under `.thelibrarian/plans/`.
+5. Use `Approve` only when you want to manually approve entries that require review.
+6. Use `Apply` only when the selected job looks correct. Apply uses confirmed, policy-approved job entries and writes a rollback manifest.
+7. Use `Rollback` to reverse an applied job when its manifest is available.
+8. Use `Delete Job` or `Delete All Jobs` to remove dashboard job history for the current root. This deletes only `.thelibrarian/jobs/...` artifacts, not user files.
 
 The dashboard never applies a freshly generated plan automatically. Apply, approval, rollback, root changes, and job deletion all require explicit confirmation.
 

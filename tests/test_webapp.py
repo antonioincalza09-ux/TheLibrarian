@@ -52,6 +52,9 @@ class WebAppTests(unittest.TestCase):
 
             self.assertIn('data-app="thelibrarian-dashboard"', html)
             self.assertIn("Operations Dashboard", html)
+            self.assertIn('id="downloadPlanBtn"', html)
+            self.assertIn('id="planSearchInput"', html)
+            self.assertIn('id="reviewCategoryFilter"', html)
             self.assertEqual(dashboard["inventory"]["summary"]["total_files"], 1)
             self.assertIn("jobs", dashboard)
 

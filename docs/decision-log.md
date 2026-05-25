@@ -31,3 +31,4 @@
 - Chose explicit runtime artifact folders under `.thelibrarian/reports/`, `.thelibrarian/plans/`, `.thelibrarian/manifests/`, and `.thelibrarian/jobs/`.
 - Chose lightweight provider diagnostics: Ollama uses `/api/tags`, and OpenAI-compatible endpoints use `/models` after checking `OPENAI_API_KEY`.
 - Chose a server-side plan save endpoint for the web UI so apply can continue to require a saved plan path.
+- Chose dashboard-only Plan and Review filters plus browser-side plan JSON download; filtering changes only what is visible in the UI and never changes the saved or applied plan.

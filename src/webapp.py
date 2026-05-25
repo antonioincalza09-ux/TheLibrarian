@@ -482,6 +482,23 @@ def _page() -> str:
       gap: 8px;
       justify-content: flex-end;
     }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(150px, 190px) minmax(150px, 190px);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .filter-bar input, .filter-bar select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      padding: 8px;
+    }
+    .table-note {
+      margin-bottom: 8px;
+    }
     .table-wrap {
       overflow: auto;
       border: 1px solid var(--line);
@@ -604,6 +621,7 @@ def _page() -> str:
       main { padding: 18px; }
       .topbar, .layout { grid-template-columns: 1fr; }
       .toolbar { justify-content: flex-start; }
+      .filter-bar { grid-template-columns: 1fr; }
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -707,7 +725,16 @@ def _page() -> str:
       </section>
       <section class="view" data-view-panel="plan">
         <div class="panel">
-          <div class="panel-header"><div><h2>Plan</h2><p class="subtle">Every row includes destination, confidence, reason, and status.</p></div></div>
+          <div class="panel-header">
+            <div><h2>Plan</h2><p class="subtle">Every row includes destination, confidence, reason, and status.</p></div>
+            <div class="panel-actions"><button type="button" id="downloadPlanBtn">Download JSON</button></div>
+          </div>
+          <div class="filter-bar" aria-label="Plan filters">
+            <input type="search" id="planSearchInput" placeholder="Search source, destination, reason">
+            <select id="planStatusFilter" aria-label="Plan status filter"><option value="">All statuses</option></select>
+            <select id="planCategoryFilter" aria-label="Plan category filter"><option value="">All categories</option></select>
+          </div>
+          <div class="subtle table-note" id="planFilterSummary"></div>
           <div class="table-wrap"><table id="planTable"></table></div>
         </div>
       </section>
@@ -729,6 +756,12 @@ def _page() -> str:
       <section class="view" data-view-panel="review">
         <div class="panel">
           <div class="panel-header"><div><h2>Review Queue</h2><p class="subtle">Ambiguous, low-confidence, or non-planned entries that should stay human-supervised.</p></div></div>
+          <div class="filter-bar" aria-label="Review filters">
+            <input type="search" id="reviewSearchInput" placeholder="Search source, destination, reason">
+            <select id="reviewStatusFilter" aria-label="Review status filter"><option value="">All statuses</option></select>
+            <select id="reviewCategoryFilter" aria-label="Review category filter"><option value="">All categories</option></select>
+          </div>
+          <div class="subtle table-note" id="reviewFilterSummary"></div>
           <div class="table-wrap"><table id="reviewTable"></table></div>
         </div>
       </section>
@@ -791,6 +824,59 @@ def _page() -> str:
       const body = `<tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`;
       return head + body;
     }
+    function updateFilterOptions(selectId, values, allLabel) {
+      const select = $(`#${selectId}`);
+      const current = select.value;
+      const unique = Array.from(new Set(values.map(value => String(value ?? '')).filter(Boolean))).sort();
+      select.replaceChildren(new Option(allLabel, ''), ...unique.map(value => new Option(value, value)));
+      select.value = unique.includes(current) ? current : '';
+    }
+    function filterValue(id) {
+      return $(`#${id}`).value;
+    }
+    function entryMatchesFilters(entry, prefix) {
+      const query = filterValue(`${prefix}SearchInput`).trim().toLowerCase();
+      const status = filterValue(`${prefix}StatusFilter`);
+      const category = filterValue(`${prefix}CategoryFilter`);
+      if (status && entry.status !== status) return false;
+      if (category && entry.category !== category) return false;
+      if (!query) return true;
+      return [
+        entry.source,
+        entry.destination,
+        entry.category,
+        entry.status,
+        entry.reason,
+        entry.warning,
+      ].some(value => String(value ?? '').toLowerCase().includes(query));
+    }
+    function reviewCandidate(entry) {
+      return entry.category === 'Review' || entry.status !== 'planned' || Number(entry.confidence) < 0.92;
+    }
+    function planRows(entries, reasonAccessor) {
+      return entries.map(entry => [
+        escapeHtml(entry.source),
+        escapeHtml(entry.destination),
+        badge(entry.category),
+        badge(entry.status),
+        escapeHtml(Number(entry.confidence).toFixed(2)),
+        escapeHtml(reasonAccessor(entry)),
+      ]);
+    }
+    function setFilterSummary(id, shown, total) {
+      $(`#${id}`).textContent = `${shown} of ${total} rows shown`;
+    }
+    function downloadJson(filename, payload) {
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
     function activeJob() {
       const jobs = state.dashboard?.jobs || [];
       return jobs.find(job => job.job_id === state.selectedJobId) || jobs[0] || null;
@@ -852,14 +938,11 @@ def _page() -> str:
         escapeHtml(Number(entry.confidence).toFixed(2)),
       ]);
       $('#overviewPlanTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence'], rows);
-      const fullRows = plan.entries.map(entry => [
-        escapeHtml(entry.source),
-        escapeHtml(entry.destination),
-        badge(entry.category),
-        badge(entry.status),
-        escapeHtml(Number(entry.confidence).toFixed(2)),
-        escapeHtml(entry.reason),
-      ]);
+      updateFilterOptions('planStatusFilter', plan.entries.map(entry => entry.status), 'All statuses');
+      updateFilterOptions('planCategoryFilter', plan.entries.map(entry => entry.category), 'All categories');
+      const filteredEntries = plan.entries.filter(entry => entryMatchesFilters(entry, 'plan'));
+      setFilterSummary('planFilterSummary', filteredEntries.length, plan.entries.length);
+      const fullRows = planRows(filteredEntries, entry => entry.reason);
       $('#planTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Reason'], fullRows);
     }
     function renderInventory(inventory) {
@@ -888,16 +971,12 @@ def _page() -> str:
       $('#jobJson').textContent = selected ? JSON.stringify(selected, null, 2) : '{}';
     }
     function renderReview(plan) {
-      const reviewRows = plan.entries
-        .filter(entry => entry.category === 'Review' || entry.status !== 'planned' || Number(entry.confidence) < 0.92)
-        .map(entry => [
-          escapeHtml(entry.source),
-          escapeHtml(entry.destination),
-          badge(entry.category),
-          badge(entry.status),
-          escapeHtml(Number(entry.confidence).toFixed(2)),
-          escapeHtml(entry.warning || entry.reason),
-        ]);
+      const reviewEntries = plan.entries.filter(reviewCandidate);
+      updateFilterOptions('reviewStatusFilter', reviewEntries.map(entry => entry.status), 'All statuses');
+      updateFilterOptions('reviewCategoryFilter', reviewEntries.map(entry => entry.category), 'All categories');
+      const filteredEntries = reviewEntries.filter(entry => entryMatchesFilters(entry, 'review'));
+      setFilterSummary('reviewFilterSummary', filteredEntries.length, reviewEntries.length);
+      const reviewRows = planRows(filteredEntries, entry => entry.warning || entry.reason);
       $('#reviewTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Why review'], reviewRows);
     }
     function renderWarnings(inventory, plan) {
@@ -978,6 +1057,12 @@ def _page() -> str:
       const saved = await api('/api/plan/save', { method: 'POST', body: '{}' });
       setStatus(`Saved plan: ${saved.path}`);
     }, { refreshAfter: false }));
+    $('#downloadPlanBtn').addEventListener('click', () => {
+      if (!state.dashboard?.plan) return;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      downloadJson(`thelibrarian-plan-${timestamp}.json`, state.dashboard.plan);
+      setStatus('Plan JSON downloaded');
+    });
     $('#setRootBtn').addEventListener('click', () => {
       const root = $('#rootInput').value.trim();
       if (!root || !confirmAction('Switch dashboard to this directory? Existing files will not be moved.')) return;
@@ -1028,6 +1113,18 @@ def _page() -> str:
     });
     $$('.nav button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
     $$('[data-view-jump]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewJump)));
+    [
+      '#planSearchInput',
+      '#planStatusFilter',
+      '#planCategoryFilter',
+      '#reviewSearchInput',
+      '#reviewStatusFilter',
+      '#reviewCategoryFilter',
+    ].forEach(selector => {
+      const element = $(selector);
+      element.addEventListener('input', render);
+      element.addEventListener('change', render);
+    });
     refresh({ keepSelection: false }).catch(error => setStatus(error.message, 'danger'));
     window.setInterval(() => {
       if (!state.busy) refresh({ silent: true }).catch(error => setStatus(error.message, 'danger'));
