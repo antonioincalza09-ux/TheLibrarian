@@ -135,8 +135,9 @@ def build_parser() -> argparse.ArgumentParser:
     job_create.add_argument("--provider", choices=available_providers())
     job_create.add_argument("--model")
     job_create.add_argument("--endpoint")
-    job_create.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"), default="dry_run_only")
+    job_create.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"))
     job_create.add_argument("--pack")
+    job_create.add_argument("--policy-pack")
     job_create.add_argument("--format", choices=("text", "json"), default="text")
 
     job_run = job_sub.add_parser("run", help="Create and run a dry-run checkpointed job.")
@@ -144,8 +145,9 @@ def build_parser() -> argparse.ArgumentParser:
     job_run.add_argument("--provider", choices=available_providers())
     job_run.add_argument("--model")
     job_run.add_argument("--endpoint")
-    job_run.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"), default="dry_run_only")
+    job_run.add_argument("--policy", choices=("dry_run_only", "supervised_autonomy"))
     job_run.add_argument("--pack")
+    job_run.add_argument("--policy-pack")
     job_run.add_argument("--format", choices=("text", "json"), default="text")
 
     job_status = job_sub.add_parser("status", help="Show one job record.")
@@ -612,10 +614,11 @@ def _handle_job(args: argparse.Namespace) -> int:
     if args.job_command in {"create", "run"}:
         config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
         runner = JobRunner(args.root, config=config)
+        pack_id = _resolve_job_pack_id(args)
         if args.job_command == "create":
-            job = runner.create_job(dry_run=True, policy_name=args.policy, pack_id=args.pack)
+            job = runner.create_job(dry_run=True, policy_name=args.policy, pack_id=pack_id)
         else:
-            job = runner.run(dry_run=True, policy_name=args.policy, pack_id=args.pack)
+            job = runner.run(dry_run=True, policy_name=args.policy, pack_id=pack_id)
 
         if args.format == "json":
             _print_json(job.to_dict())
@@ -677,6 +680,14 @@ def _handle_job(args: argparse.Namespace) -> int:
         return 0
 
     raise ValueError(f"Unknown job command: {args.job_command}")
+
+
+def _resolve_job_pack_id(args: argparse.Namespace) -> str | None:
+    legacy_pack = getattr(args, "pack", None)
+    policy_pack = getattr(args, "policy_pack", None)
+    if legacy_pack and policy_pack and legacy_pack != policy_pack:
+        raise ValueError("--pack and --policy-pack refer to different packs.")
+    return policy_pack or legacy_pack
 
 
 def main(argv: list[str] | None = None) -> int:

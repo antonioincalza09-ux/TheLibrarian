@@ -69,6 +69,7 @@ thelibrarian providers doctor --provider ollama
 thelibrarian packs list
 thelibrarian packs show studio_legale
 thelibrarian job run "C:\path\to\target" --pack studio_legale --provider deterministic
+thelibrarian job run "C:\path\to\target" --policy-pack supervised_documents
 thelibrarian managed start "C:\path\to\target" --client "Acme SRL" --operator "Antonio" --pack studio_legale
 thelibrarian doctor "C:\path\to\target"
 thelibrarian serve "C:\path\to\target" --host 127.0.0.1 --port 8765

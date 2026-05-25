@@ -59,7 +59,9 @@ The registry currently ships 25 vertical packs: `general_office`, `studio_legale
 
 ## Job Integration
 
-`thelibrarian job run ROOT --pack studio_legale` validates the pack, saves it as `.thelibrarian/jobs/<job_id>/policy_pack.json`, and stores `pack_id` in `job.json`. In this version the pack does not yet change classification.
+`thelibrarian job run ROOT --policy-pack supervised_documents` validates the pack, saves it as `.thelibrarian/jobs/<job_id>/policy_pack.json`, stores `pack_id` in `job.json`, and uses the pack policy when `--policy` is not explicitly provided.
+
+`--pack PACK_ID` remains supported as a compatibility alias, including vertical packs such as `studio_legale`. In this version packs do not yet change classification or destination generation.
 
 ## Safety
 

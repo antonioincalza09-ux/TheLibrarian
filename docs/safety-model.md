@@ -23,7 +23,7 @@ Online providers operate in metadata-only mode. They must not receive file conte
 
 Policy packs are local JSON templates. They can configure a policy gate, but they cannot bypass planner or executor validation.
 
-Managed cleanup sessions are local dry-run previews. They do not apply moves, require no cloud service, and write only `.thelibrarian/managed-cleanups/` artifacts.
+Managed cleanup sessions are local dry-run previews. They do not apply moves, require no cloud service, and write only `.thelibrarian/managed/` or `.thelibrarian/managed-cleanups/` artifacts.
 
 Execution rechecks every source and destination at apply time because the filesystem may have changed after planning.
 

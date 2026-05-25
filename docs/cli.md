@@ -18,8 +18,9 @@ The official command is `thelibrarian`. During local development, every command 
 - `managed show SESSION_ID --root ROOT`: shows one managed cleanup session.
 - `managed report SESSION_ID --root ROOT`: regenerates a managed cleanup report.
 - `serve ROOT --host 127.0.0.1 --port 8765`: starts the local browser preview app.
-- `job create ROOT --pack PACK_ID`: creates a checkpointed job record without scanning.
-- `job run ROOT --pack PACK_ID`: creates and runs a dry-run checkpointed job.
+- `job create ROOT --policy-pack PACK_ID`: creates a checkpointed job record without scanning and attaches a policy pack.
+- `job run ROOT --policy-pack PACK_ID`: creates and runs a dry-run checkpointed job using the pack policy unless `--policy` is explicitly provided.
+- `job create|run ROOT --pack PACK_ID`: compatibility alias for attaching a pack.
 - `job approve JOB_ID --root ROOT --confirm`: manually approves decisions that require approval.
 - `job apply JOB_ID --root ROOT --confirm`: applies only policy-approved entries.
 - `job rollback JOB_ID --root ROOT --confirm`: rolls back a job manifest.

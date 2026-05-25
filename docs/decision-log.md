@@ -39,3 +39,4 @@
 - Chose a filesystem-based Managed Cleanup foundation under `.thelibrarian/managed/<session_id>/` with KPI and client-readable reports, always dry-run by default.
 - Chose `remote-compatible` and `antonio-managed` provider adapters for future hosted AI classification, with metadata-only payloads and deterministic fallback.
 - Chose to extend the dashboard/API with policy packs, managed cleanup, KPI, and provider status without adding a frontend framework or enabling automatic apply.
+- Chose `job create/run --policy-pack PACK_ID` as the explicit bridge from Policy Packs to Job Engine while keeping `--policy` as the manual override and `--pack` as a compatibility alias.
