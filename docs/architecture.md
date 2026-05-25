@@ -13,6 +13,8 @@ TheLibrarian is organized around a small safety-first core.
 7. `jobs` records checkpointed scan/plan/report work under `.thelibrarian/jobs/<job_id>/`.
 8. `policies` evaluates plans before any job apply and records auditable decisions.
 9. `doctor` runs install, config, root permission, and provider readiness checks.
+10. `policy_packs` defines local reusable policy templates and a file-based registry.
+11. `managed_cleanup` creates local dry-run cleanup sessions with KPI and report artifacts.
 
 ## Provider Interface
 
@@ -28,6 +30,8 @@ The planner rejects unknown sources, unknown categories, invalid confidence valu
 - Job JSON uses `JobRecord.to_dict()` and is updated atomically by the filesystem `JobStore`.
 - Job events are append-only NDJSON lines in `events.ndjson`.
 - Policy decisions are saved as `policy_decision.json` and include status, reason, risk score, and manual approval state.
+- Policy pack JSON uses `PolicyPack.to_dict()` and can be exported under `.thelibrarian/policy-packs/`.
+- Managed cleanup sessions write `cleanup_session.json`, `inventory.json`, `plan.json`, `policy_decision.json`, `kpi.json`, `policy_pack.json`, and `report.txt`.
 
 ## Runtime Directories
 
@@ -35,4 +39,6 @@ The planner rejects unknown sources, unknown categories, invalid confidence valu
 - Saved plans are written under `.thelibrarian/plans/`.
 - Rollback manifests are written under `.thelibrarian/manifests/`.
 - Jobs are written under `.thelibrarian/jobs/<job_id>/`.
+- Local policy packs are written under `.thelibrarian/policy-packs/`.
+- Managed cleanup sessions are written under `.thelibrarian/managed-cleanups/<session_id>/`.
 - The scanner skips both `.thelibrarian/` and the legacy `.the_librarian/` directory name.

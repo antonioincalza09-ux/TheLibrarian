@@ -69,6 +69,8 @@ thelibrarian providers doctor --provider ollama
 thelibrarian doctor "C:\path\to\target"
 thelibrarian serve "C:\path\to\target" --host 127.0.0.1 --port 8765
 thelibrarian job run "C:\path\to\target" --policy supervised_autonomy
+thelibrarian policy-packs list
+thelibrarian cleanup preview "C:\path\to\target" --policy-pack supervised_documents
 ```
 
 See `docs/cli.md` for the full command reference.
@@ -128,3 +130,11 @@ Skills/<skill>/Source/*.py
 Skills/<skill>/References/*.md
 Skills/<skill>/Metadata/*.json
 ```
+
+## Policy Packs and Managed Cleanup
+
+The project includes local foundations for future policy templates and managed cleanup workflows. These are file-based and do not call cloud services.
+
+- `policy-packs list|show|export` inspects built-in packs and optional local packs under `.thelibrarian/policy-packs/`.
+- `cleanup preview ROOT` creates a dry-run managed cleanup session under `.thelibrarian/managed-cleanups/<session_id>/`.
+- Managed cleanup sessions write inventory, plan, policy decision, KPI, policy pack, and report artifacts without moving files.

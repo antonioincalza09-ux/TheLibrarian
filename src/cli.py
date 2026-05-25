@@ -11,8 +11,11 @@ from src.doctor import build_doctor_report
 from src.executor import execute_plan, rollback_manifest
 from src.jobs import JobRunner, JobStore
 from src.jsonio import read_plan, write_inventory, write_plan
+from src.managed_cleanup import get_cleanup_session, list_cleanup_sessions, run_cleanup_preview
+from src.managed_cleanup.store import CleanupStore
 from src.orchestrator import organize_directory
 from src.planner import build_plan
+from src.policy_packs import export_policy_pack, get_policy_pack, list_policy_packs
 from src.providers import ProviderContext, available_providers, get_provider
 from src.providers.diagnostics import diagnose_provider
 from src.reporter import render_plan_report, write_report
@@ -132,6 +135,40 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_command.add_argument("--model")
     doctor_command.add_argument("--endpoint")
     doctor_command.add_argument("--format", choices=("text", "json"), default="text")
+
+    policy_packs = subcommands.add_parser("policy-packs", help="Inspect local policy pack templates.")
+    policy_pack_sub = policy_packs.add_subparsers(dest="policy_pack_command", required=True)
+    policy_pack_list = policy_pack_sub.add_parser("list", help="List built-in and local policy packs.")
+    policy_pack_list.add_argument("--root")
+    policy_pack_list.add_argument("--format", choices=("text", "json"), default="text")
+    policy_pack_show = policy_pack_sub.add_parser("show", help="Show one policy pack.")
+    policy_pack_show.add_argument("pack_id")
+    policy_pack_show.add_argument("--root")
+    policy_pack_show.add_argument("--format", choices=("text", "json"), default="text")
+    policy_pack_export = policy_pack_sub.add_parser("export", help="Export a policy pack under .thelibrarian/policy-packs/.")
+    policy_pack_export.add_argument("pack_id")
+    policy_pack_export.add_argument("root")
+    policy_pack_export.add_argument("--format", choices=("text", "json"), default="text")
+
+    cleanup = subcommands.add_parser("cleanup", help="Run local managed cleanup preview sessions.")
+    cleanup_sub = cleanup.add_subparsers(dest="cleanup_command", required=True)
+    cleanup_preview = cleanup_sub.add_parser("preview", help="Create a dry-run managed cleanup session.")
+    cleanup_preview.add_argument("root")
+    cleanup_preview.add_argument("--provider", choices=available_providers())
+    cleanup_preview.add_argument("--model")
+    cleanup_preview.add_argument("--endpoint")
+    cleanup_preview.add_argument("--policy-pack", default="local_safe_review")
+    cleanup_preview.add_argument("--format", choices=("text", "json"), default="text")
+    cleanup_list = cleanup_sub.add_parser("list", help="List managed cleanup sessions for a root.")
+    cleanup_list.add_argument("root")
+    cleanup_list.add_argument("--format", choices=("text", "json"), default="text")
+    cleanup_status = cleanup_sub.add_parser("status", help="Show one managed cleanup session.")
+    cleanup_status.add_argument("session_id")
+    cleanup_status.add_argument("--root", required=True)
+    cleanup_status.add_argument("--format", choices=("text", "json"), default="text")
+    cleanup_report = cleanup_sub.add_parser("report", help="Print one managed cleanup report.")
+    cleanup_report.add_argument("session_id")
+    cleanup_report.add_argument("--root", required=True)
 
     return parser
 
@@ -309,6 +346,103 @@ def _print_job(job) -> None:
         print(f"Error: {job.error}")
 
 
+def _print_policy_pack(pack) -> None:
+    print(f"Policy Pack: {pack.pack_id}")
+    print(f"Name: {pack.name}")
+    print(f"Version: {pack.version}")
+    print(f"Source: {pack.source}")
+    print(f"Policy: {pack.policy.name}")
+    print(f"Mode: {pack.policy.mode.value}")
+    print(f"Description: {pack.description}")
+    if pack.tags:
+        print(f"Tags: {', '.join(pack.tags)}")
+
+
+def _print_cleanup_session(session) -> None:
+    print(f"Cleanup: {session.session_id}")
+    print(f"Root: {session.root}")
+    print(f"Status: {session.status.value}")
+    print(f"Dry run: {session.dry_run}")
+    print(f"Provider: {session.provider}")
+    print(f"Policy pack: {session.policy_pack_id}")
+    print(f"Service mode: {session.service_mode}")
+    for name, path in session.artifacts.items():
+        print(f"{name}: {path}")
+    if session.kpis:
+        print(f"Files scanned: {session.kpis.get('files_scanned', 0)}")
+        print(f"Planned moves: {session.kpis.get('planned_entries', 0)}")
+        print(f"Requires approval: {session.kpis.get('requires_approval', 0)}")
+        print(f"Auto approved: {session.kpis.get('auto_approved', 0)}")
+        print(f"Blocked: {session.kpis.get('blocked', 0)}")
+    if session.error:
+        print(f"Error: {session.error}")
+
+
+def _handle_policy_packs(args: argparse.Namespace) -> int:
+    if args.policy_pack_command == "list":
+        packs = list_policy_packs(args.root)
+        if args.format == "json":
+            _print_json({"policy_packs": [pack.summary() for pack in packs]})
+        else:
+            for pack in packs:
+                print(f"{pack.pack_id}\t{pack.version}\t{pack.source}\t{pack.policy.mode.value}\t{pack.name}")
+        return 0
+
+    if args.policy_pack_command == "show":
+        pack = get_policy_pack(args.pack_id, args.root)
+        if args.format == "json":
+            _print_json(pack.to_dict())
+        else:
+            _print_policy_pack(pack)
+        return 0
+
+    if args.policy_pack_command == "export":
+        path = export_policy_pack(args.pack_id, args.root)
+        payload = {"pack_id": args.pack_id, "path": str(path)}
+        if args.format == "json":
+            _print_json(payload)
+        else:
+            print(f"Exported policy pack: {path}")
+        return 0
+
+    raise ValueError(f"Unknown policy-packs command: {args.policy_pack_command}")
+
+
+def _handle_cleanup(args: argparse.Namespace) -> int:
+    if args.cleanup_command == "preview":
+        config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
+        session = run_cleanup_preview(args.root, config=config, policy_pack_id=args.policy_pack)
+        if args.format == "json":
+            _print_json(session.to_dict())
+        else:
+            _print_cleanup_session(session)
+        return 0
+
+    if args.cleanup_command == "list":
+        sessions = list_cleanup_sessions(args.root)
+        if args.format == "json":
+            _print_json({"cleanups": [session.to_dict() for session in sessions]})
+        else:
+            for session in sessions:
+                print(f"{session.session_id}\t{session.status.value}\t{session.policy_pack_id}\t{session.updated_at}")
+        return 0
+
+    if args.cleanup_command == "status":
+        session = get_cleanup_session(args.root, args.session_id)
+        if args.format == "json":
+            _print_json(session.to_dict())
+        else:
+            _print_cleanup_session(session)
+        return 0
+
+    if args.cleanup_command == "report":
+        report_path = CleanupStore(args.root).artifact_path(args.session_id, "report.txt")
+        print(report_path.read_text(encoding="utf-8"))
+        return 0
+
+    raise ValueError(f"Unknown cleanup command: {args.cleanup_command}")
+
+
 def _handle_job(args: argparse.Namespace) -> int:
     if args.job_command in {"create", "run"}:
         config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
@@ -393,6 +527,8 @@ def main(argv: list[str] | None = None) -> int:
         "serve": _handle_serve,
         "job": _handle_job,
         "doctor": _handle_doctor,
+        "policy-packs": _handle_policy_packs,
+        "cleanup": _handle_cleanup,
     }
     try:
         return handlers[args.command](args)

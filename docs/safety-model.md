@@ -21,6 +21,10 @@ Provider output is untrusted. A provider can suggest category, reason, and confi
 
 Online providers operate in metadata-only mode. They must not receive file contents, snippets, hashes intended to identify private content, or absolute paths.
 
+Policy packs are local JSON templates. They can configure a policy gate, but they cannot bypass planner or executor validation.
+
+Managed cleanup sessions are local dry-run previews. They do not apply moves, require no cloud service, and write only `.thelibrarian/managed-cleanups/` artifacts.
+
 Execution rechecks every source and destination at apply time because the filesystem may have changed after planning.
 
 ## Job Policy Gate

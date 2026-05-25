@@ -32,3 +32,5 @@
 - Chose lightweight provider diagnostics: Ollama uses `/api/tags`, and OpenAI-compatible endpoints use `/models` after checking `OPENAI_API_KEY`.
 - Chose a server-side plan save endpoint for the web UI so apply can continue to require a saved plan path.
 - Chose dashboard-only Plan and Review filters plus browser-side plan JSON download; filtering changes only what is visible in the UI and never changes the saved or applied plan.
+- Chose local file-based Policy Packs as the marketplace foundation, with built-in packs plus optional `.thelibrarian/policy-packs/` exports and no remote marketplace calls.
+- Chose local dry-run Managed Cleanup sessions under `.thelibrarian/managed-cleanups/` as the managed service foundation, producing KPI and report artifacts without cloud services or apply behavior.

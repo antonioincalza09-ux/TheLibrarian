@@ -21,6 +21,13 @@ The official command is `thelibrarian`. During local development, every command 
 - `job status JOB_ID --root ROOT`: prints one job record.
 - `job list ROOT`: lists jobs under a root.
 - `job events JOB_ID --root ROOT`: prints append-only job events.
+- `policy-packs list [--root ROOT]`: lists built-in and local policy packs.
+- `policy-packs show PACK_ID [--root ROOT]`: prints a policy pack.
+- `policy-packs export PACK_ID ROOT`: writes a pack under `.thelibrarian/policy-packs/`.
+- `cleanup preview ROOT --policy-pack PACK_ID`: creates a local dry-run managed cleanup session.
+- `cleanup list ROOT`: lists managed cleanup sessions.
+- `cleanup status SESSION_ID --root ROOT`: prints one managed cleanup session.
+- `cleanup report SESSION_ID --root ROOT`: prints the managed cleanup report.
 
 ## Safety Defaults
 
@@ -33,6 +40,8 @@ The official command is `thelibrarian`. During local development, every command 
 ## Output Formats
 
 `scan`, `plan`, `run`, `apply`, `rollback`, `doctor`, and `providers doctor` support JSON output where useful. Human-readable output is intended for operators; JSON output is intended for automation and tests.
+
+`policy-packs` and `cleanup` are local foundations for future template marketplace and managed service workflows. They do not authenticate, bill, sync, or call external services.
 
 ## Diagnostics
 
