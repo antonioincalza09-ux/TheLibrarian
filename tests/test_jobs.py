@@ -104,6 +104,20 @@ class JobRunnerTests(unittest.TestCase):
             self.assertTrue(source.exists())
             self.assertFalse((root / "Documents" / "Reports" / "report.pdf").exists())
 
+    def test_job_run_with_pack_writes_policy_pack_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "contract.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            job = JobRunner(root).run(dry_run=True, pack_id="studio_legale")
+            job_directory = root / ".thelibrarian" / "jobs" / job.job_id
+            pack_payload = json.loads((job_directory / "policy_pack.json").read_text(encoding="utf-8"))
+
+            self.assertEqual(job.pack_id, "studio_legale")
+            self.assertEqual(pack_payload["id"], "studio_legale")
+            self.assertTrue(source.exists())
+
     def test_non_dry_run_without_allow_apply_awaits_approval(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
@@ -202,6 +216,22 @@ class JobCliTests(unittest.TestCase):
             self.assertEqual(status_exit, 0)
             self.assertEqual(status_payload["status"], "completed")
             self.assertEqual(status_payload["job_id"], payload["job_id"])
+
+    def test_job_run_cli_with_pack_writes_pack_id(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            source = root / "contract.pdf"
+            source.write_text("content", encoding="utf-8")
+
+            run_exit, run_output, _ = run_cli(
+                ["job", "run", str(root), "--pack", "studio_legale", "--format", "json"]
+            )
+            payload = json.loads(run_output)
+
+            self.assertEqual(run_exit, 0)
+            self.assertEqual(payload["pack_id"], "studio_legale")
+            self.assertTrue((root / ".thelibrarian" / "jobs" / payload["job_id"] / "policy_pack.json").exists())
+            self.assertTrue(source.exists())
 
     def test_job_apply_requires_confirmation(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:

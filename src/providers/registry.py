@@ -3,6 +3,7 @@ from __future__ import annotations
 from src.providers.deterministic import DeterministicProvider
 from src.providers.ollama import OllamaProvider
 from src.providers.openai_compatible import OpenAICompatibleProvider
+from src.providers.remote import AntonioManagedProvider, RemoteCompatibleProvider
 from src.providers.types import ClassificationProvider
 
 
@@ -11,11 +12,15 @@ PROVIDER_FACTORIES = {
     "ollama": OllamaProvider,
     "openai-compatible": OpenAICompatibleProvider,
     "openai_compatible": OpenAICompatibleProvider,
+    "remote-compatible": RemoteCompatibleProvider,
+    "remote_compatible": RemoteCompatibleProvider,
+    "antonio-managed": AntonioManagedProvider,
+    "antonio_managed": AntonioManagedProvider,
 }
 
 
 def available_providers() -> list[str]:
-    return ["deterministic", "ollama", "openai-compatible"]
+    return ["deterministic", "ollama", "openai-compatible", "remote-compatible", "antonio-managed"]
 
 
 def get_provider(name: str) -> ClassificationProvider:

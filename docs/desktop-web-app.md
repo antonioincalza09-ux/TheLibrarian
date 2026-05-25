@@ -27,7 +27,9 @@ The server exposes:
 - `/api/jobs/<job_id>/delete?confirm=true`: deletes one job record and its job artifacts.
 - `/api/jobs/delete-all?confirm=true`: deletes all job records for the current root.
 
-The v1 dashboard shows Overview, Inventory, Plan, Review, Warnings, Jobs, Policy, Events, and Manifest views. It polls the local server for updates and exposes functional buttons for selecting the target directory, creating jobs, running dry-run jobs, approving policy decisions, applying approved entries, rolling back applied jobs, and deleting job history.
+The v1 dashboard shows Overview, Inventory, Plan, Review, Warnings, Jobs, Policy, Events, and Manifest views. It polls the local server for updates and exposes functional buttons for selecting the target directory, creating jobs, running dry-run jobs, saving or downloading the current plan JSON, approving policy decisions, applying approved entries, rolling back applied jobs, and deleting job history.
+
+The Plan and Review views include local search plus status and category filters. These filters affect only the dashboard tables; they do not mutate the plan or change what apply is allowed to do.
 
 It does not auto-apply generated plans. Root changes, apply, job approval, rollback, and job deletion require explicit confirmation.
 

@@ -13,6 +13,8 @@ python -m unittest discover -s tests -v
 python -m src.cli providers list
 python -m src.cli doctor C:\target
 python -m src.cli run C:\target
+python -m src.cli policy-packs list
+python -m src.cli cleanup preview C:\target --policy-pack local_safe_review
 ```
 
 ## Safe Apply

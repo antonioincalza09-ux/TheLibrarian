@@ -31,3 +31,11 @@
 - Chose explicit runtime artifact folders under `.thelibrarian/reports/`, `.thelibrarian/plans/`, `.thelibrarian/manifests/`, and `.thelibrarian/jobs/`.
 - Chose lightweight provider diagnostics: Ollama uses `/api/tags`, and OpenAI-compatible endpoints use `/models` after checking `OPENAI_API_KEY`.
 - Chose a server-side plan save endpoint for the web UI so apply can continue to require a saved plan path.
+- Chose dashboard-only Plan and Review filters plus browser-side plan JSON download; filtering changes only what is visible in the UI and never changes the saved or applied plan.
+- Chose local file-based Policy Packs as the marketplace foundation, with built-in packs plus optional `.thelibrarian/policy-packs/` exports and no remote marketplace calls.
+- Chose local dry-run Managed Cleanup sessions under `.thelibrarian/managed-cleanups/` as the managed service foundation, producing KPI and report artifacts without cloud services or apply behavior.
+- Chose data-driven JSON policy packs under `data/policy_packs/` so vertical templates can evolve without scattering industry logic through Python.
+- Chose to attach packs to jobs by copying `policy_pack.json` into the job directory and storing `pack_id` in `job.json`, while leaving classification unchanged for this step.
+- Chose a filesystem-based Managed Cleanup foundation under `.thelibrarian/managed/<session_id>/` with KPI and client-readable reports, always dry-run by default.
+- Chose `remote-compatible` and `antonio-managed` provider adapters for future hosted AI classification, with metadata-only payloads and deterministic fallback.
+- Chose to extend the dashboard/API with policy packs, managed cleanup, KPI, and provider status without adding a frontend framework or enabling automatic apply.

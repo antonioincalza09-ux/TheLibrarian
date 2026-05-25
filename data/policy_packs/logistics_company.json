@@ -1,0 +1,17 @@
+{
+  "id": "logistics_company",
+  "name": "Logistics Company",
+  "version": "0.1.0",
+  "industry": "logistics",
+  "description": "Policy pack for shipments, suppliers, clients, and warehouse exports.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Shipments", "Suppliers", "Clients", "Invoices", "Compliance"],
+  "categories": ["Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Shipments/", "Documents/Suppliers/", "Documents/Clients/", "Documents/Invoices/", "Documents/Compliance/", "Data/WarehouseExports/", "Archives/OldShipments/", "Review/NeedsHumanReview/"],
+  "naming_conventions": [{"name": "Shipment document", "pattern": "{shipment}_{document_type}_{yyyy-mm-dd}", "example": "ship123_invoice_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 65, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

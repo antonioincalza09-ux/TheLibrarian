@@ -1,0 +1,17 @@
+{
+  "id": "freelancer_consultant",
+  "name": "Freelancer Consultant",
+  "version": "0.1.0",
+  "industry": "consulting",
+  "description": "Policy pack for freelancers and consultants managing client work.",
+  "tier": "free",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Clients", "Proposals", "Contracts", "Invoices", "Reports"],
+  "categories": ["Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Clients/", "Documents/Proposals/", "Documents/Contracts/", "Documents/Invoices/", "Documents/Reports/", "Data/Exports/", "Archives/OldClients/", "Review/NeedsHumanReview/"],
+  "naming_conventions": [{"name": "Consulting document", "pattern": "{client}_{document_type}_{yyyy-mm-dd}", "example": "acme_proposal_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 65, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

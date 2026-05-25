@@ -1,0 +1,17 @@
+{
+  "id": "hr_recruiting",
+  "name": "HR Recruiting",
+  "version": "0.1.0",
+  "industry": "hr",
+  "description": "Policy pack for recruiting and candidate workflows.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Candidates", "Clients", "Job descriptions", "Contracts", "Interviews"],
+  "categories": ["Documents", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Candidates/", "Documents/Clients/", "Documents/JobDescriptions/", "Documents/Contracts/", "Documents/Interviews/", "Data/CandidateExports/", "Archives/ClosedSearches/", "Review/NeedsHumanReview/"],
+  "naming_conventions": [{"name": "Candidate document", "pattern": "{candidate}_{role}_{document_type}", "example": "mario_rossi_developer_cv"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 20, "target_automation_percent": 60, "risk_tolerance": "low"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

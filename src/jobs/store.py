@@ -20,8 +20,21 @@ class JobStore:
         self.root = resolve_root(root)
         self.jobs_directory = self.root / JOB_DIRECTORY
 
-    def create(self, *, dry_run: bool = True, provider: str = "deterministic", policy_name: str | None = None) -> JobRecord:
-        job = JobRecord.create(root=str(self.root), dry_run=dry_run, provider=provider, policy_name=policy_name)
+    def create(
+        self,
+        *,
+        dry_run: bool = True,
+        provider: str = "deterministic",
+        policy_name: str | None = None,
+        pack_id: str | None = None,
+    ) -> JobRecord:
+        job = JobRecord.create(
+            root=str(self.root),
+            dry_run=dry_run,
+            provider=provider,
+            policy_name=policy_name,
+            pack_id=pack_id,
+        )
         self.job_directory(job.job_id).mkdir(parents=True, exist_ok=False)
         self.save(job)
         self.append_event(

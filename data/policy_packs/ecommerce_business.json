@@ -1,0 +1,17 @@
+{
+  "id": "ecommerce_business",
+  "name": "Ecommerce Business",
+  "version": "0.1.0",
+  "industry": "ecommerce",
+  "description": "Policy pack for ecommerce operations, suppliers, orders, and product media.",
+  "tier": "premium_stub",
+  "recommended_policy": "supervised_autonomy",
+  "use_cases": ["Suppliers", "Invoices", "Customers", "Operations", "Product catalog"],
+  "categories": ["Documents", "Media", "Data", "Archives", "Review"],
+  "folder_templates": ["Documents/Suppliers/", "Documents/Invoices/", "Documents/Customers/", "Documents/Operations/", "Data/ProductCatalogs/", "Data/Orders/", "Media/ProductImages/", "Archives/OldCampaigns/", "Review/NeedsHumanReview/"],
+  "naming_conventions": [{"name": "Ecommerce document", "pattern": "{area}_{document_type}_{yyyy-mm-dd}", "example": "orders_export_2026-05-24"}],
+  "sensitive_directories": [".git", ".ssh", ".config", ".thelibrarian", ".the_librarian"],
+  "high_risk_categories": ["Apps", "Code", "Archives", "Review"],
+  "kpi_profile": {"review_threshold_percent": 25, "target_automation_percent": 65, "risk_tolerance": "medium"},
+  "managed_service_recommendations": [{"id": "initial_audit", "title": "Initial Cleanup Audit", "description": "Review the current directory structure and generate a safe cleanup plan.", "suggested_frequency": "one_time"}, {"id": "guided_cleanup", "title": "Guided Cleanup Session", "description": "Review risky files with the client before applying changes.", "suggested_frequency": "one_time"}, {"id": "monthly_maintenance", "title": "Monthly Directory Maintenance", "description": "Run recurring cleanup checks and resolve review items.", "suggested_frequency": "monthly"}]
+}

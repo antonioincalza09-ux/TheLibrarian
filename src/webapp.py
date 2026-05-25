@@ -10,8 +10,11 @@ from src.config import RuntimeConfig
 from src.executor import execute_plan
 from src.jobs import JobRunner, JobStore
 from src.jsonio import read_plan
+from src.managed import load_managed_session, list_managed_sessions, start_managed_cleanup
+from src.policy_packs import get_policy_pack, list_policy_packs, recommend_policy_packs
 from src.planner import build_plan
-from src.providers import ProviderContext, get_provider
+from src.providers import ProviderContext, available_providers, get_provider
+from src.providers.diagnostics import diagnose_provider
 from src.reporter import write_plan_artifact
 from src.scanner import scan_directory
 from src.security import SafetyError, resolve_root
@@ -116,6 +119,9 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 "active_policy": active_policy,
                 "active_events": active_events,
                 "active_manifest": active_manifest,
+                "packs": [pack.to_dict() for pack in list_policy_packs()],
+                "managed_sessions": [session.to_dict() for session in list_managed_sessions(resolved_root)],
+                "providers": _providers_payload(config),
             }
 
         def _read_root_artifact(self, artifact_path: str) -> dict[str, object]:
@@ -156,6 +162,35 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     return
                 if parsed.path == "/api/plan":
                     self._json(200, self._plan())
+                    return
+                if parsed.path == "/api/packs":
+                    self._json(200, {"packs": [pack.to_dict() for pack in list_policy_packs()]})
+                    return
+                if parsed.path.startswith("/api/packs/recommend"):
+                    query = parse_qs(parsed.query)
+                    industry = query.get("industry", [""])[0]
+                    self._json(200, {"industry": industry, "packs": [pack.to_dict() for pack in recommend_policy_packs(industry)]})
+                    return
+                if parsed.path.startswith("/api/packs/"):
+                    pack_id = parsed.path.removeprefix("/api/packs/").strip("/")
+                    self._json(200, get_policy_pack(pack_id).to_dict())
+                    return
+                if parsed.path == "/api/managed":
+                    self._json(200, {"sessions": [session.to_dict() for session in list_managed_sessions(self._root())]})
+                    return
+                if parsed.path.startswith("/api/managed/"):
+                    session_id = parsed.path.removeprefix("/api/managed/").strip("/")
+                    self._json(200, load_managed_session(self._root(), session_id).to_dict())
+                    return
+                if parsed.path == "/api/providers":
+                    self._json(200, _providers_payload(config))
+                    return
+                if parsed.path == "/api/providers/doctor":
+                    query = parse_qs(parsed.query)
+                    provider_name = query.get("provider", [config.provider])[0]
+                    context = ProviderContext(model=config.model, endpoint=config.endpoint, privacy_mode=config.privacy_mode)
+                    checks = [check.to_dict() for check in diagnose_provider(provider_name, context, required=False)]
+                    self._json(200, {"provider": provider_name, "checks": checks})
                     return
                 if parsed.path == "/api/jobs":
                     self._json(200, {"jobs": [job.to_dict() for job in JobStore(self._root()).list()]})
@@ -216,14 +251,36 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
 
                 if parsed.path == "/api/jobs/create":
                     policy = str(body.get("policy", "dry_run_only"))
-                    job = JobRunner(self._root(), config=config).create_job(dry_run=True, policy_name=policy)
+                    pack_id = body.get("pack")
+                    job = JobRunner(self._root(), config=config).create_job(
+                        dry_run=True,
+                        policy_name=policy,
+                        pack_id=str(pack_id) if pack_id else None,
+                    )
                     self._json(200, job.to_dict())
                     return
 
                 if parsed.path == "/api/jobs/run":
                     policy = str(body.get("policy", "dry_run_only"))
-                    job = JobRunner(self._root(), config=config).run(dry_run=True, policy_name=policy)
+                    pack_id = body.get("pack")
+                    job = JobRunner(self._root(), config=config).run(
+                        dry_run=True,
+                        policy_name=policy,
+                        pack_id=str(pack_id) if pack_id else None,
+                    )
                     self._json(200, job.to_dict())
+                    return
+
+                if parsed.path == "/api/managed/start":
+                    self._confirm(query, "Managed cleanup start")
+                    session = start_managed_cleanup(
+                        self._root(),
+                        client_name=str(body.get("client_name", "Client")),
+                        operator_name=str(body.get("operator_name", "Operator")),
+                        pack_id=str(body.get("pack_id", "general_office")),
+                        config=config,
+                    )
+                    self._json(200, session.to_dict())
                     return
 
                 if parsed.path == "/api/jobs/delete-all":
@@ -272,6 +329,17 @@ def _build_current_plan(root: Path, config: RuntimeConfig):
         privacy_mode=config.privacy_mode,
     )
     return build_plan(inventory, provider=provider, context=context)
+
+
+def _providers_payload(config: RuntimeConfig) -> dict[str, object]:
+    return {
+        "active": config.provider,
+        "model": config.model,
+        "endpoint": config.endpoint,
+        "privacy_mode": config.privacy_mode,
+        "available": available_providers(),
+        "notice": "No file contents are sent. Online providers receive metadata only.",
+    }
 
 
 def serve(root: str | Path, *, host: str, port: int, config: RuntimeConfig) -> None:
@@ -482,6 +550,23 @@ def _page() -> str:
       gap: 8px;
       justify-content: flex-end;
     }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(150px, 190px) minmax(150px, 190px);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .filter-bar input, .filter-bar select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      padding: 8px;
+    }
+    .table-note {
+      margin-bottom: 8px;
+    }
     .table-wrap {
       overflow: auto;
       border: 1px solid var(--line);
@@ -604,6 +689,7 @@ def _page() -> str:
       main { padding: 18px; }
       .topbar, .layout { grid-template-columns: 1fr; }
       .toolbar { justify-content: flex-start; }
+      .filter-bar { grid-template-columns: 1fr; }
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -637,6 +723,9 @@ def _page() -> str:
         <button type="button" data-view="review">Review</button>
         <button type="button" data-view="warnings">Warnings</button>
         <button type="button" data-view="jobs">Jobs</button>
+        <button type="button" data-view="packs">Policy Packs</button>
+        <button type="button" data-view="managed">Managed Cleanup</button>
+        <button type="button" data-view="providers">Providers</button>
         <button type="button" data-view="policy">Policy</button>
         <button type="button" data-view="events">Events</button>
         <button type="button" data-view="manifest">Manifest</button>
@@ -653,6 +742,8 @@ def _page() -> str:
           <option value="dry_run_only">dry_run_only</option>
           <option value="supervised_autonomy">supervised_autonomy</option>
         </select>
+        <h3 style="margin-top:14px">Policy Pack</h3>
+        <select id="packSelect" aria-label="Policy pack"></select>
         <p class="subtle" style="margin:10px 0 0">Dry-run remains the default. Apply and rollback always require confirmation.</p>
       </div>
     </aside>
@@ -707,7 +798,16 @@ def _page() -> str:
       </section>
       <section class="view" data-view-panel="plan">
         <div class="panel">
-          <div class="panel-header"><div><h2>Plan</h2><p class="subtle">Every row includes destination, confidence, reason, and status.</p></div></div>
+          <div class="panel-header">
+            <div><h2>Plan</h2><p class="subtle">Every row includes destination, confidence, reason, and status.</p></div>
+            <div class="panel-actions"><button type="button" id="downloadPlanBtn">Download JSON</button></div>
+          </div>
+          <div class="filter-bar" aria-label="Plan filters">
+            <input type="search" id="planSearchInput" placeholder="Search source, destination, reason">
+            <select id="planStatusFilter" aria-label="Plan status filter"><option value="">All statuses</option></select>
+            <select id="planCategoryFilter" aria-label="Plan category filter"><option value="">All categories</option></select>
+          </div>
+          <div class="subtle table-note" id="planFilterSummary"></div>
           <div class="table-wrap"><table id="planTable"></table></div>
         </div>
       </section>
@@ -726,9 +826,49 @@ def _page() -> str:
           </div>
         </div>
       </section>
+      <section class="view" data-view-panel="packs">
+        <div class="panel">
+          <div class="panel-header">
+            <div><h2>Policy Packs</h2><p class="subtle">Data-driven vertical packs. Select one before creating a job or managed cleanup session.</p></div>
+          </div>
+          <div class="table-wrap"><table id="packsTable"></table></div>
+        </div>
+      </section>
+      <section class="view" data-view-panel="managed">
+        <div class="layout">
+          <div class="panel">
+            <div class="panel-header">
+              <div><h2>Managed Cleanup</h2><p class="subtle">Dry-run service sessions with KPI and client-readable reports.</p></div>
+              <div class="panel-actions"><button type="button" class="button-primary" id="startManagedBtn">Start Managed Session</button></div>
+            </div>
+            <div class="kv"><strong>Client</strong><input id="managedClientInput" type="text" value="Demo Client"></div>
+            <div class="kv"><strong>Operator</strong><input id="managedOperatorInput" type="text" value="Antonio"></div>
+            <p class="subtle">No file contents are sent. This action creates a dry-run job and report artifacts only.</p>
+            <div class="table-wrap"><table id="managedTable"></table></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><h2>KPI</h2><p class="subtle">Latest managed session metrics.</p></div></div>
+            <pre id="managedKpiJson">{}</pre>
+          </div>
+        </div>
+      </section>
+      <section class="view" data-view-panel="providers">
+        <div class="panel">
+          <div class="panel-header">
+            <div><h2>Providers</h2><p class="subtle" id="providerNotice">No file contents are sent.</p></div>
+          </div>
+          <div class="table-wrap"><table id="providersTable"></table></div>
+        </div>
+      </section>
       <section class="view" data-view-panel="review">
         <div class="panel">
           <div class="panel-header"><div><h2>Review Queue</h2><p class="subtle">Ambiguous, low-confidence, or non-planned entries that should stay human-supervised.</p></div></div>
+          <div class="filter-bar" aria-label="Review filters">
+            <input type="search" id="reviewSearchInput" placeholder="Search source, destination, reason">
+            <select id="reviewStatusFilter" aria-label="Review status filter"><option value="">All statuses</option></select>
+            <select id="reviewCategoryFilter" aria-label="Review category filter"><option value="">All categories</option></select>
+          </div>
+          <div class="subtle table-note" id="reviewFilterSummary"></div>
           <div class="table-wrap"><table id="reviewTable"></table></div>
         </div>
       </section>
@@ -791,6 +931,59 @@ def _page() -> str:
       const body = `<tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`;
       return head + body;
     }
+    function updateFilterOptions(selectId, values, allLabel) {
+      const select = $(`#${selectId}`);
+      const current = select.value;
+      const unique = Array.from(new Set(values.map(value => String(value ?? '')).filter(Boolean))).sort();
+      select.replaceChildren(new Option(allLabel, ''), ...unique.map(value => new Option(value, value)));
+      select.value = unique.includes(current) ? current : '';
+    }
+    function filterValue(id) {
+      return $(`#${id}`).value;
+    }
+    function entryMatchesFilters(entry, prefix) {
+      const query = filterValue(`${prefix}SearchInput`).trim().toLowerCase();
+      const status = filterValue(`${prefix}StatusFilter`);
+      const category = filterValue(`${prefix}CategoryFilter`);
+      if (status && entry.status !== status) return false;
+      if (category && entry.category !== category) return false;
+      if (!query) return true;
+      return [
+        entry.source,
+        entry.destination,
+        entry.category,
+        entry.status,
+        entry.reason,
+        entry.warning,
+      ].some(value => String(value ?? '').toLowerCase().includes(query));
+    }
+    function reviewCandidate(entry) {
+      return entry.category === 'Review' || entry.status !== 'planned' || Number(entry.confidence) < 0.92;
+    }
+    function planRows(entries, reasonAccessor) {
+      return entries.map(entry => [
+        escapeHtml(entry.source),
+        escapeHtml(entry.destination),
+        badge(entry.category),
+        badge(entry.status),
+        escapeHtml(Number(entry.confidence).toFixed(2)),
+        escapeHtml(reasonAccessor(entry)),
+      ]);
+    }
+    function setFilterSummary(id, shown, total) {
+      $(`#${id}`).textContent = `${shown} of ${total} rows shown`;
+    }
+    function downloadJson(filename, payload) {
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
     function activeJob() {
       const jobs = state.dashboard?.jobs || [];
       return jobs.find(job => job.job_id === state.selectedJobId) || jobs[0] || null;
@@ -836,6 +1029,9 @@ def _page() -> str:
       renderPlanTables(plan);
       renderInventory(inventory);
       renderJobs(jobs, selected);
+      renderPacks(dashboard.packs || []);
+      renderManaged(dashboard.managed_sessions || []);
+      renderProviders(dashboard.providers || {});
       renderReview(plan);
       renderWarnings(inventory, plan);
       renderPolicy();
@@ -852,14 +1048,11 @@ def _page() -> str:
         escapeHtml(Number(entry.confidence).toFixed(2)),
       ]);
       $('#overviewPlanTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence'], rows);
-      const fullRows = plan.entries.map(entry => [
-        escapeHtml(entry.source),
-        escapeHtml(entry.destination),
-        badge(entry.category),
-        badge(entry.status),
-        escapeHtml(Number(entry.confidence).toFixed(2)),
-        escapeHtml(entry.reason),
-      ]);
+      updateFilterOptions('planStatusFilter', plan.entries.map(entry => entry.status), 'All statuses');
+      updateFilterOptions('planCategoryFilter', plan.entries.map(entry => entry.category), 'All categories');
+      const filteredEntries = plan.entries.filter(entry => entryMatchesFilters(entry, 'plan'));
+      setFilterSummary('planFilterSummary', filteredEntries.length, plan.entries.length);
+      const fullRows = planRows(filteredEntries, entry => entry.reason);
       $('#planTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Reason'], fullRows);
     }
     function renderInventory(inventory) {
@@ -887,17 +1080,49 @@ def _page() -> str:
       }));
       $('#jobJson').textContent = selected ? JSON.stringify(selected, null, 2) : '{}';
     }
+    function renderPacks(packs) {
+      const select = $('#packSelect');
+      const selected = select.value || 'general_office';
+      select.innerHTML = packs.map(pack => `<option value="${escapeHtml(pack.id)}">${escapeHtml(pack.name)} (${escapeHtml(pack.industry)})</option>`).join('');
+      if (packs.some(pack => pack.id === selected)) select.value = selected;
+      const rows = packs.map(pack => [
+        escapeHtml(pack.id),
+        escapeHtml(pack.industry),
+        badge(pack.tier),
+        escapeHtml(pack.name),
+        escapeHtml(pack.recommended_policy),
+      ]);
+      $('#packsTable').innerHTML = table(['Pack', 'Industry', 'Tier', 'Name', 'Policy'], rows);
+    }
+    function renderManaged(sessions) {
+      const rows = sessions.map(session => [
+        escapeHtml(session.session_id),
+        badge(session.stage),
+        escapeHtml(session.client_name),
+        escapeHtml(session.pack_id),
+        escapeHtml(session.job_id),
+        escapeHtml(session.updated_at),
+      ]);
+      $('#managedTable').innerHTML = table(['Session', 'Stage', 'Client', 'Pack', 'Job', 'Updated'], rows);
+      $('#managedKpiJson').textContent = sessions[0] ? JSON.stringify(sessions[0].kpi, null, 2) : '{}';
+    }
+    function renderProviders(providers) {
+      $('#providerNotice').textContent = providers.notice || 'No file contents are sent.';
+      const available = providers.available || [];
+      const rows = available.map(name => [
+        escapeHtml(name),
+        name === providers.active ? badge('active') : badge('available'),
+        escapeHtml(providers.privacy_mode || 'metadata-only'),
+      ]);
+      $('#providersTable').innerHTML = table(['Provider', 'Status', 'Privacy'], rows);
+    }
     function renderReview(plan) {
-      const reviewRows = plan.entries
-        .filter(entry => entry.category === 'Review' || entry.status !== 'planned' || Number(entry.confidence) < 0.92)
-        .map(entry => [
-          escapeHtml(entry.source),
-          escapeHtml(entry.destination),
-          badge(entry.category),
-          badge(entry.status),
-          escapeHtml(Number(entry.confidence).toFixed(2)),
-          escapeHtml(entry.warning || entry.reason),
-        ]);
+      const reviewEntries = plan.entries.filter(reviewCandidate);
+      updateFilterOptions('reviewStatusFilter', reviewEntries.map(entry => entry.status), 'All statuses');
+      updateFilterOptions('reviewCategoryFilter', reviewEntries.map(entry => entry.category), 'All categories');
+      const filteredEntries = reviewEntries.filter(entry => entryMatchesFilters(entry, 'review'));
+      setFilterSummary('reviewFilterSummary', filteredEntries.length, reviewEntries.length);
+      const reviewRows = planRows(filteredEntries, entry => entry.warning || entry.reason);
       $('#reviewTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Why review'], reviewRows);
     }
     function renderWarnings(inventory, plan) {
@@ -978,6 +1203,12 @@ def _page() -> str:
       const saved = await api('/api/plan/save', { method: 'POST', body: '{}' });
       setStatus(`Saved plan: ${saved.path}`);
     }, { refreshAfter: false }));
+    $('#downloadPlanBtn').addEventListener('click', () => {
+      if (!state.dashboard?.plan) return;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      downloadJson(`thelibrarian-plan-${timestamp}.json`, state.dashboard.plan);
+      setStatus('Plan JSON downloaded');
+    });
     $('#setRootBtn').addEventListener('click', () => {
       const root = $('#rootInput').value.trim();
       if (!root || !confirmAction('Switch dashboard to this directory? Existing files will not be moved.')) return;
@@ -988,14 +1219,30 @@ def _page() -> str:
     });
     $('#createJobBtn').addEventListener('click', () => runAction('Create job', async () => {
       const policy = $('#policySelect').value;
-      const job = await api('/api/jobs/create', { method: 'POST', body: JSON.stringify({ policy }) });
+      const pack = $('#packSelect').value;
+      const job = await api('/api/jobs/create', { method: 'POST', body: JSON.stringify({ policy, pack }) });
       state.selectedJobId = job.job_id;
     }));
     $('#runJobBtn').addEventListener('click', () => runAction('Dry-run job', async () => {
       const policy = $('#policySelect').value;
-      const job = await api('/api/jobs/run', { method: 'POST', body: JSON.stringify({ policy }) });
+      const pack = $('#packSelect').value;
+      const job = await api('/api/jobs/run', { method: 'POST', body: JSON.stringify({ policy, pack }) });
       state.selectedJobId = job.job_id;
     }));
+    $('#startManagedBtn').addEventListener('click', () => {
+      if (!confirmAction('Start a managed cleanup dry-run session? No user files will be moved.')) return;
+      runAction('Managed cleanup', async () => {
+        const session = await api('/api/managed/start?confirm=true', {
+          method: 'POST',
+          body: JSON.stringify({
+            client_name: $('#managedClientInput').value || 'Client',
+            operator_name: $('#managedOperatorInput').value || 'Operator',
+            pack_id: $('#packSelect').value || 'general_office',
+          }),
+        });
+        state.selectedJobId = session.job_id;
+      });
+    });
     $('#approveJobBtn').addEventListener('click', () => {
       const job = activeJob();
       if (!job || !confirmAction('Approve all review-required policy decisions for this job?')) return;
@@ -1028,6 +1275,18 @@ def _page() -> str:
     });
     $$('.nav button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
     $$('[data-view-jump]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewJump)));
+    [
+      '#planSearchInput',
+      '#planStatusFilter',
+      '#planCategoryFilter',
+      '#reviewSearchInput',
+      '#reviewStatusFilter',
+      '#reviewCategoryFilter',
+    ].forEach(selector => {
+      const element = $(selector);
+      element.addEventListener('input', render);
+      element.addEventListener('change', render);
+    });
     refresh({ keepSelection: false }).catch(error => setStatus(error.message, 'danger'));
     window.setInterval(() => {
       if (!state.busy) refresh({ silent: true }).catch(error => setStatus(error.message, 'danger'));
