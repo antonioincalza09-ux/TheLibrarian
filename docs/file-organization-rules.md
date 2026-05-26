@@ -63,3 +63,5 @@ This contextual layout can also repair broad category layouts created by earlier
 - Preserve relative subpaths under top-level category folders to reduce collisions and simplify rollback.
 - Skip symlinks and operational directories such as `.thelibrarian/` and the legacy `.the_librarian/` path to avoid self-organization and path escapes.
 - Treat structured text formats with dual use, such as `.json`, `.xml`, `.yml`, and `.yaml`, as `Review/` in the MVP.
+- In CLI chat mode, manual plan edits are allowed only on destination, reason, and confidence metadata. File contents are never modified.
+- In CLI chat mode, added analysis directories must be descendants of the assigned root.

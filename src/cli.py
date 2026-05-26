@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from src.config import load_config
+from src.chat import run_chat
 from src.doctor import build_doctor_report
 from src.executor import execute_plan, rollback_manifest
 from src.jobs import JobRunner, JobStore
@@ -222,6 +223,15 @@ def build_parser() -> argparse.ArgumentParser:
     cleanup_report = cleanup_sub.add_parser("report", help="Print one managed cleanup report.")
     cleanup_report.add_argument("session_id")
     cleanup_report.add_argument("--root", required=True)
+
+    chat = subcommands.add_parser("chat", help="Interactive CLI chat to review plans and analysis scope.")
+    chat.add_argument("root")
+    chat.add_argument(
+        "--command",
+        action="append",
+        dest="commands",
+        help="Execute one chat command in sequence (can be repeated).",
+    )
 
     return parser
 
@@ -610,6 +620,10 @@ def _handle_cleanup(args: argparse.Namespace) -> int:
     raise ValueError(f"Unknown cleanup command: {args.cleanup_command}")
 
 
+def _handle_chat(args: argparse.Namespace) -> int:
+    return run_chat(args.root, commands=args.commands)
+
+
 def _handle_job(args: argparse.Namespace) -> int:
     if args.job_command in {"create", "run"}:
         config = load_config(root=args.root, config_path=args.config, overrides=_config_overrides(args))
@@ -707,6 +721,7 @@ def main(argv: list[str] | None = None) -> int:
         "doctor": _handle_doctor,
         "policy-packs": _handle_policy_packs,
         "cleanup": _handle_cleanup,
+        "chat": _handle_chat,
     }
     try:
         return handlers[args.command](args)

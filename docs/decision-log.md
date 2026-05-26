@@ -40,3 +40,9 @@
 - Chose `remote-compatible` and `antonio-managed` provider adapters for future hosted AI classification, with metadata-only payloads and deterministic fallback.
 - Chose to extend the dashboard/API with policy packs, managed cleanup, KPI, and provider status without adding a frontend framework or enabling automatic apply.
 - Chose `job create/run --policy-pack PACK_ID` as the explicit bridge from Policy Packs to Job Engine while keeping `--policy` as the manual override and `--pack` as a compatibility alias.
+
+## 2026-05-26
+
+- Chose a new `thelibrarian chat <root>` command to let operators discuss and revise planned moves in natural-language-like CLI prompts without directly editing JSON plans.
+- Chose chat-scoped directory inclusion (`add-dir`/`aggiungi directory`) to explicitly focus analysis on selected subdirectories while keeping the root boundary enforced.
+- Chose scripted chat commands (`--command` repeatable) to keep the interaction testable and automation-friendly.
