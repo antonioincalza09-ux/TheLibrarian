@@ -136,6 +136,58 @@ class CliTests(unittest.TestCase):
         self.assertEqual(payload["status"], "ok")
         self.assertEqual(get_json.call_args.args[0], "http://ollama.test/api/tags")
 
+    def test_chat_can_filter_analysis_with_added_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "A").mkdir()
+            (root / "B").mkdir()
+            (root / "A" / "keep.pdf").write_text("content", encoding="utf-8")
+            (root / "B" / "skip.pdf").write_text("content", encoding="utf-8")
+
+            exit_code, output, _ = run_cli(
+                [
+                    "chat",
+                    str(root),
+                    "--command",
+                    "add-dir A",
+                    "--command",
+                    "scan",
+                    "--command",
+                    "plan",
+                    "--command",
+                    "show",
+                    "--command",
+                    "exit",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn("A/keep.pdf", output)
+            self.assertNotIn("B/skip.pdf", output)
+
+    def test_chat_can_rewrite_plan_entry(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "report.pdf").write_text("content", encoding="utf-8")
+
+            exit_code, output, _ = run_cli(
+                [
+                    "chat",
+                    str(root),
+                    "--command",
+                    "plan",
+                    "--command",
+                    "move report.pdf Documents/General/manual-report.pdf",
+                    "--command",
+                    "show",
+                    "--command",
+                    "exit",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn("report.pdf -> Documents/General/manual-report.pdf", output)
+
 
 if __name__ == "__main__":
     unittest.main()

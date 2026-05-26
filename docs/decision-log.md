@@ -46,3 +46,9 @@
 - Chose a two-level before/after dashboard preview so operators can see dry-run structure changes before saving, approving, or applying a plan.
 - Chose a root-confined managed report HTML preview endpoint and iframe panel so operators can inspect client deliverables without opening files manually or loading remote assets.
 - Chose to move policy pack detail into the dashboard so vertical templates are visible before an operator creates a job or managed session.
+
+## 2026-05-26
+
+- Chose a new `thelibrarian chat <root>` command to let operators discuss and revise planned moves in natural-language-like CLI prompts without directly editing JSON plans.
+- Chose chat-scoped directory inclusion (`add-dir`/`aggiungi directory`) to explicitly focus analysis on selected subdirectories while keeping the root boundary enforced.
+- Chose scripted chat commands (`--command` repeatable) to keep the interaction testable and automation-friendly.
