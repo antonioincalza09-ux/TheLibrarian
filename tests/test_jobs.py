@@ -23,13 +23,16 @@ def run_cli(args: list[str]) -> tuple[int, str, str]:
 class JobStoreTests(unittest.TestCase):
     def test_create_job_record(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
-            root = Path(temp_directory)
+            root = Path(temp_directory) / "Client Files"
+            root.mkdir()
             store = JobStore(root)
 
             job = store.create()
 
             self.assertEqual(job.status, JobStatus.CREATED)
             self.assertEqual(job.phase, JobPhase.CREATED)
+            self.assertTrue(job.job_id.startswith("client-files-"))
+            self.assertEqual(job.job_name.split("/", 1)[0], "Client Files")
             self.assertTrue((root / ".thelibrarian" / "jobs" / job.job_id / "job.json").exists())
 
     def test_save_and_load_job_record(self) -> None:
@@ -361,10 +364,12 @@ class JobCliTests(unittest.TestCase):
             root = Path(temp_directory)
             _, output, _ = run_cli(["job", "create", str(root)])
             job_id = next(line for line in output.splitlines() if line.startswith("Job: ")).split(": ", 1)[1]
+            job_name = next(line for line in output.splitlines() if line.startswith("Name: ")).split(": ", 1)[1]
 
             exit_code, list_output, _ = run_cli(["job", "list", str(root)])
 
             self.assertEqual(exit_code, 0)
+            self.assertIn(job_name, list_output)
             self.assertIn(job_id, list_output)
 
 

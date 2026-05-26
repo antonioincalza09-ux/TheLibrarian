@@ -55,9 +55,11 @@ class WebAppTests(unittest.TestCase):
             self.assertIn("Privacy-first file organization copilot", html)
             self.assertIn("Safe workflow", html)
             self.assertIn("Before / After Tree", html)
+            self.assertIn("Chat Review", html)
             self.assertIn("Pack Detail", html)
             self.assertIn("Client Report Preview", html)
             self.assertIn('id="downloadPlanBtn"', html)
+            self.assertIn('id="chatInput"', html)
             self.assertIn('id="managedKpiCards"', html)
             self.assertIn('id="beforeTreePreview"', html)
             self.assertIn('id="packDetails"', html)
@@ -66,6 +68,7 @@ class WebAppTests(unittest.TestCase):
             self.assertIn('id="reviewCategoryFilter"', html)
             self.assertEqual(dashboard["inventory"]["summary"]["total_files"], 1)
             self.assertIn("jobs", dashboard)
+            self.assertIn("chat", dashboard)
 
     def test_job_run_endpoint_creates_artifacts_without_moving_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
@@ -295,6 +298,42 @@ class WebAppTests(unittest.TestCase):
 
             self.assertEqual(plan["entries"][0]["destination"], "Documents/Contracts/contract.pdf")
             self.assertEqual(saved["plan"]["entries"][0]["destination"], "Documents/Contracts/contract.pdf")
+
+    def test_chat_endpoint_updates_dashboard_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "report.pdf").write_text("content", encoding="utf-8")
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                for command in ("analizza", "piano", "sposta report.pdf Documents/General/finale.pdf"):
+                    request = Request(
+                        f"http://{host}:{port}/api/chat",
+                        data=json.dumps({"command": command}).encode("utf-8"),
+                        headers={"Content-Type": "application/json"},
+                        method="POST",
+                    )
+                    urlopen(request, timeout=5).read()
+                dashboard = json.loads(urlopen(f"http://{host}:{port}/api/dashboard", timeout=5).read())
+                save_request = Request(
+                    f"http://{host}:{port}/api/plan/save",
+                    data=b"{}",
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                saved = json.loads(urlopen(save_request, timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            self.assertTrue(dashboard["chat"]["has_plan"])
+            self.assertIn("analizza", [item["content"] for item in dashboard["chat"]["history"] if item["role"] == "user"])
+            self.assertEqual(dashboard["plan"]["entries"][0]["destination"], "Documents/General/finale.pdf")
+            self.assertEqual(saved["plan"]["entries"][0]["destination"], "Documents/General/finale.pdf")
 
     def test_policy_pack_and_provider_api_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:

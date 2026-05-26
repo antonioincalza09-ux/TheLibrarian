@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 from src.models import Inventory, OrganizationPlan
 from src.orchestrator import organize_directory
@@ -12,19 +13,77 @@ from src.security import resolve_root
 
 
 @dataclass(slots=True)
+class ChatMessage:
+    role: str
+    content: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {"role": self.role, "content": self.content}
+
+
+@dataclass(slots=True)
 class ChatSession:
     root: Path
     include_dirs: set[str] = field(default_factory=set)
     inventory: Inventory | None = None
     plan: OrganizationPlan | None = None
     report: str | None = None
+    history: list[ChatMessage] = field(default_factory=list)
+
+    def snapshot(self) -> dict[str, Any]:
+        return {
+            "root": str(self.root),
+            "include_dirs": sorted(self.include_dirs),
+            "inventory": None if self.inventory is None else self.inventory.to_dict(),
+            "plan": None if self.plan is None else self.plan.to_dict(),
+            "report": self.report,
+            "history": [message.to_dict() for message in self.history],
+            "has_inventory": self.inventory is not None,
+            "has_plan": self.plan is not None,
+            "suggestions": [
+                "analizza",
+                "piano",
+                "mostra",
+                "aggiungi directory <cartella>",
+                "sposta <source> <destinazione>",
+                "review <source>",
+            ],
+        }
+
+
+def create_chat_session(root: str | Path) -> ChatSession:
+    session = ChatSession(root=resolve_root(root))
+    session.history.append(
+        ChatMessage(
+            role="assistant",
+            content=(
+                "Chat pronta. Posso analizzare cartelle, rigenerare il piano e riassegnare file con comandi come "
+                "'analizza', 'piano', 'aggiungi directory Invoices', 'sposta report.pdf Documents/Reports/finale.pdf'."
+            ),
+        )
+    )
+    return session
+
+
+def execute_chat_command(session: ChatSession, prompt: str) -> dict[str, Any]:
+    cleaned = prompt.strip()
+    if not cleaned:
+        raise ValueError("Inserisci un comando chat.")
+    session.history.append(ChatMessage(role="user", content=cleaned))
+    if _is_exit(cleaned):
+        reply = "Sessione chiusa."
+        session.history.append(ChatMessage(role="assistant", content=reply))
+        return {"message": reply, "exit": True, "session": session.snapshot()}
+    reply = _handle_prompt(session, cleaned)
+    session.history.append(ChatMessage(role="assistant", content=reply))
+    return {"message": reply, "exit": False, "session": session.snapshot()}
 
 
 def run_chat(root: str | Path, commands: list[str] | None = None) -> int:
-    session = ChatSession(root=resolve_root(root))
+    session = create_chat_session(root)
     scripted = list(commands or [])
     scripted_mode = commands is not None
-    print("TheLibrarian chat pronta. Comandi: help, scan, plan, show, add-dir <dir>, move <src> <dest>, review <src>, exit")
+    print(session.history[0].content)
 
     while True:
         prompt = scripted.pop(0) if scripted else input("thelibrarian> ").strip()
@@ -32,12 +91,11 @@ def run_chat(root: str | Path, commands: list[str] | None = None) -> int:
             print(f"> {prompt}")
         if not prompt:
             continue
-        if _is_exit(prompt):
-            print("Sessione chiusa.")
-            return 0
         try:
-            message = _handle_prompt(session, prompt)
-            print(message)
+            result = execute_chat_command(session, prompt)
+            print(result["message"])
+            if result["exit"]:
+                return 0
         except ValueError as exc:
             print(f"Error: {exc}")
 
@@ -47,14 +105,23 @@ def _handle_prompt(session: ChatSession, prompt: str) -> str:
     if lowered in {"help", "aiuto", "?"}:
         return (
             "Comandi: scan/analizza, plan/piano, show/mostra, add-dir/aggiungi directory <dir>, "
-            "move/sposta <source> <destinazione>, review <source>, exit."
+            "move/sposta <source> <destinazione>, review <source>, reset, exit."
         )
+    if lowered == "reset":
+        session.include_dirs.clear()
+        session.inventory = None
+        session.plan = None
+        session.report = None
+        return "Contesto chat azzerato. Puoi ripartire con 'analizza' o 'piano'."
     if lowered.startswith(("add-dir ", "aggiungi directory ")):
         raw = prompt.split(" ", 1)[1].replace("directory ", "", 1).strip()
         return _add_include_dir(session, raw)
     if lowered in {"scan", "analizza", "analizza cartelle"}:
         inventory = scan_directory(session.root)
         session.inventory = _filter_inventory(inventory, session.include_dirs)
+        if session.plan is not None:
+            session.plan = build_plan(session.inventory)
+            session.report = render_plan_report(session.inventory, session.plan)
         return f"Inventario: {session.inventory.total_files} file in analisi."
     if lowered in {"plan", "piano", "genera piano"}:
         if session.inventory is None:
@@ -68,15 +135,15 @@ def _handle_prompt(session: ChatSession, prompt: str) -> str:
         )
     if lowered in {"show", "mostra", "show plan", "mostra piano"}:
         if session.plan is None:
-            return "Nessun piano in memoria. Esegui 'plan'."
+            return "Nessun piano in memoria. Esegui 'piano'."
         return _render_preview(session)
     if lowered.startswith(("move ", "sposta ")):
         if session.plan is None:
-            raise ValueError("Esegui prima 'plan'.")
+            raise ValueError("Esegui prima 'piano'.")
         return _move_entry(session, prompt)
     if lowered.startswith("review "):
         if session.plan is None:
-            raise ValueError("Esegui prima 'plan'.")
+            raise ValueError("Esegui prima 'piano'.")
         source = prompt.split(" ", 1)[1].strip()
         destination = f"Review/{PurePosixPath(source).name}"
         return _rewrite_entry(session, source, destination, "Riassegnato manualmente in chat a Review.", 0.4)
@@ -132,6 +199,7 @@ def _rewrite_entry(session: ChatSession, source: str, destination: str, reason: 
             entry.confidence = confidence
             entry.status = "planned"
             entry.warning = None
+            session.report = render_plan_report(session.inventory, session.plan) if session.inventory is not None else session.report
             return f"Aggiornato: {normalized_source} -> {normalized_destination}"
     raise ValueError(f"Source non presente nel piano: {normalized_source}")
 

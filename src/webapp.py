@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from src.chat import create_chat_session, execute_chat_command
 from src.config import RuntimeConfig
 from src.executor import execute_plan
 from src.jobs import JobRunner, JobStore
@@ -26,7 +27,8 @@ class ConfirmationRequired(SafetyError):
 
 def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConfig) -> ThreadingHTTPServer:
     root_lock = threading.RLock()
-    root_state = {"path": resolve_root(root)}
+    resolved_root = resolve_root(root)
+    root_state = {"path": resolved_root, "chat": create_chat_session(resolved_root)}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, format: str, *args: object) -> None:
@@ -73,7 +75,12 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
             next_root = resolve_root(root_value)
             with root_lock:
                 root_state["path"] = next_root
+                root_state["chat"] = create_chat_session(next_root)
             return next_root
+
+        def _chat(self):
+            with root_lock:
+                return root_state["chat"]
 
         def _inventory(self) -> dict[str, object]:
             return scan_directory(self._root()).to_dict()
@@ -83,8 +90,9 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
 
         def _dashboard(self) -> dict[str, object]:
             resolved_root = self._root()
-            inventory = self._inventory()
-            plan = self._plan()
+            chat_session = self._chat()
+            inventory = chat_session.inventory.to_dict() if chat_session.inventory is not None else self._inventory()
+            plan = chat_session.plan.to_dict() if chat_session.plan is not None else self._plan()
             store = JobStore(resolved_root)
             jobs = [job.to_dict() for job in store.list()]
             active_job = jobs[0] if jobs else None
@@ -122,6 +130,7 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 "packs": [pack.to_dict() for pack in list_policy_packs()],
                 "managed_sessions": [session.to_dict() for session in list_managed_sessions(resolved_root)],
                 "providers": _providers_payload(config),
+                "chat": chat_session.snapshot(),
             }
 
         def _read_root_artifact(self, artifact_path: str) -> dict[str, object]:
@@ -209,6 +218,9 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 if parsed.path == "/api/providers":
                     self._json(200, _providers_payload(config))
                     return
+                if parsed.path == "/api/chat":
+                    self._json(200, self._chat().snapshot())
+                    return
                 if parsed.path == "/api/providers/doctor":
                     query = parse_qs(parsed.query)
                     provider_name = query.get("provider", [config.provider])[0]
@@ -255,14 +267,32 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     next_root = self._set_root(body.get("root"))
                     self._json(200, {"root": str(next_root)})
                     return
+                if parsed.path == "/api/chat":
+                    command = body.get("command")
+                    if not isinstance(command, str):
+                        self._json(400, {"error": "Request body must include command."})
+                        return
+                    result = execute_chat_command(self._chat(), command)
+                    self._json(200, result)
+                    return
+                if parsed.path == "/api/chat/reset":
+                    with root_lock:
+                        root_state["chat"] = create_chat_session(self._root())
+                        snapshot = root_state["chat"].snapshot()
+                    self._json(200, {"message": "Chat reset.", "session": snapshot})
+                    return
 
                 if parsed.path == "/api/plan/save":
                     pack_id = body.get("pack_id")
-                    plan = _build_current_plan(
-                        self._root(),
-                        config,
-                        pack_id=str(pack_id) if pack_id else None,
-                    )
+                    active_chat = self._chat()
+                    if active_chat.plan is not None:
+                        plan = active_chat.plan
+                    else:
+                        plan = _build_current_plan(
+                            self._root(),
+                            config,
+                            pack_id=str(pack_id) if pack_id else None,
+                        )
                     plan_path = write_plan_artifact(self._root(), plan)
                     self._json(200, {"path": str(plan_path), "plan": plan.to_dict()})
                     return
@@ -795,6 +825,43 @@ def _page() -> str:
       border: 1px solid var(--line);
       background: white;
     }
+    .chat-transcript {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      padding: 14px;
+      min-height: 320px;
+      max-height: 420px;
+      overflow: auto;
+      display: grid;
+      gap: 10px;
+    }
+    .chat-message {
+      border: 1px solid var(--line);
+      background: #f8fbf6;
+      padding: 10px 12px;
+    }
+    .chat-message.user {
+      background: #eef6f2;
+      border-color: #c9ddd1;
+    }
+    .chat-message strong {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .chat-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .chat-meta {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
     .view { display: none; }
     .view.active { display: block; }
     @media (max-width: 980px) {
@@ -840,6 +907,7 @@ def _page() -> str:
         <button type="button" data-view="review">Review</button>
         <button type="button" data-view="warnings">Warnings</button>
         <button type="button" data-view="jobs">Jobs</button>
+        <button type="button" data-view="chat">Chat</button>
         <button type="button" data-view="packs">Policy Packs</button>
         <button type="button" data-view="managed">Managed Cleanup</button>
         <button type="button" data-view="providers">Providers</button>
@@ -944,7 +1012,7 @@ def _page() -> str:
           <div class="table-wrap"><table id="planTable"></table></div>
         </div>
       </section>
-      <section class="view" data-view-panel="jobs">
+        <section class="view" data-view-panel="jobs">
         <div class="layout">
           <div class="panel">
             <div class="panel-header">
@@ -958,8 +1026,31 @@ def _page() -> str:
             <pre id="jobJson">{}</pre>
           </div>
         </div>
-      </section>
-      <section class="view" data-view-panel="packs">
+        </section>
+        <section class="view" data-view-panel="chat">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Chat Review</h2>
+                <p class="subtle">Parla con TheLibrarian per restringere l'analisi, rigenerare il piano e riassegnare file senza toccare i contenuti.</p>
+              </div>
+              <div class="panel-actions">
+                <button type="button" id="chatResetBtn">Reset Chat</button>
+              </div>
+            </div>
+            <div class="chat-transcript" id="chatTranscript"></div>
+            <div class="chat-controls">
+              <input id="chatInput" type="text" aria-label="Chat command" placeholder="Esempio: aggiungi directory Invoices oppure sposta report.pdf Documents/Reports/finale.pdf">
+              <button type="button" id="chatSendBtn" class="button-blue">Send</button>
+              <button type="button" id="chatPlanBtn">Plan</button>
+            </div>
+            <div class="chat-meta">
+              <div class="kv"><strong>Scope</strong><span id="chatScope">Root completa</span></div>
+              <div class="kv"><strong>Suggestions</strong><span id="chatSuggestions"></span></div>
+            </div>
+          </div>
+        </section>
+        <section class="view" data-view-panel="packs">
         <div class="layout">
           <div class="panel">
             <div class="panel-header">
@@ -1144,7 +1235,7 @@ def _page() -> str:
     async function refresh({ keepSelection = true, silent = false } = {}) {
       const previous = keepSelection ? state.selectedJobId : null;
       state.dashboard = await api('/api/dashboard');
-      if (state.planPackId) {
+      if (state.planPackId && !state.dashboard.chat?.has_plan) {
         state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
       }
       const jobs = state.dashboard.jobs || [];
@@ -1191,6 +1282,7 @@ def _page() -> str:
       renderEvents();
       renderManifest();
       renderActiveJob(selected);
+      renderChat(dashboard.chat || {});
     }
     function renderPlanTables(plan) {
       const rows = plan.entries.slice(0, 8).map(entry => [
@@ -1253,6 +1345,7 @@ def _page() -> str:
       $('#jobList').innerHTML = jobs.length ? jobs.map(job => `
         <button type="button" class="job-card ${selected?.job_id === job.job_id ? 'active' : ''}" data-job="${escapeHtml(job.job_id)}">
           <div>${badge(job.status)} ${badge(job.phase)}</div>
+          <strong>${escapeHtml(job.job_name || job.job_id)}</strong>
           <code>${escapeHtml(job.job_id)}</code>
           <div class="subtle">${escapeHtml(job.updated_at)}</div>
         </button>
@@ -1370,6 +1463,7 @@ def _page() -> str:
         return;
       }
       $('#activeJobDetails').innerHTML = [
+        ['Name', job.job_name || job.job_id],
         ['Job', job.job_id],
         ['Status', job.status],
         ['Phase', job.phase],
@@ -1382,6 +1476,17 @@ def _page() -> str:
       $('#applyJobBtn').disabled = !job.policy_path;
       $('#rollbackJobBtn').disabled = !job.manifest_path;
       $('#deleteJobBtn').disabled = false;
+    }
+    function renderChat(chat) {
+      const history = chat.history || [];
+      $('#chatTranscript').innerHTML = history.length ? history.map(message => `
+        <div class="chat-message ${escapeHtml(message.role)}">
+          <strong>${escapeHtml(message.role)}</strong>
+          <div>${escapeHtml(message.content).replace(/\n/g, '<br>')}</div>
+        </div>
+      `).join('') : '<div class="empty">No chat messages yet.</div>';
+      $('#chatScope').textContent = (chat.include_dirs || []).length ? chat.include_dirs.join(', ') : 'Root completa';
+      $('#chatSuggestions').textContent = (chat.suggestions || []).join(' | ');
     }
     function renderPolicy() {
       const decisions = state.policy?.decisions || [];
@@ -1515,10 +1620,31 @@ def _page() -> str:
       state.planPackId = pack || '';
       renderPackDetails((state.dashboard?.packs || []).find(item => item.id === state.planPackId));
       runAction('Policy pack preview', async () => {
-        if (!state.dashboard || !state.planPackId) return;
+        if (!state.dashboard || !state.planPackId || state.dashboard.chat?.has_plan) return;
         state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
         setStatus(`Plan preview uses ${state.planPackId}`);
       }, { refreshAfter: false });
+    });
+    $('#chatSendBtn').addEventListener('click', () => runAction('Chat command', async () => {
+      const command = $('#chatInput').value.trim();
+      if (!command) return;
+      await api('/api/chat', { method: 'POST', body: JSON.stringify({ command }) });
+      $('#chatInput').value = '';
+    }));
+    $('#chatPlanBtn').addEventListener('click', () => runAction('Chat plan', async () => {
+      await api('/api/chat', { method: 'POST', body: JSON.stringify({ command: 'piano' }) });
+      setView('chat');
+    }));
+    $('#chatResetBtn').addEventListener('click', () => {
+      if (!confirmAction('Azzerare la sessione chat e tornare al contesto di root?')) return;
+      runAction('Chat reset', async () => {
+        await api('/api/chat/reset', { method: 'POST', body: '{}' });
+      });
+    });
+    $('#chatInput').addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.shiftKey) return;
+      event.preventDefault();
+      $('#chatSendBtn').click();
     });
     $$('.nav button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
     $$('[data-view-jump]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewJump)));

@@ -1,0 +1,48 @@
+librarian_id: bbb4c7ea4eaa1e01
+type: file
+original_path: docs/meeting_minutes.md
+current_path: docs/meeting_minutes.md
+proposed_path: docs/meeting_minutes.md
+name: meeting_minutes.md
+extension: .md
+size_bytes: 67
+created_at: '2026-05-26T20:53:18.814412+00:00'
+modified_at: '2026-05-26T20:53:18.814412+00:00'
+indexed_at: '2026-05-26T20:57:33.015161+00:00'
+mime_type: text/markdown
+content_hash: d7fae07860439f48b477f39c3f843d1543b1202ca09e689b7bd861846edce95d
+name_hash: 79f5d5c57bbcf9b54b8154a40fc6fc95ef5f764624b9127f82a44a4023a6fa89
+readable: true
+read_error: null
+file_kind: document
+detected_language: null
+title: meeting_minutes
+summary: Matched meeting keywords.
+human_description: File docs/meeting_minutes.md classified as Work/Meetings.
+developer_notes: []
+tags:
+- Work
+- Meetings
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Work
+  category: Meetings
+  confidence: 0.88
+  reason: Matched meeting keywords.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 2
+parent_path: docs
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: true
+risk_level: low

@@ -1,0 +1,48 @@
+librarian_id: 42c59af8a4bae559
+type: file
+original_path: README.md
+current_path: README.md
+proposed_path: README.md
+name: README.md
+extension: .md
+size_bytes: 72
+created_at: '2026-05-26T20:53:18.813406+00:00'
+modified_at: '2026-05-26T20:53:18.813406+00:00'
+indexed_at: '2026-05-26T20:57:33.015161+00:00'
+mime_type: text/markdown
+content_hash: 26aa2bcb3a6b440b55ea94e3e9b1737b760b8e3b13f5a19d9302a340a2f80e34
+name_hash: b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5
+readable: true
+read_error: null
+file_kind: document
+detected_language: null
+title: README
+summary: Recognized document type.
+human_description: File README.md classified as Documentation/Documents.
+developer_notes: []
+tags:
+- Documentation
+- Documents
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Documentation
+  category: Documents
+  confidence: 0.7
+  reason: Recognized document type.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 1
+parent_path: .
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: true
+risk_level: low

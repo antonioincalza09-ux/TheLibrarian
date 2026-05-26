@@ -17,6 +17,8 @@ The official command is `thelibrarian`. During local development, every command 
 - `managed list ROOT`: lists managed cleanup sessions.
 - `managed show SESSION_ID --root ROOT`: shows one managed cleanup session.
 - `managed report SESSION_ID --root ROOT`: regenerates a managed cleanup report.
+- `chat ROOT`: starts an interactive review chat for analysis scope and plan edits.
+- `chat ROOT --command "analizza" --command "piano"`: runs scripted chat commands for tests or automation.
 - `serve ROOT --host 127.0.0.1 --port 8765`: starts the local browser preview app.
 - `job create ROOT --policy-pack PACK_ID`: creates a checkpointed job record without scanning and attaches a policy pack.
 - `job run ROOT --policy-pack PACK_ID`: creates and runs a dry-run checkpointed job using the pack policy unless `--policy` is explicitly provided.

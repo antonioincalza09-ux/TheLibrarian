@@ -26,6 +26,8 @@ The server exposes:
 - `/api/jobs/<job_id>/rollback?confirm=true`: rolls back from the job manifest.
 - `/api/jobs/<job_id>/delete?confirm=true`: deletes one job record and its job artifacts.
 - `/api/jobs/delete-all?confirm=true`: deletes all job records for the current root.
+- `/api/chat`: runs one review-chat command against the current root and returns the updated chat session snapshot.
+- `/api/chat/reset`: resets the dashboard chat session for the current root.
 
 The v1 dashboard shows Overview, Inventory, Plan, Review, Warnings, Jobs, Policy, Events, and Manifest views. It polls the local server for updates and exposes functional buttons for selecting the target directory, creating jobs, running dry-run jobs, saving or downloading the current plan JSON, approving policy decisions, applying approved entries, rolling back applied jobs, and deleting job history.
 

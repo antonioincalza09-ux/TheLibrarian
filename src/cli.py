@@ -506,6 +506,7 @@ def _handle_doctor(args: argparse.Namespace) -> int:
 
 def _print_job(job) -> None:
     print(f"Job: {job.job_id}")
+    print(f"Name: {job.job_name}")
     print(f"Root: {job.root}")
     print(f"Status: {job.status.value}")
     print(f"Phase: {job.phase.value}")
@@ -657,7 +658,7 @@ def _handle_job(args: argparse.Namespace) -> int:
             _print_json({"jobs": [job.to_dict() for job in jobs]})
         else:
             for job in jobs:
-                print(f"{job.job_id}\t{job.status.value}\t{job.phase.value}\t{job.updated_at}")
+                print(f"{job.job_name}\t{job.job_id}\t{job.status.value}\t{job.phase.value}\t{job.updated_at}")
         return 0
 
     if args.job_command == "events":
