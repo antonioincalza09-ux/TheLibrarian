@@ -52,3 +52,6 @@
 - Chose a new `thelibrarian chat <root>` command to let operators discuss and revise planned moves in natural-language-like CLI prompts without directly editing JSON plans.
 - Chose chat-scoped directory inclusion (`add-dir`/`aggiungi directory`) to explicitly focus analysis on selected subdirectories while keeping the root boundary enforced.
 - Chose scripted chat commands (`--command` repeatable) to keep the interaction testable and automation-friendly.
+- Chose folder-derived job names and job ids so operators see readable job references instead of opaque alphanumeric identifiers.
+- Chose to expose the review chat inside the localhost dashboard as a first-class panel backed by the same server-side chat session used by the CLI workflow.
+- Chose to allow safe whole-directory move planning and apply/rollback for non-code subtrees when every descendant file is movable, while keeping codebase-like trees logical-only.

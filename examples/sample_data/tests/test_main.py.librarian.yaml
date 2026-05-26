@@ -1,0 +1,80 @@
+librarian_id: 39f531939c26c939
+type: file
+original_path: tests/test_main.py
+current_path: tests/test_main.py
+proposed_path: tests/test_main.py
+name: test_main.py
+extension: .py
+size_bytes: 107
+created_at: '2026-05-26T20:53:18.813908+00:00'
+modified_at: '2026-05-26T20:53:18.813908+00:00'
+indexed_at: '2026-05-26T20:57:33.015161+00:00'
+mime_type: text/x-python
+content_hash: bef116a8f5d778607d03043bbbd6aa0c7d2689a5d5db66f1f4e336013e9e0d31
+name_hash: b3f46f7b70562c63e46bae252ec733f8a748fb67e540280715dc4ea5bdaa8375
+readable: true
+read_error: null
+file_kind: source_code
+detected_language: Python
+title: test_main
+summary: Looks like a test file.
+human_description: File tests/test_main.py classified as Code/Tests.
+developer_notes:
+- Python AST analysis completed.
+tags:
+- Code
+- Tests
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Code
+  category: Tests
+  confidence: 0.96
+  reason: Looks like a test file.
+code_metadata:
+  language: Python
+  module_name: test_main
+  package_name: tests.test_main
+  imports:
+    internal: []
+    external:
+    - sample_app.utils
+    standard_library: []
+  symbols:
+    functions:
+    - name: test_greet
+      line_start: 4
+      line_end: 5
+    classes: []
+    methods: []
+  docstrings:
+    module: null
+    functions: {}
+    classes: {}
+  entrypoints: []
+  framework_hints: []
+  test_hints:
+  - test_greet
+  config_hints: []
+  risk_level: low
+  generated_file: false
+  vendor_file: false
+  lock_file: false
+  should_modify: false
+  should_move: false
+  reason: Python AST analysis completed.
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 2
+parent_path: tests
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: low

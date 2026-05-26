@@ -5,17 +5,22 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "thelibrarian"
 version = "0.1.0"
-description = "Privacy-first file organization copilot for professionals and small businesses"
+description = "Developer-first offline workspace librarian with sidecar metadata and reversible planning"
 requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.0",
+  "PyYAML>=6.0",
+]
 
 [project.optional-dependencies]
 online = []
 ollama = []
 web = []
-dev = []
+dev = ["pytest>=8.0"]
 
 [project.scripts]
 thelibrarian = "src.cli:main"
+librarian = "src.librarian.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["src*"]

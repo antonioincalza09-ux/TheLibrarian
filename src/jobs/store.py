@@ -4,6 +4,7 @@ import json
 import os
 import re
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 
 from src.jobs.models import JobEvent, JobPhase, JobRecord, JobStatus
@@ -28,7 +29,10 @@ class JobStore:
         policy_name: str | None = None,
         pack_id: str | None = None,
     ) -> JobRecord:
+        job_id = self._next_job_id()
         job = JobRecord.create(
+            job_id=job_id,
+            job_name=self._job_name_from_id(job_id),
             root=str(self.root),
             dry_run=dry_run,
             provider=provider,
@@ -167,6 +171,27 @@ class JobStore:
         if not job_id or "/" in job_id or "\\" in job_id or ".." in job_id or not _SAFE_JOB_ID.match(job_id):
             raise SafetyError(f"Invalid job id: {job_id}")
         return job_id
+
+    def _next_job_id(self) -> str:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        base = self._slugify_path_name(self.root.name or "root")
+        candidate = f"{base}-{timestamp}"
+        suffix = 2
+        while self.job_directory(candidate).exists():
+            candidate = f"{base}-{timestamp}-{suffix}"
+            suffix += 1
+        return candidate
+
+    def _job_name_from_id(self, job_id: str) -> str:
+        folder_name = self.root.name or "root"
+        prefix = f"{self._slugify_path_name(folder_name)}-"
+        if job_id.startswith(prefix):
+            return f"{folder_name}/{job_id[len(prefix):]}"
+        return job_id
+
+    def _slugify_path_name(self, value: str) -> str:
+        normalized = re.sub(r"[^A-Za-z0-9]+", "-", value.strip().lower()).strip("-")
+        return normalized or "root"
 
     def _atomic_write_json(self, path: Path, payload: dict[str, object]) -> None:
         temporary_path = path.with_suffix(path.suffix + ".tmp")

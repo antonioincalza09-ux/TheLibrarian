@@ -1,0 +1,74 @@
+{
+  "workspace_root": "C:\\Users\\PC\\Documents\\TheLibrarian\\examples\\sample_data",
+  "generated_at": "2026-05-26T20:57:52.861319+00:00",
+  "entries": [
+    {
+      "source": "README.md",
+      "destination": "docs/documents/readme.md",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket docs/documents.",
+      "confidence": 0.7,
+      "safe_to_move": true,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "pyproject.toml",
+      "destination": "review/projectconfig/pyproject.toml",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/projectconfig.",
+      "confidence": 0.85,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "docs/meeting_minutes.md",
+      "destination": "work/meetings/meeting-minutes.md",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket work/meetings.",
+      "confidence": 0.88,
+      "safe_to_move": true,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "src/sample_app/main.py",
+      "destination": "review/project/main.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "src/sample_app/utils.py",
+      "destination": "review/project/utils.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "tests/test_main.py",
+      "destination": "review/tests/test-main.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/tests.",
+      "confidence": 0.96,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}

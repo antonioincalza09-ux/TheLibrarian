@@ -1,0 +1,78 @@
+librarian_id: 7e752c5c3789f476
+type: file
+original_path: src/sample_app/utils.py
+current_path: src/sample_app/utils.py
+proposed_path: src/sample_app/utils.py
+name: utils.py
+extension: .py
+size_bytes: 57
+created_at: '2026-05-26T20:53:18.813908+00:00'
+modified_at: '2026-05-26T20:53:18.813908+00:00'
+indexed_at: '2026-05-26T20:57:33.015161+00:00'
+mime_type: text/x-python
+content_hash: 34cb016ab63320603dad74e5902ea9aeab2fca21f0923928e3ac8b04858ecf1d
+name_hash: 09d0cbaf891d623ac245ccf84485a687b554217349ca55557c60b33234b969ae
+readable: true
+read_error: null
+file_kind: source_code
+detected_language: Python
+title: utils
+summary: Recognized source code.
+human_description: File src/sample_app/utils.py classified as Code/Project.
+developer_notes:
+- Python AST analysis completed.
+tags:
+- Code
+- Project
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Code
+  category: Project
+  confidence: 0.9
+  reason: Recognized source code.
+code_metadata:
+  language: Python
+  module_name: utils
+  package_name: src.sample_app.utils
+  imports:
+    internal: []
+    external: []
+    standard_library: []
+  symbols:
+    functions:
+    - name: greet
+      line_start: 1
+      line_end: 2
+    classes: []
+    methods: []
+  docstrings:
+    module: null
+    functions: {}
+    classes: {}
+  entrypoints: []
+  framework_hints: []
+  test_hints: []
+  config_hints: []
+  risk_level: low
+  generated_file: false
+  vendor_file: false
+  lock_file: false
+  should_modify: false
+  should_move: false
+  reason: Python AST analysis completed.
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 3
+parent_path: src/sample_app
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: low

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
-from uuid import uuid4
 
 from src.models import utc_now_iso
 
@@ -119,6 +118,7 @@ class JobEvent:
 @dataclass(slots=True)
 class JobRecord:
     job_id: str
+    job_name: str
     root: str
     created_at: str
     updated_at: str
@@ -140,6 +140,7 @@ class JobRecord:
     def to_dict(self) -> dict[str, Any]:
         return {
             "job_id": self.job_id,
+            "job_name": self.job_name,
             "root": self.root,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
@@ -163,6 +164,8 @@ class JobRecord:
     def create(
         cls,
         *,
+        job_id: str,
+        job_name: str,
         root: str,
         dry_run: bool = True,
         provider: str = "deterministic",
@@ -171,7 +174,8 @@ class JobRecord:
     ) -> "JobRecord":
         now = utc_now_iso()
         return cls(
-            job_id=uuid4().hex,
+            job_id=job_id,
+            job_name=job_name,
             root=root,
             created_at=now,
             updated_at=now,
@@ -194,6 +198,7 @@ class JobRecord:
     def from_dict(cls, payload: dict[str, Any]) -> "JobRecord":
         return cls(
             job_id=str(payload["job_id"]),
+            job_name=str(payload.get("job_name", payload["job_id"])),
             root=str(payload["root"]),
             created_at=str(payload["created_at"]),
             updated_at=str(payload["updated_at"]),
