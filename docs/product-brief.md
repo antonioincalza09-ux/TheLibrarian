@@ -1,27 +1,32 @@
 # Product Brief
 
-## Product
+TheLibrarian is a privacy-first file organization copilot for professionals and small businesses.
 
-File Organizer Agent is a local assistant that organizes messy directories into practical, usage-centered structures.
+This brief is a short orientation document. The product source of truth is [product/prd.md](product/prd.md).
 
 ## Users
 
-- Professionals managing mixed downloads, project folders, reports, media, and archives.
-- Teams that need consistent local folder hygiene.
-- Operators who want a safe plan before allowing any file move.
+- Professionals with messy local folders.
+- Small businesses with sensitive client files.
+- Operators who provide cleanup as a managed service.
+- Future teams that need shared templates and policy governance.
+
+## Core Value
+
+TheLibrarian creates safe, auditable organization plans before any file move. It is designed around local-first privacy, dry-run previews, rollback manifests, and vertical policy packs.
 
 ## Primary Jobs
 
-- Understand what files exist in a target directory.
-- Group files by practical use, not only by extension.
-- Propose a clear organization plan.
-- Apply approved changes safely.
-- Leave a manifest that explains what happened and supports rollback.
+- Scan a target directory.
+- Classify file metadata.
+- Propose a practical organization plan.
+- Route uncertainty to review.
+- Generate operator and client-facing reports.
+- Apply only with confirmation and rollback support.
 
 ## Non-Goals
 
 - Deleting files automatically.
-- Uploading user files to external services by default.
-- Rewriting file contents.
-- Making irreversible changes without a manifest.
-
+- Modifying file contents.
+- Uploading file contents to external services.
+- Implementing billing, authentication, or hosted SaaS in the current local product.

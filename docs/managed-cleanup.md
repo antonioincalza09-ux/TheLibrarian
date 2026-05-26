@@ -20,9 +20,39 @@ Managed sessions are stored under:
   session.json
   report.json
   report.md
+  report.html
 ```
 
 The related job remains under `.thelibrarian/jobs/<job_id>/` and contains inventory, plan, policy decision, policy pack, report, and events.
+
+## Client-Readable Report
+
+`report.md` is the portable source report, `report.json` is the structured artifact, and `report.html` is the client-ready visual export for browser review or printing. Reports are intended to be shared with a client or internal stakeholder after operator review. They include:
+
+- service snapshot with client, operator, pack, stage, and dry-run posture
+- executive summary
+- client outcome and readiness label
+- KPI snapshot
+- review and risk summary
+- recommended actions from the selected policy pack
+- artifact map
+- safety appendix
+- next steps
+
+The HTML report uses only local static markup and CSS. It does not load remote assets, scripts, trackers, or cloud services.
+
+The dashboard can preview the latest generated HTML report through a root-confined local endpoint:
+
+```text
+GET /api/managed/<session_id>/report-html
+```
+
+Example report files are available in:
+
+```text
+examples/managed-report-sample.md
+examples/managed-report-sample.json
+```
 
 ## Cleanup Preview Compatibility
 
@@ -54,5 +84,6 @@ Scores are deterministic and model-free. They are meant for operational triage a
 - Managed sessions are dry-run only in this version.
 - No file contents are modified.
 - No file contents are sent to providers.
+- HTML reports are generated as local files with no external assets.
 - Apply still uses the existing explicit confirmation and rollback manifest workflow.
 - Session IDs are validated to block path traversal.

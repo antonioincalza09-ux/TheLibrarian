@@ -107,7 +107,7 @@ class JobRunner:
                 endpoint=job_config.endpoint,
                 privacy_mode=job_config.privacy_mode,
             )
-            plan = build_plan(inventory, provider=provider, context=context)
+            plan = build_plan(inventory, provider=provider, context=context, policy_pack=policy_pack)
             plan_path = self.store.artifact_path(active_job.job_id, "plan.json")
             write_plan(plan_path, plan)
             policy = self._policy_for_job(job_config.policy_name, policy_pack)

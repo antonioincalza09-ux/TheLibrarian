@@ -52,7 +52,16 @@ class WebAppTests(unittest.TestCase):
 
             self.assertIn('data-app="thelibrarian-dashboard"', html)
             self.assertIn("Operations Dashboard", html)
+            self.assertIn("Privacy-first file organization copilot", html)
+            self.assertIn("Safe workflow", html)
+            self.assertIn("Before / After Tree", html)
+            self.assertIn("Pack Detail", html)
+            self.assertIn("Client Report Preview", html)
             self.assertIn('id="downloadPlanBtn"', html)
+            self.assertIn('id="managedKpiCards"', html)
+            self.assertIn('id="beforeTreePreview"', html)
+            self.assertIn('id="packDetails"', html)
+            self.assertIn('id="managedReportPreview"', html)
             self.assertIn('id="planSearchInput"', html)
             self.assertIn('id="reviewCategoryFilter"', html)
             self.assertEqual(dashboard["inventory"]["summary"]["total_files"], 1)
@@ -261,6 +270,32 @@ class WebAppTests(unittest.TestCase):
             self.assertEqual(plan_path.parent, root / ".thelibrarian" / "plans")
             self.assertEqual(payload["plan"]["entries"][0]["destination"], "Documents/Reports/report.pdf")
 
+    def test_plan_endpoint_can_preview_policy_pack_templates(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "contract.pdf").write_text("content", encoding="utf-8")
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                plan = json.loads(urlopen(f"http://{host}:{port}/api/plan?pack_id=studio_legale", timeout=5).read())
+                request = Request(
+                    f"http://{host}:{port}/api/plan/save",
+                    data=json.dumps({"pack_id": "studio_legale"}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                saved = json.loads(urlopen(request, timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            self.assertEqual(plan["entries"][0]["destination"], "Documents/Contracts/contract.pdf")
+            self.assertEqual(saved["plan"]["entries"][0]["destination"], "Documents/Contracts/contract.pdf")
+
     def test_policy_pack_and_provider_api_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
@@ -312,6 +347,10 @@ class WebAppTests(unittest.TestCase):
                 )
                 session = json.loads(urlopen(request, timeout=5).read())
                 sessions = json.loads(urlopen(f"http://{host}:{port}/api/managed", timeout=5).read())
+                report_html = urlopen(
+                    f"http://{host}:{port}/api/managed/{session['session_id']}/report-html",
+                    timeout=5,
+                ).read().decode("utf-8")
             finally:
                 server.shutdown()
                 server.server_close()
@@ -322,6 +361,9 @@ class WebAppTests(unittest.TestCase):
             self.assertTrue((session_directory / "session.json").exists())
             self.assertTrue((session_directory / "report.json").exists())
             self.assertTrue((session_directory / "report.md").exists())
+            self.assertTrue((session_directory / "report.html").exists())
+            self.assertIn("TheLibrarian Managed Cleanup Report", report_html)
+            self.assertIn("No files were moved during this report run.", report_html)
             self.assertEqual(sessions["sessions"][0]["session_id"], session["session_id"])
 
 

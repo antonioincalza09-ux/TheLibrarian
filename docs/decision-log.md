@@ -40,6 +40,12 @@
 - Chose `remote-compatible` and `antonio-managed` provider adapters for future hosted AI classification, with metadata-only payloads and deterministic fallback.
 - Chose to extend the dashboard/API with policy packs, managed cleanup, KPI, and provider status without adding a frontend framework or enabling automatic apply.
 - Chose `job create/run --policy-pack PACK_ID` as the explicit bridge from Policy Packs to Job Engine while keeping `--policy` as the manual override and `--pack` as a compatibility alias.
+- Chose to add a local static HTML managed report next to Markdown and JSON so operators have a client-ready visual deliverable without remote assets or cloud services.
+- Chose dashboard polish around workflow and KPI clarity instead of adding a frontend framework, preserving the stdlib-only local UI for this phase.
+- Chose conservative policy-pack folder-template routing in the planner: packs can refine destinations only when the existing category and filename/path tokens match a safe relative template.
+- Chose a two-level before/after dashboard preview so operators can see dry-run structure changes before saving, approving, or applying a plan.
+- Chose a root-confined managed report HTML preview endpoint and iframe panel so operators can inspect client deliverables without opening files manually or loading remote assets.
+- Chose to move policy pack detail into the dashboard so vertical templates are visible before an operator creates a job or managed session.
 
 ## 2026-05-26
 

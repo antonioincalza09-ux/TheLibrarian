@@ -61,8 +61,17 @@ The registry currently ships 25 vertical packs: `general_office`, `studio_legale
 
 `thelibrarian job run ROOT --policy-pack supervised_documents` validates the pack, saves it as `.thelibrarian/jobs/<job_id>/policy_pack.json`, stores `pack_id` in `job.json`, and uses the pack policy when `--policy` is not explicitly provided.
 
-`--pack PACK_ID` remains supported as a compatibility alias, including vertical packs such as `studio_legale`. In this version packs do not yet change classification or destination generation.
+`--pack PACK_ID` remains supported as a compatibility alias, including vertical packs such as `studio_legale`.
+
+When a job or dashboard preview supplies a pack, the planner may use matching `folder_templates` to refine destinations. This is conservative:
+
+- provider or deterministic classification still chooses the top-level category
+- the pack can refine a destination only inside valid relative templates for that category
+- template matching is based on filename/path tokens, such as `contract` -> `Documents/Contracts/`
+- `Review` entries may route to the pack's review template, such as `Review/NeedsHumanReview/`
+- unmatched files keep the normal deterministic destination
+- executor and policy safety checks still run before any apply
 
 ## Safety
 
-Policy packs configure policy and reporting only. They cannot directly bypass planner validation, apply moves, suppress executor safety checks, or move files outside the assigned root.
+Policy packs configure policy, reporting, and conservative destination templates. They cannot directly bypass planner validation, apply moves, suppress executor safety checks, overwrite files, or move files outside the assigned root.

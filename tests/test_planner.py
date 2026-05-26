@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from src.planner import build_plan
+from src.policy_packs import get_policy_pack
 from src.scanner import scan_directory
 
 
@@ -137,6 +138,20 @@ class PlannerTests(unittest.TestCase):
             )
             self.assertEqual(entries["presentation.pptx"].destination, "Documents/Presentations/presentation.pptx")
             self.assertEqual(entries["memo.txt"].destination, "Documents/Notes/memo.txt")
+
+    def test_policy_pack_templates_refine_matching_destinations(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            (root / "client-contract.pdf").write_text("contract", encoding="utf-8")
+            (root / "unknown.json").write_text("{}", encoding="utf-8")
+
+            inventory = scan_directory(root)
+            plan = build_plan(inventory, policy_pack=get_policy_pack("studio_legale"))
+            entries = {entry.source: entry for entry in plan.entries}
+
+            self.assertEqual(entries["client-contract.pdf"].destination, "Documents/Contracts/client-contract.pdf")
+            self.assertIn("Policy pack 'Studio Legale'", entries["client-contract.pdf"].reason)
+            self.assertEqual(entries["unknown.json"].destination, "Review/NeedsHumanReview/unknown.json")
 
 
 if __name__ == "__main__":

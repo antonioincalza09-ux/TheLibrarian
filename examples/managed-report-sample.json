@@ -1,0 +1,44 @@
+{
+  "session_id": "sample-session",
+  "summary": "TheLibrarian analyzed 128 file(s), planned 84 reversible move(s), and identified 19 item(s) for human review. No files were moved during this managed cleanup session.",
+  "kpi": {
+    "files_scanned": 128,
+    "total_bytes_scanned": 482344192,
+    "planned_moves": 84,
+    "auto_approved_moves": 65,
+    "manual_review_moves": 19,
+    "blocked_moves": 0,
+    "review_category_count": 11,
+    "conflict_count": 3,
+    "already_organized_count": 33,
+    "applied_moves": 0,
+    "verified_moves": 0,
+    "rollback_available": false,
+    "safety_score": 100,
+    "organization_score": 72,
+    "automation_score": 61,
+    "risk_score": 24,
+    "estimated_minutes_saved": 61.0
+  },
+  "recommendations": [
+    {
+      "id": "initial_audit",
+      "title": "Initial Cleanup Audit",
+      "description": "Review the current directory structure and generate a safe cleanup plan.",
+      "priority": "normal"
+    },
+    {
+      "id": "guided_cleanup",
+      "title": "Guided Cleanup Session",
+      "description": "Review risky files with the client before applying changes.",
+      "priority": "normal"
+    }
+  ],
+  "artifacts": {
+    "job": ".thelibrarian/jobs/sample-job/job.json",
+    "plan": ".thelibrarian/jobs/sample-job/plan.json",
+    "policy": ".thelibrarian/jobs/sample-job/policy_decision.json",
+    "report_md": ".thelibrarian/managed/sample-session/report.md",
+    "report_html": ".thelibrarian/managed/sample-session/report.html"
+  }
+}

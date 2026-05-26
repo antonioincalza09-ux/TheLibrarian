@@ -78,8 +78,8 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
         def _inventory(self) -> dict[str, object]:
             return scan_directory(self._root()).to_dict()
 
-        def _plan(self) -> dict[str, object]:
-            return _build_current_plan(self._root(), config).to_dict()
+        def _plan(self, pack_id: str | None = None) -> dict[str, object]:
+            return _build_current_plan(self._root(), config, pack_id=pack_id).to_dict()
 
         def _dashboard(self) -> dict[str, object]:
             resolved_root = self._root()
@@ -138,6 +138,17 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 raise SafetyError("Artifact is not a JSON object.")
             return payload
 
+        def _read_root_text_file(self, path: Path) -> str:
+            resolved_root = self._root()
+            resolved_path = path.resolve(strict=False)
+            try:
+                resolved_path.relative_to(resolved_root)
+            except ValueError as exc:
+                raise SafetyError("Artifact path escapes the assigned root.") from exc
+            if not resolved_path.exists():
+                raise SafetyError(f"Missing artifact: {path}")
+            return resolved_path.read_text(encoding="utf-8")
+
         def _job_id_from_path(self, prefix: str, path: str) -> tuple[str, str]:
             remainder = path.removeprefix(prefix).strip("/")
             parts = remainder.split("/")
@@ -161,7 +172,9 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     self._json(200, self._inventory())
                     return
                 if parsed.path == "/api/plan":
-                    self._json(200, self._plan())
+                    query = parse_qs(parsed.query)
+                    pack_id = query.get("pack_id", [""])[0] or None
+                    self._json(200, self._plan(pack_id=pack_id))
                     return
                 if parsed.path == "/api/packs":
                     self._json(200, {"packs": [pack.to_dict() for pack in list_policy_packs()]})
@@ -179,8 +192,19 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     self._json(200, {"sessions": [session.to_dict() for session in list_managed_sessions(self._root())]})
                     return
                 if parsed.path.startswith("/api/managed/"):
-                    session_id = parsed.path.removeprefix("/api/managed/").strip("/")
-                    self._json(200, load_managed_session(self._root(), session_id).to_dict())
+                    remainder = parsed.path.removeprefix("/api/managed/").strip("/")
+                    parts = remainder.split("/", 1)
+                    session_id = parts[0]
+                    suffix = parts[1] if len(parts) > 1 else ""
+                    session = load_managed_session(self._root(), session_id)
+                    if suffix == "report-html":
+                        report_path = self._root() / ".thelibrarian" / "managed" / session.session_id / "report.html"
+                        self._html(200, self._read_root_text_file(report_path))
+                        return
+                    if suffix:
+                        self._json(404, {"error": "Not found"})
+                        return
+                    self._json(200, session.to_dict())
                     return
                 if parsed.path == "/api/providers":
                     self._json(200, _providers_payload(config))
@@ -233,7 +257,12 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                     return
 
                 if parsed.path == "/api/plan/save":
-                    plan = _build_current_plan(self._root(), config)
+                    pack_id = body.get("pack_id")
+                    plan = _build_current_plan(
+                        self._root(),
+                        config,
+                        pack_id=str(pack_id) if pack_id else None,
+                    )
                     plan_path = write_plan_artifact(self._root(), plan)
                     self._json(200, {"path": str(plan_path), "plan": plan.to_dict()})
                     return
@@ -320,7 +349,7 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
     return ThreadingHTTPServer((host, port), Handler)
 
 
-def _build_current_plan(root: Path, config: RuntimeConfig):
+def _build_current_plan(root: Path, config: RuntimeConfig, *, pack_id: str | None = None):
     inventory = scan_directory(root)
     provider = get_provider(config.provider)
     context = ProviderContext(
@@ -328,7 +357,8 @@ def _build_current_plan(root: Path, config: RuntimeConfig):
         endpoint=config.endpoint,
         privacy_mode=config.privacy_mode,
     )
-    return build_plan(inventory, provider=provider, context=context)
+    policy_pack = get_policy_pack(pack_id, root) if pack_id else None
+    return build_plan(inventory, provider=provider, context=context, policy_pack=policy_pack)
 
 
 def _providers_payload(config: RuntimeConfig) -> dict[str, object]:
@@ -637,6 +667,18 @@ def _page() -> str:
       display: grid;
       gap: 10px;
     }
+    .detail-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .detail-list span {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      padding: 8px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
     .kv {
       display: grid;
       grid-template-columns: 118px minmax(0, 1fr);
@@ -664,6 +706,60 @@ def _page() -> str:
       background: var(--ok);
       flex: 0 0 auto;
     }
+    .workflow-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .workflow-step {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.84);
+      padding: 11px;
+      min-height: 78px;
+    }
+    .workflow-step strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #26352f;
+    }
+    .workflow-step span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .workflow-step.current {
+      border-color: #b7d0bf;
+      box-shadow: inset 3px 0 0 var(--accent);
+      background: #f6fbf5;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      padding: 11px;
+      min-height: 74px;
+    }
+    .kpi-card strong {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .kpi-card span {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+      font-weight: 760;
+    }
     .empty {
       border: 1px dashed #c9d4ca;
       background: #f8fbf6;
@@ -681,6 +777,24 @@ def _page() -> str:
       font-size: 12px;
       line-height: 1.45;
     }
+    .tree-preview {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .tree-preview pre {
+      min-height: 120px;
+      background: #f8fbf6;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      max-height: 260px;
+    }
+    .report-frame {
+      width: 100%;
+      min-height: 420px;
+      border: 1px solid var(--line);
+      background: white;
+    }
     .view { display: none; }
     .view.active { display: block; }
     @media (max-width: 980px) {
@@ -691,11 +805,14 @@ def _page() -> str:
       .toolbar { justify-content: flex-start; }
       .filter-bar { grid-template-columns: 1fr; }
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workflow-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tree-preview { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       aside { padding: 16px; }
       main { padding: 14px; }
       .grid { grid-template-columns: 1fr; }
+      .workflow-strip, .kpi-grid { grid-template-columns: 1fr; }
       .panel { padding: 12px; }
       .title-block h2 { font-size: 24px; }
       button { width: 100%; }
@@ -712,7 +829,7 @@ def _page() -> str:
         <div class="mark">TL</div>
         <div>
           <h1>TheLibrarian</h1>
-          <div class="subtle">Safe directory operations console</div>
+          <div class="subtle">Privacy-first file organization copilot</div>
         </div>
       </div>
       <div class="subtle" id="rootPath">Loading root</div>
@@ -761,6 +878,13 @@ def _page() -> str:
         </div>
       </div>
       <div class="status-line"><span class="dot" id="statusDot"></span><span id="statusText">Loading dashboard</span></div>
+      <section class="workflow-strip" aria-label="Safe workflow">
+        <div class="workflow-step current"><strong>1. Scan</strong><span>Read local metadata inside the selected root.</span></div>
+        <div class="workflow-step"><strong>2. Plan</strong><span>Create a dry-run organization proposal.</span></div>
+        <div class="workflow-step"><strong>3. Review</strong><span>Inspect low-confidence, risky, or conflicting rows.</span></div>
+        <div class="workflow-step"><strong>4. Approve</strong><span>Use policy gates before any apply action.</span></div>
+        <div class="workflow-step"><strong>5. Apply/Rollback</strong><span>Move only with confirmation and manifest support.</span></div>
+      </section>
       <section class="grid" aria-label="Summary metrics">
         <div class="metric"><span class="label">Files</span><span class="value" id="metricFiles">0</span></div>
         <div class="metric"><span class="label">Planned</span><span class="value" id="metricPlanned">0</span></div>
@@ -787,6 +911,15 @@ def _page() -> str:
               <button type="button" class="button-danger" id="rollbackJobBtn">Rollback</button>
               <button type="button" class="button-danger" id="deleteJobBtn">Delete Job</button>
             </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-header">
+            <div><h2>Before / After Tree</h2><p class="subtle">Dry-run two-level preview. It compares current scanned locations with planned destinations without moving files.</p></div>
+          </div>
+          <div class="tree-preview">
+            <div><h3>Before</h3><pre id="beforeTreePreview">Loading</pre></div>
+            <div><h3>After</h3><pre id="afterTreePreview">Loading</pre></div>
           </div>
         </div>
       </section>
@@ -827,11 +960,19 @@ def _page() -> str:
         </div>
       </section>
       <section class="view" data-view-panel="packs">
-        <div class="panel">
-          <div class="panel-header">
-            <div><h2>Policy Packs</h2><p class="subtle">Data-driven vertical packs. Select one before creating a job or managed cleanup session.</p></div>
+        <div class="layout">
+          <div class="panel">
+            <div class="panel-header">
+              <div><h2>Policy Packs</h2><p class="subtle">Data-driven vertical packs. Select one before creating a job or managed cleanup session.</p></div>
+            </div>
+            <div class="table-wrap"><table id="packsTable"></table></div>
           </div>
-          <div class="table-wrap"><table id="packsTable"></table></div>
+          <div class="panel">
+            <div class="panel-header">
+              <div><h2>Pack Detail</h2><p class="subtle">Current selected pack, template hints, and managed recommendations.</p></div>
+            </div>
+            <div class="details" id="packDetails"></div>
+          </div>
         </div>
       </section>
       <section class="view" data-view-panel="managed">
@@ -848,8 +989,16 @@ def _page() -> str:
           </div>
           <div class="panel">
             <div class="panel-header"><div><h2>KPI</h2><p class="subtle">Latest managed session metrics.</p></div></div>
+            <div class="kpi-grid" id="managedKpiCards"></div>
             <pre id="managedKpiJson">{}</pre>
           </div>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-header">
+            <div><h2>Client Report Preview</h2><p class="subtle">Local HTML report for the selected managed session. It is loaded from .thelibrarian/managed inside the current root.</p></div>
+            <div class="panel-actions"><button type="button" id="previewManagedReportBtn">Preview Latest Report</button></div>
+          </div>
+          <iframe class="report-frame" id="managedReportPreview" title="Managed cleanup report preview" sandbox=""></iframe>
         </div>
       </section>
       <section class="view" data-view-panel="providers">
@@ -899,7 +1048,7 @@ def _page() -> str:
     </main>
   </div>
   <script>
-    const state = { dashboard: null, selectedJobId: null, policy: null, events: [], manifest: null, busy: false };
+    const state = { dashboard: null, selectedJobId: null, policy: null, events: [], manifest: null, busy: false, planPackId: '' };
     const $ = selector => document.querySelector(selector);
     const $$ = selector => Array.from(document.querySelectorAll(selector));
 
@@ -995,6 +1144,9 @@ def _page() -> str:
     async function refresh({ keepSelection = true, silent = false } = {}) {
       const previous = keepSelection ? state.selectedJobId : null;
       state.dashboard = await api('/api/dashboard');
+      if (state.planPackId) {
+        state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
+      }
       const jobs = state.dashboard.jobs || [];
       state.selectedJobId = jobs.some(job => job.job_id === previous) ? previous : (jobs[0]?.job_id || null);
       await loadJobSideData();
@@ -1027,6 +1179,7 @@ def _page() -> str:
       $('#metricReview').textContent = plan.entries.filter(entry => entry.category === 'Review').length;
       $('#metricJobs').textContent = jobs.length;
       renderPlanTables(plan);
+      renderTreePreview(inventory, plan);
       renderInventory(inventory);
       renderJobs(jobs, selected);
       renderPacks(dashboard.packs || []);
@@ -1054,6 +1207,37 @@ def _page() -> str:
       setFilterSummary('planFilterSummary', filteredEntries.length, plan.entries.length);
       const fullRows = planRows(filteredEntries, entry => entry.reason);
       $('#planTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Reason'], fullRows);
+    }
+    function renderTreePreview(inventory, plan) {
+      const beforePaths = inventory.files.map(file => file.relative_path);
+      const afterPaths = plan.entries.map(entry => entry.status === 'planned' ? entry.destination : entry.source);
+      $('#beforeTreePreview').textContent = previewTree(beforePaths);
+      $('#afterTreePreview').textContent = previewTree(afterPaths);
+    }
+    function previewTree(paths) {
+      if (!paths.length) return 'No files scanned.';
+      const topCounts = new Map();
+      const childCounts = new Map();
+      for (const path of paths) {
+        const parts = String(path).split('/').filter(Boolean);
+        const top = parts.length > 1 ? `${parts[0]}/` : '(root)';
+        topCounts.set(top, (topCounts.get(top) || 0) + 1);
+        if (parts.length > 2) {
+          const childKey = `${top}${parts[1]}/`;
+          childCounts.set(childKey, (childCounts.get(childKey) || 0) + 1);
+        }
+      }
+      return Array.from(topCounts.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([name, count]) => {
+          const children = Array.from(childCounts.entries())
+            .filter(([child]) => child.startsWith(name) && child !== name)
+            .sort(([left], [right]) => left.localeCompare(right))
+            .slice(0, 6)
+            .map(([child, childCount]) => `  ${child.replace(name, '')} ${childCount} file${childCount === 1 ? '' : 's'}`);
+          return [`${name} ${count} file${count === 1 ? '' : 's'}`, ...children].join('\n');
+        })
+        .join('\n');
     }
     function renderInventory(inventory) {
       const rows = inventory.files.map(file => [
@@ -1085,6 +1269,7 @@ def _page() -> str:
       const selected = select.value || 'general_office';
       select.innerHTML = packs.map(pack => `<option value="${escapeHtml(pack.id)}">${escapeHtml(pack.name)} (${escapeHtml(pack.industry)})</option>`).join('');
       if (packs.some(pack => pack.id === selected)) select.value = selected;
+      const activePack = packs.find(pack => pack.id === select.value) || packs[0];
       const rows = packs.map(pack => [
         escapeHtml(pack.id),
         escapeHtml(pack.industry),
@@ -1093,6 +1278,32 @@ def _page() -> str:
         escapeHtml(pack.recommended_policy),
       ]);
       $('#packsTable').innerHTML = table(['Pack', 'Industry', 'Tier', 'Name', 'Policy'], rows);
+      renderPackDetails(activePack);
+    }
+    function renderPackDetails(pack) {
+      if (!pack) {
+        $('#packDetails').innerHTML = '<div class="empty">No pack selected.</div>';
+        return;
+      }
+      const templates = (pack.folder_templates || []).slice(0, 8).map(item => `<span>${escapeHtml(item)}</span>`).join('');
+      const useCases = (pack.use_cases || []).slice(0, 6).map(item => `<span>${escapeHtml(item)}</span>`).join('');
+      const recommendations = (pack.managed_service_recommendations || [])
+        .slice(0, 4)
+        .map(item => `<span><strong>${escapeHtml(item.title)}</strong><br>${escapeHtml(item.description)}</span>`)
+        .join('');
+      $('#packDetails').innerHTML = `
+        <div class="kv"><strong>Name</strong><span>${escapeHtml(pack.name)}</span></div>
+        <div class="kv"><strong>Industry</strong><span>${escapeHtml(pack.industry || 'general')}</span></div>
+        <div class="kv"><strong>Tier</strong><span>${badge(pack.tier)}</span></div>
+        <div class="kv"><strong>Policy</strong><span>${escapeHtml(pack.recommended_policy)}</span></div>
+        <div class="kv"><strong>Description</strong><span>${escapeHtml(pack.description || '(none)')}</span></div>
+        <h3>Use Cases</h3>
+        <div class="detail-list">${useCases || '<span>No use cases listed.</span>'}</div>
+        <h3>Folder Templates</h3>
+        <div class="detail-list">${templates || '<span>No folder templates listed.</span>'}</div>
+        <h3>Managed Recommendations</h3>
+        <div class="detail-list">${recommendations || '<span>No recommendations listed.</span>'}</div>
+      `;
     }
     function renderManaged(sessions) {
       const rows = sessions.map(session => [
@@ -1100,11 +1311,27 @@ def _page() -> str:
         badge(session.stage),
         escapeHtml(session.client_name),
         escapeHtml(session.pack_id),
-        escapeHtml(session.job_id),
+        `<code>${escapeHtml(session.artifacts?.report_html || session.artifacts?.report_md || '(pending)')}</code>`,
         escapeHtml(session.updated_at),
       ]);
-      $('#managedTable').innerHTML = table(['Session', 'Stage', 'Client', 'Pack', 'Job', 'Updated'], rows);
+      $('#managedTable').innerHTML = table(['Session', 'Stage', 'Client', 'Pack', 'Client Report', 'Updated'], rows);
+      $('#managedKpiCards').innerHTML = sessions[0] ? managedKpiCards(sessions[0].kpi) : '<div class="empty">No managed sessions yet.</div>';
       $('#managedKpiJson').textContent = sessions[0] ? JSON.stringify(sessions[0].kpi, null, 2) : '{}';
+      $('#previewManagedReportBtn').disabled = !sessions[0]?.artifacts?.report_html;
+    }
+    function managedKpiCards(kpi) {
+      const cards = [
+        ['Safety', `${kpi.safety_score}/100`],
+        ['Planned', kpi.planned_moves],
+        ['Review', kpi.manual_review_moves],
+        ['Risk', `${kpi.risk_score}/100`],
+      ];
+      return cards.map(([label, value]) => `
+        <div class="kpi-card">
+          <strong>${escapeHtml(label)}</strong>
+          <span>${escapeHtml(value)}</span>
+        </div>
+      `).join('');
     }
     function renderProviders(providers) {
       $('#providerNotice').textContent = providers.notice || 'No file contents are sent.';
@@ -1200,7 +1427,8 @@ def _page() -> str:
     }
     $('#refreshBtn').addEventListener('click', () => runAction('Refresh', () => refresh({ silent: true }), { refreshAfter: false }));
     $('#savePlanBtn').addEventListener('click', () => runAction('Save plan', async () => {
-      const saved = await api('/api/plan/save', { method: 'POST', body: '{}' });
+      const body = state.planPackId ? JSON.stringify({ pack_id: state.planPackId }) : '{}';
+      const saved = await api('/api/plan/save', { method: 'POST', body });
       setStatus(`Saved plan: ${saved.path}`);
     }, { refreshAfter: false }));
     $('#downloadPlanBtn').addEventListener('click', () => {
@@ -1215,6 +1443,7 @@ def _page() -> str:
       runAction('Set directory', async () => {
         await api('/api/root?confirm=true', { method: 'POST', body: JSON.stringify({ root }) });
         state.selectedJobId = null;
+        state.planPackId = '';
       });
     });
     $('#createJobBtn').addEventListener('click', () => runAction('Create job', async () => {
@@ -1272,6 +1501,24 @@ def _page() -> str:
         await api('/api/jobs/delete-all?confirm=true', { method: 'POST', body: '{}' });
         state.selectedJobId = null;
       });
+    });
+    $('#previewManagedReportBtn').addEventListener('click', () => runAction('Report preview', async () => {
+      const session = (state.dashboard?.managed_sessions || [])[0];
+      if (!session?.artifacts?.report_html) return;
+      const response = await fetch(`/api/managed/${encodeURIComponent(session.session_id)}/report-html`);
+      if (!response.ok) throw new Error('Managed report preview is not available.');
+      $('#managedReportPreview').srcdoc = await response.text();
+      setStatus(`Previewing report: ${session.session_id}`);
+    }, { refreshAfter: false }));
+    $('#packSelect').addEventListener('change', () => {
+      const pack = $('#packSelect').value;
+      state.planPackId = pack || '';
+      renderPackDetails((state.dashboard?.packs || []).find(item => item.id === state.planPackId));
+      runAction('Policy pack preview', async () => {
+        if (!state.dashboard || !state.planPackId) return;
+        state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
+        setStatus(`Plan preview uses ${state.planPackId}`);
+      }, { refreshAfter: false });
     });
     $$('.nav button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
     $$('[data-view-jump]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewJump)));

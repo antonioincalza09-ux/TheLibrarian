@@ -15,7 +15,7 @@ from src.managed.models import (
     ManagedCleanupSession,
     ManagedCleanupStage,
 )
-from src.managed.report import build_managed_report, render_managed_report_markdown
+from src.managed.report import build_managed_report, render_managed_report_html, render_managed_report_markdown
 from src.policy_packs import get_policy_pack
 from src.policies.models import PolicyEvaluation
 from src.security import SafetyError, resolve_root
@@ -153,9 +153,11 @@ def _write_session_artifacts(root: Path, session: ManagedCleanupSession, pack) -
             "session": str(directory / "session.json"),
             "report_json": str(directory / "report.json"),
             "report_md": str(directory / "report.md"),
+            "report_html": str(directory / "report.html"),
         }
     )
     report.artifacts = dict(session.artifacts)
     _write_json(directory / "session.json", session.to_dict())
     _write_json(directory / "report.json", report.to_dict())
     (directory / "report.md").write_text(render_managed_report_markdown(session, report, pack), encoding="utf-8")
+    (directory / "report.html").write_text(render_managed_report_html(session, report, pack), encoding="utf-8")
