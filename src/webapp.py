@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import threading
+from collections import Counter, defaultdict
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -23,6 +25,712 @@ from src.security import SafetyError, resolve_root
 
 class ConfirmationRequired(SafetyError):
     pass
+
+
+def _load_json_if_present(path: Path) -> tuple[object | None, str | None]:
+    if not path.exists():
+        return None, "missing"
+    try:
+        return json.loads(path.read_text(encoding="utf-8")), None
+    except (OSError, json.JSONDecodeError) as exc:
+        return None, str(exc)
+
+
+def _load_text_if_present(path: Path) -> tuple[str | None, str | None]:
+    if not path.exists():
+        return None, "missing"
+    try:
+        return path.read_text(encoding="utf-8"), None
+    except OSError as exc:
+        return None, str(exc)
+
+
+def _relative_to_root(root: Path, path: Path) -> str:
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        return path.name
+
+
+def _abbr_path(path: Path, max_parts: int = 4) -> str:
+    parts = path.parts
+    if len(parts) <= max_parts:
+        return str(path)
+    return str(Path("...", *parts[-max_parts:]))
+
+
+def _status_variant(kind: str) -> str:
+    lowered = kind.lower()
+    if lowered in {"error", "errors", "high", "failed"}:
+        return "danger"
+    if lowered in {"warning", "warnings", "medium", "stale", "missing"}:
+        return "warn"
+    return "ok"
+
+
+def _manifest_sidecar_path(root: Path, item_path: str, node_type: str) -> Path:
+    if node_type == "directory":
+        return root / ".librarian.yaml" if item_path == "." else root / item_path / ".librarian.yaml"
+    return root / f"{item_path}.librarian.yaml"
+
+
+def _normalize_graph_node(raw: dict[str, object]) -> dict[str, object]:
+    return {
+        "id": str(raw.get("id") or raw.get("node_id") or raw.get("path") or raw.get("label") or "unknown"),
+        "label": str(raw.get("label") or raw.get("name") or raw.get("title") or raw.get("id") or "Unknown"),
+        "type": str(raw.get("type") or raw.get("node_type") or "unknown"),
+        "path": raw.get("path"),
+        "tags": list(raw.get("tags", [])) if isinstance(raw.get("tags"), list) else [],
+        "confidence": float(raw.get("confidence", 0.0) or 0.0),
+        "summary": str(raw.get("summary") or raw.get("description") or ""),
+    }
+
+
+def _normalize_graph_edge(raw: dict[str, object]) -> dict[str, object]:
+    return {
+        "source": str(raw.get("source") or raw.get("from") or raw.get("src") or ""),
+        "target": str(raw.get("target") or raw.get("to") or raw.get("dst") or ""),
+        "type": str(raw.get("type") or raw.get("edge_type") or "related"),
+        "confidence": float(raw.get("confidence", 0.0) or 0.0),
+        "reason": str(raw.get("reason") or raw.get("label") or ""),
+    }
+
+
+def _read_librarian_state(root: Path) -> dict[str, object]:
+    runtime = root / ".librarian"
+    manifest, manifest_error = _load_json_if_present(runtime / "manifest.json")
+    graph, graph_error = _load_json_if_present(runtime / "graph.json")
+    validation, validation_error = _load_json_if_present(runtime / "validation_report.json")
+    agent_context, agent_context_error = _load_json_if_present(runtime / "agent_context.json")
+    plan, plan_error = _load_json_if_present(runtime / "plan.json")
+    graph_report, graph_report_error = _load_text_if_present(runtime / "graph_report.md")
+    notes = sorted((runtime / "notes").glob("*.md")) if (runtime / "notes").exists() else []
+    graph_notes = sorted((runtime / "graph_notes").glob("*.md")) if (runtime / "graph_notes").exists() else []
+    runbooks = sorted((runtime / "runbooks").glob("*.md")) if (runtime / "runbooks").exists() else []
+    scripts = sorted((runtime / "scripts").glob("*.py")) if (runtime / "scripts").exists() else []
+    operations_path = runtime / "logs" / "operations.jsonl"
+    operations: list[dict[str, object]] = []
+    if operations_path.exists():
+        for line in operations_path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                operations.append(json.loads(line))
+            except json.JSONDecodeError:
+                operations.append({"timestamp": "", "action": "parse_error", "status": "warning", "message": "Invalid operations log line."})
+    graph_nodes = []
+    graph_edges = []
+    if isinstance(graph, dict):
+        raw_nodes = graph.get("nodes") or graph.get("graph", {}).get("nodes") or []
+        raw_edges = graph.get("edges") or graph.get("graph", {}).get("edges") or []
+        if isinstance(raw_nodes, list):
+            graph_nodes = [_normalize_graph_node(node) for node in raw_nodes if isinstance(node, dict)]
+        if isinstance(raw_edges, list):
+            graph_edges = [_normalize_graph_edge(edge) for edge in raw_edges if isinstance(edge, dict)]
+    return {
+        "runtime": runtime,
+        "manifest": manifest if isinstance(manifest, dict) else None,
+        "manifest_error": manifest_error,
+        "graph": graph if isinstance(graph, dict) else None,
+        "graph_error": graph_error,
+        "validation": validation if isinstance(validation, dict) else None,
+        "validation_error": validation_error,
+        "agent_context": agent_context if isinstance(agent_context, dict) else None,
+        "agent_context_error": agent_context_error,
+        "plan": plan if isinstance(plan, dict) else None,
+        "plan_error": plan_error,
+        "graph_report": graph_report,
+        "graph_report_error": graph_report_error,
+        "notes": notes,
+        "graph_notes": graph_notes,
+        "runbooks": runbooks,
+        "scripts": scripts,
+        "operations": operations,
+        "graph_nodes": graph_nodes,
+        "graph_edges": graph_edges,
+    }
+
+
+def _build_librarian_dashboard(root: Path) -> dict[str, object]:
+    state = _read_librarian_state(root)
+    manifest = state["manifest"] if isinstance(state["manifest"], dict) else None
+    files = _build_file_rows(root, manifest)
+    directories = _build_directory_rows(root, manifest)
+    code = _build_code_summary(files)
+    graph = _build_graph_summary(state, files, code["entrypoints"])
+    risks = _build_risks(state, files, directories)
+    diagnostics = _build_diagnostics(root, state, files, directories, risks, graph)
+    overview = _build_overview(root, manifest, files, directories, code, graph, risks, state, diagnostics)
+    start_here = _build_start_here(root, state, manifest, files, code, risks, diagnostics)
+    runbooks = _build_runbook_rows(root, state)
+    scripts = _build_script_rows(root, state)
+    operations = _build_operation_rows(state)
+    workspace = {
+        "name": root.name,
+        "path": str(root),
+        "short_path": _abbr_path(root),
+        "last_indexed": manifest.get("generated_at") if manifest else None,
+        "status": overview["status"],
+        "summary": overview["hero"]["description"],
+        "project_type": overview["hero"]["project_type"],
+        "confidence": overview["hero"]["confidence"],
+        "languages": overview["hero"]["languages"],
+        "frameworks": overview["hero"]["frameworks"],
+    }
+    return {
+        "workspace": workspace,
+        "overview": overview,
+        "start_here": start_here,
+        "files": files,
+        "directories": directories,
+        "code": code,
+        "graph": graph,
+        "risks": risks,
+        "runbooks": runbooks,
+        "scripts": scripts,
+        "operations": operations,
+        "diagnostics": diagnostics,
+        "agent_brief": _build_agent_brief(workspace, start_here, code, risks, state),
+    }
+
+
+def _build_file_rows(root: Path, manifest: dict[str, object] | None) -> list[dict[str, object]]:
+    if manifest is None:
+        return []
+    rows: list[dict[str, object]] = []
+    for item in manifest.get("files", []):
+        if not isinstance(item, dict):
+            continue
+        current_path = str(item.get("current_path") or item.get("original_path") or "")
+        sidecar_exists = _manifest_sidecar_path(root, current_path, "file").exists()
+        classification = item.get("classification", {}) if isinstance(item.get("classification"), dict) else {}
+        code_metadata = item.get("code_metadata", {}) if isinstance(item.get("code_metadata"), dict) else {}
+        rows.append(
+            {
+                "name": item.get("name") or Path(current_path).name,
+                "path": current_path,
+                "kind": item.get("file_kind") or "unknown",
+                "language": item.get("detected_language") or code_metadata.get("language"),
+                "tags": list(item.get("tags", [])) if isinstance(item.get("tags"), list) else [],
+                "risk": item.get("risk_level") or "low",
+                "confidence": float(classification.get("confidence", 0.0) or 0.0),
+                "summary": item.get("summary") or classification.get("reason") or "",
+                "generated": bool(item.get("generated_file")),
+                "vendor": bool(item.get("vendor_file")),
+                "lockfile": bool(item.get("lock_file")),
+                "should_modify": bool(item.get("should_modify")),
+                "should_move": bool(item.get("should_move")),
+                "sidecar_status": "present" if sidecar_exists else "missing",
+                "modified_at": item.get("modified_at"),
+                "size_bytes": int(item.get("size_bytes", 0) or 0),
+                "mime_type": item.get("mime_type"),
+                "domain": classification.get("domain") or "General",
+                "category": classification.get("category") or "Unsorted",
+                "entrypoints": list(code_metadata.get("entrypoints", [])) if isinstance(code_metadata.get("entrypoints"), list) else [],
+                "framework_hints": list(code_metadata.get("framework_hints", [])) if isinstance(code_metadata.get("framework_hints"), list) else [],
+                "test_hints": list(code_metadata.get("test_hints", [])) if isinstance(code_metadata.get("test_hints"), list) else [],
+                "imports_internal": list((code_metadata.get("imports", {}) or {}).get("internal", [])) if isinstance(code_metadata.get("imports"), dict) else [],
+                "imports_external": list((code_metadata.get("imports", {}) or {}).get("external", [])) if isinstance(code_metadata.get("imports"), dict) else [],
+                "symbols": code_metadata.get("symbols", {}),
+                "readable": bool(item.get("readable", True)),
+                "human_description": item.get("human_description") or "",
+            }
+        )
+    return rows
+
+
+def _build_directory_rows(root: Path, manifest: dict[str, object] | None) -> list[dict[str, object]]:
+    if manifest is None:
+        return []
+    rows: list[dict[str, object]] = []
+    for item in manifest.get("directories", []):
+        if not isinstance(item, dict):
+            continue
+        current_path = str(item.get("current_path") or ".")
+        analysis = item.get("directory_analysis", {}) if isinstance(item.get("directory_analysis"), dict) else {}
+        roles = list(analysis.get("possible_roles", [])) if isinstance(analysis.get("possible_roles"), list) else []
+        sidecar_exists = _manifest_sidecar_path(root, current_path, "directory").exists()
+        confidence = 0.94 if roles else 0.55
+        rows.append(
+            {
+                "name": item.get("name") or Path(current_path).name or root.name,
+                "path": current_path,
+                "roles": roles,
+                "theme": analysis.get("theme") or "General",
+                "direct_file_count": int(analysis.get("direct_file_count", 0) or 0),
+                "direct_subdirectory_count": int(analysis.get("direct_subdirectory_count", 0) or 0),
+                "total_file_count": int(analysis.get("total_file_count", 0) or 0),
+                "dominant_languages": list(analysis.get("dominant_languages", [])) if isinstance(analysis.get("dominant_languages"), list) else [],
+                "dominant_extensions": list(analysis.get("dominant_extensions", [])) if isinstance(analysis.get("dominant_extensions"), list) else [],
+                "should_reorganize": bool(analysis.get("should_reorganize")),
+                "risk": "high" if "project_root" in roles else "medium" if any(role in {"vendor", "generated"} for role in roles) else "low",
+                "confidence": confidence,
+                "description": item.get("human_description") or analysis.get("reason") or "",
+                "sidecar_status": "present" if sidecar_exists else "missing",
+            }
+        )
+    return rows
+
+
+def _build_code_summary(files: list[dict[str, object]]) -> dict[str, object]:
+    languages = Counter(str(item.get("language") or "") for item in files if item.get("language"))
+    frameworks = Counter(
+        hint
+        for item in files
+        for hint in item.get("framework_hints", [])
+        if isinstance(hint, str) and hint
+    )
+    modules = []
+    imported_by = defaultdict(int)
+    for item in files:
+        if item.get("language") == "Python":
+            module_name = str(Path(str(item["path"])).with_suffix("").as_posix()).replace("/", ".")
+            modules.append(
+                {
+                    "module": module_name,
+                    "file": item["path"],
+                    "imports_count": len(item.get("imports_internal", [])) + len(item.get("imports_external", [])),
+                    "imported_by_count": 0,
+                    "risk": item["risk"],
+                    "summary": item["summary"],
+                }
+            )
+            for target in item.get("imports_internal", []):
+                imported_by[target] += 1
+    for module in modules:
+        module["imported_by_count"] = imported_by.get(module["module"], 0)
+    entrypoints = []
+    tests = []
+    config_files = []
+    for item in files:
+        for entrypoint in item.get("entrypoints", []):
+            entrypoints.append(
+                {
+                    "file": item["path"],
+                    "symbol": entrypoint,
+                    "type": entrypoint.split(":", 1)[0] if ":" in entrypoint else "entrypoint",
+                    "confidence": item["confidence"],
+                    "reason": item["summary"],
+                    "command": f'python "{item["path"]}"' if item.get("language") == "Python" else item["path"],
+                }
+            )
+        if item.get("test_hints") or item.get("category") == "Tests":
+            tests.append(
+                {
+                    "file": item["path"],
+                    "tested_target": item.get("imports_internal", [None])[0],
+                    "framework": ", ".join(item.get("framework_hints", []) or ["pytest" if "test" in str(item["path"]).lower() else "unknown"]),
+                    "confidence": item["confidence"],
+                }
+            )
+        if item.get("kind") == "config":
+            config_files.append(item["path"])
+    return {
+        "languages": [{"name": name, "count": count} for name, count in languages.most_common()],
+        "frameworks": [{"name": name, "count": count} for name, count in frameworks.most_common()],
+        "packages": sorted({str(Path(item["path"]).parts[0]) for item in files if item.get("language") == "Python" and "/" in str(item["path"])})[:20],
+        "modules": modules,
+        "entrypoints": entrypoints,
+        "tests": tests,
+        "config_files": config_files[:50],
+    }
+
+
+def _build_graph_summary(state: dict[str, object], files: list[dict[str, object]], entrypoints: list[dict[str, object]]) -> dict[str, object]:
+    nodes = list(state.get("graph_nodes", []))
+    edges = list(state.get("graph_edges", []))
+    available = bool(nodes or edges)
+    node_types = Counter(str(node.get("type") or "unknown") for node in nodes)
+    edge_types = Counter(str(edge.get("type") or "related") for edge in edges)
+    degree = Counter()
+    for edge in edges:
+        degree[str(edge.get("source"))] += 1
+        degree[str(edge.get("target"))] += 1
+    top_connected = []
+    for node in nodes:
+        node_id = str(node.get("id"))
+        top_connected.append({"id": node_id, "label": node.get("label"), "degree": degree.get(node_id, 0), "type": node.get("type")})
+    top_connected.sort(key=lambda item: item["degree"], reverse=True)
+    isolated = [node for node in nodes if degree.get(str(node.get("id")), 0) == 0][:20]
+    entrypoint_files = {item["file"] for item in entrypoints}
+    entrypoint_neighborhood = [edge for edge in edges if str(edge.get("source")) in entrypoint_files or str(edge.get("target")) in entrypoint_files][:40]
+    return {
+        "available": available,
+        "nodes": nodes,
+        "edges": edges,
+        "summary": {
+            "nodes": len(nodes),
+            "edges": len(edges),
+            "top_connected": top_connected[:10],
+            "top_tags": [{"name": name, "count": count} for name, count in node_types.most_common()],
+            "top_edge_types": [{"name": name, "count": count} for name, count in edge_types.most_common()],
+            "isolated_nodes": isolated,
+        },
+        "entrypoint_neighborhood": entrypoint_neighborhood,
+        "empty_message": "Graph is missing. Generate graph data to unlock relationship views." if not available else "",
+    }
+
+
+def _build_risks(state: dict[str, object], files: list[dict[str, object]], directories: list[dict[str, object]]) -> list[dict[str, object]]:
+    risks: list[dict[str, object]] = []
+    for item in files:
+        if item["risk"] == "high":
+            risks.append({"severity": "Error", "item": item["path"], "reason": item["summary"] or "High-risk file.", "recommended_action": "Inspect before editing.", "source": "manifest", "confidence": item["confidence"]})
+        if item["generated"] or item["vendor"] or item["lockfile"]:
+            risks.append({"severity": "Warning", "item": item["path"], "reason": "Generated/vendor/lock file.", "recommended_action": "Avoid editing unless necessary.", "source": "manifest", "confidence": item["confidence"]})
+        if item["confidence"] < 0.6:
+            risks.append({"severity": "Info", "item": item["path"], "reason": "Low-confidence classification.", "recommended_action": "Review metadata before relying on this classification.", "source": "manifest", "confidence": item["confidence"]})
+        if not item["readable"]:
+            risks.append({"severity": "Warning", "item": item["path"], "reason": "Unreadable file.", "recommended_action": "Check file permissions or file encoding.", "source": "manifest", "confidence": item["confidence"]})
+        if item["sidecar_status"] == "missing":
+            risks.append({"severity": "Warning", "item": item["path"], "reason": "Missing sidecar metadata.", "recommended_action": 'Run "librarian mark <path>".', "source": "filesystem", "confidence": 1.0})
+        if item["size_bytes"] > 5_000_000:
+            risks.append({"severity": "Warning", "item": item["path"], "reason": "Large file.", "recommended_action": "Inspect carefully before loading or editing.", "source": "manifest", "confidence": 1.0})
+    for item in directories:
+        if item["sidecar_status"] == "missing":
+            risks.append({"severity": "Warning", "item": item["path"], "reason": "Missing directory sidecar.", "recommended_action": 'Run "librarian mark <path>".', "source": "filesystem", "confidence": 1.0})
+    validation = state.get("validation")
+    if isinstance(validation, dict):
+        for error in validation.get("errors", []):
+            risks.append({"severity": "Error", "item": "validation", "reason": str(error), "recommended_action": "Review validation report.", "source": "validation_report.json", "confidence": 1.0})
+        for warning in validation.get("warnings", []):
+            risks.append({"severity": "Warning", "item": "validation", "reason": str(warning), "recommended_action": "Inspect validation warning.", "source": "validation_report.json", "confidence": 1.0})
+    if state.get("graph_error") == "missing":
+        risks.append({"severity": "Info", "item": ".librarian/graph.json", "reason": "Graph is missing.", "recommended_action": "Generate graph to unlock relationship views.", "source": "filesystem", "confidence": 1.0})
+    return risks[:300]
+
+
+def _build_diagnostics(
+    root: Path,
+    state: dict[str, object],
+    files: list[dict[str, object]],
+    directories: list[dict[str, object]],
+    risks: list[dict[str, object]],
+    graph: dict[str, object],
+) -> dict[str, object]:
+    manifest = state.get("manifest")
+    manifest_status = "ok" if manifest else "missing"
+    last_indexed = manifest.get("generated_at") if isinstance(manifest, dict) else None
+    stale = False
+    if isinstance(last_indexed, str):
+        try:
+            generated_at = datetime.fromisoformat(last_indexed)
+            stale = datetime.now(timezone.utc) - generated_at > __import__("datetime").timedelta(days=7)
+        except ValueError:
+            stale = False
+    diagnostics_items = [
+        {"label": "Manifest", "status": "warning" if manifest_status == "missing" else "ok", "detail": ".librarian/manifest.json"},
+        {"label": "Graph", "status": "warning" if not graph["available"] else "ok", "detail": ".librarian/graph.json"},
+        {"label": "Validation", "status": "warning" if state.get("validation_error") == "missing" else "ok", "detail": ".librarian/validation_report.json"},
+        {"label": "Notes", "status": "ok" if state.get("notes") else "warning", "detail": f"{len(state.get('notes', []))} markdown notes"},
+        {"label": "Runbooks", "status": "ok" if state.get("runbooks") else "warning", "detail": f"{len(state.get('runbooks', []))} runbooks"},
+        {"label": "Scripts", "status": "ok" if state.get("scripts") else "warning", "detail": f"{len(state.get('scripts', []))} runnable scripts"},
+    ]
+    return {
+        "items": diagnostics_items,
+        "manifest_status": manifest_status,
+        "graph_status": "ok" if graph["available"] else "missing",
+        "validation_status": "missing" if state.get("validation_error") == "missing" else "ok",
+        "stale_index": stale,
+        "schema_version": manifest.get("librarian_version") if isinstance(manifest, dict) else None,
+        "parsing_errors": [value for key, value in state.items() if key.endswith("_error") and value not in {None, "missing"}],
+        "warnings": len([risk for risk in risks if risk["severity"] in {"Warning", "Info"}]),
+        "errors": len([risk for risk in risks if risk["severity"] == "Error"]),
+        "suggestions": _diagnostic_suggestions(state, files, directories, graph, stale),
+    }
+
+
+def _build_overview(
+    root: Path,
+    manifest: dict[str, object] | None,
+    files: list[dict[str, object]],
+    directories: list[dict[str, object]],
+    code: dict[str, object],
+    graph: dict[str, object],
+    risks: list[dict[str, object]],
+    state: dict[str, object],
+    diagnostics: dict[str, object],
+) -> dict[str, object]:
+    languages = [item["name"] for item in code["languages"][:4]]
+    frameworks = [item["name"] for item in code["frameworks"][:4]]
+    project_type = "Workspace"
+    if any(directory["risk"] == "high" and "project_root" in directory["roles"] for directory in directories):
+        project_type = "Codebase"
+    elif languages:
+        project_type = f"{languages[0]} workspace"
+    hero_confidence = round(min(0.98, 0.55 + (0.08 * min(len(languages), 3)) + (0.05 * min(len(frameworks), 2))), 2)
+    if manifest is None:
+        hero_confidence = 0.2
+    high_risks = len([risk for risk in risks if risk["severity"] == "Error"])
+    warnings = len([risk for risk in risks if risk["severity"] == "Warning"])
+    status = "Healthy"
+    if manifest is None:
+        status = "Needs Index"
+    elif high_risks:
+        status = "Errors"
+    elif warnings or diagnostics["stale_index"]:
+        status = "Warnings"
+    metrics = [
+        {"label": "Files", "value": len(files), "variant": "neutral"},
+        {"label": "Directories", "value": len(directories), "variant": "neutral"},
+        {"label": "Entrypoints", "value": len(code["entrypoints"]), "variant": "neutral"},
+        {"label": "Tests", "value": len(code["tests"]), "variant": "neutral"},
+        {"label": "Risks", "value": len(risks), "variant": "warn" if risks else "ok"},
+        {"label": "Tags", "value": len({tag for item in files for tag in item["tags"]}), "variant": "neutral"},
+        {"label": "Graph nodes", "value": graph["summary"]["nodes"], "variant": "neutral"},
+        {"label": "Graph edges", "value": graph["summary"]["edges"], "variant": "neutral"},
+    ]
+    do_not_touch = [item for item in files if item["generated"] or item["vendor"] or item["lockfile"] or item["risk"] == "high"][:7]
+    recent_operations = _build_operation_rows(state)[:7]
+    health_items = [
+        {"label": "Missing manifest", "value": 0 if manifest else 1, "variant": "danger" if manifest is None else "ok"},
+        {"label": "Validation errors", "value": len([risk for risk in risks if risk["source"] == "validation_report.json" and risk["severity"] == "Error"]), "variant": "danger"},
+        {"label": "Low confidence items", "value": len([item for item in files if item["confidence"] < 0.6]), "variant": "warn"},
+        {"label": "Stale graph", "value": 0 if graph["available"] else 1, "variant": "warn"},
+        {"label": "Missing runbooks", "value": 0 if state.get("runbooks") else 1, "variant": "warn"},
+        {"label": "Missing sidecars", "value": len([risk for risk in risks if "sidecar" in risk["reason"].lower()]), "variant": "warn"},
+    ]
+    return {
+        "status": status,
+        "hero": {
+            "title": root.name,
+            "description": "Developer-first workspace dashboard for understanding structure, code intelligence, risk, and runnable context.",
+            "languages": languages,
+            "frameworks": frameworks,
+            "project_type": project_type,
+            "confidence": hero_confidence,
+        },
+        "metrics": metrics,
+        "do_not_touch": do_not_touch,
+        "health": health_items,
+        "recent_operations": recent_operations,
+    }
+
+
+def _build_start_here(
+    root: Path,
+    state: dict[str, object],
+    manifest: dict[str, object] | None,
+    files: list[dict[str, object]],
+    code: dict[str, object],
+    risks: list[dict[str, object]],
+    diagnostics: dict[str, object],
+) -> dict[str, object]:
+    recommended_reads = []
+    candidate_paths = [
+        "README.md",
+        ".librarian/README.librarian.md",
+        ".librarian/notes/index.md",
+        ".librarian/notes/explain.md",
+        ".librarian/graph_report.md",
+        ".librarian/runbooks/index.md",
+    ]
+    for candidate in candidate_paths:
+        candidate_path = root / candidate
+        if candidate_path.exists():
+            recommended_reads.append({"label": candidate_path.name, "path": candidate, "reason": "Recommended first read."})
+    for entrypoint in code["entrypoints"][:3]:
+        recommended_reads.append({"label": entrypoint["file"], "path": entrypoint["file"], "reason": entrypoint["reason"]})
+    important_files = [item for item in files if item["entrypoints"] or item["risk"] == "high" or item["kind"] == "config"][:10]
+    commands = [
+        {"label": "Re-index workspace", "command": f'librarian dev index "{root}"', "modifies": True},
+        {"label": "Refresh metadata", "command": f'librarian mark "{root}"', "modifies": True},
+        {"label": "Show workspace status", "command": f'librarian status "{root}"', "modifies": False},
+        {"label": "Inspect manifest summary", "command": 'python .librarian/scripts/print_manifest_summary.py', "modifies": False},
+    ]
+    return {
+        "recommended_reads": recommended_reads[:7],
+        "recommended_commands": commands,
+        "runnable_scripts": _build_script_rows(root, state)[:6],
+        "important_files": important_files,
+        "main_entrypoints": code["entrypoints"][:8],
+        "main_risks": risks[:8],
+        "agent_instructions": state.get("agent_context") or {"message": "No agent context file found. Use the generated brief below."},
+        "empty_message": "Run librarian mark and librarian dev index to generate a richer start-here view." if manifest is None else "",
+    }
+
+
+def _build_runbook_rows(root: Path, state: dict[str, object]) -> list[dict[str, object]]:
+    rows = []
+    for path in state.get("runbooks", []):
+        if not isinstance(path, Path):
+            continue
+        rows.append(
+            {
+                "name": path.name,
+                "path": _relative_to_root(root, path),
+                "description": f"Runbook generated by The Librarian: {path.stem.replace('_', ' ')}",
+                "command": f'type "{_relative_to_root(root, path)}"',
+                "read_only": True,
+                "validated": path.exists(),
+            }
+        )
+    return rows
+
+
+def _build_script_rows(root: Path, state: dict[str, object]) -> list[dict[str, object]]:
+    descriptions = {
+        "inspect_workspace.py": "Inspect the manifest and print a quick workspace summary.",
+        "print_manifest_summary.py": "Print counts, languages, domains, entrypoints, and warnings.",
+        "find_entrypoints.py": "List likely entrypoints extracted from manifest and sidecars.",
+        "find_unmarked.py": "List files or directories that are missing sidecars.",
+    }
+    rows = []
+    for path in state.get("scripts", []):
+        if not isinstance(path, Path):
+            continue
+        rows.append(
+            {
+                "name": path.name,
+                "path": _relative_to_root(root, path),
+                "description": descriptions.get(path.name, "Runnable helper generated by The Librarian."),
+                "command": f'python "{_relative_to_root(root, path)}"',
+                "read_only": path.name != "find_unmarked.py" or True,
+                "validated": path.exists(),
+                "expected_input": ".librarian/manifest.json",
+                "expected_output": "Console summary",
+            }
+        )
+    return rows
+
+
+def _build_operation_rows(state: dict[str, object]) -> list[dict[str, object]]:
+    rows = []
+    for operation in list(state.get("operations", []))[-80:]:
+        if not isinstance(operation, dict):
+            continue
+        rows.append(
+            {
+                "timestamp": operation.get("timestamp") or "",
+                "type": operation.get("action") or operation.get("type") or "operation",
+                "item": operation.get("source") or operation.get("item") or "",
+                "result": operation.get("status") or "unknown",
+                "detail": operation.get("message") or operation.get("destination") or "",
+                "rollback_available": operation.get("action") == "move" and operation.get("status") == "applied",
+            }
+        )
+    rows.reverse()
+    return rows
+
+
+def _build_agent_brief(
+    workspace: dict[str, object],
+    start_here: dict[str, object],
+    code: dict[str, object],
+    risks: list[dict[str, object]],
+    state: dict[str, object],
+) -> str:
+    reads = "\n".join(f"- {item['path']}" for item in start_here["recommended_reads"][:5]) or "- No recommended reads available."
+    scripts = "\n".join(f"- {item['command']}" for item in start_here["runnable_scripts"][:4]) or "- No runnable scripts available."
+    risk_items = "\n".join(f"- {item['item']}: {item['reason']}" for item in risks[:5]) or "- No major risks detected."
+    entrypoints = "\n".join(f"- {item['file']} ({item['symbol']})" for item in code["entrypoints"][:5]) or "- No entrypoints detected."
+    graph_path = ".librarian/graph.json" if state.get("graph") else "(graph missing)"
+    return f"""Workspace summary: {workspace['summary']}
+
+Recommended first reads:
+{reads}
+
+Runnable scripts:
+{scripts}
+
+Entrypoints:
+{entrypoints}
+
+Risks:
+{risk_items}
+
+Graph path: {graph_path}
+"""
+
+
+def _diagnostic_suggestions(
+    state: dict[str, object],
+    files: list[dict[str, object]],
+    directories: list[dict[str, object]],
+    graph: dict[str, object],
+    stale: bool,
+) -> list[str]:
+    suggestions = []
+    if state.get("manifest_error") == "missing":
+        suggestions.append('Run "librarian mark <path>" to create metadata.')
+    if not state.get("notes"):
+        suggestions.append('Run "librarian dev init <path>" to generate notes and scripts.')
+    if not graph["available"]:
+        suggestions.append("Graph is missing. Generate graph data to unlock relationship views.")
+    if stale:
+        suggestions.append('Run "librarian dev index <path>" to refresh stale metadata.')
+    if any(item["sidecar_status"] == "missing" for item in files + directories):
+        suggestions.append('Run "librarian mark <path>" to repair missing sidecars.')
+    return suggestions
+
+
+def _filter_files(files: list[dict[str, object]], query: dict[str, list[str]]) -> list[dict[str, object]]:
+    search = query.get("q", [""])[0].strip().lower()
+    risk = query.get("risk", [""])[0]
+    language = query.get("language", [""])[0]
+    kind = query.get("kind", [""])[0]
+    tag = query.get("tag", [""])[0]
+    sort_by = query.get("sort", ["name"])[0]
+    descending = query.get("desc", ["false"])[0].lower() == "true"
+    rows = []
+    for item in files:
+        if risk and item["risk"] != risk:
+            continue
+        if language and str(item.get("language") or "") != language:
+            continue
+        if kind and str(item.get("kind") or "") != kind:
+            continue
+        if tag and tag not in item.get("tags", []):
+            continue
+        if search:
+            haystack = " ".join(
+                [
+                    str(item.get("name") or ""),
+                    str(item.get("path") or ""),
+                    str(item.get("summary") or ""),
+                    " ".join(item.get("tags", [])),
+                    str(item.get("language") or ""),
+                ]
+            ).lower()
+            if search not in haystack:
+                continue
+        rows.append(item)
+    key_map = {
+        "name": lambda row: str(row.get("name") or ""),
+        "size": lambda row: int(row.get("size_bytes") or 0),
+        "risk": lambda row: str(row.get("risk") or ""),
+        "confidence": lambda row: float(row.get("confidence") or 0.0),
+        "modified": lambda row: str(row.get("modified_at") or ""),
+    }
+    rows.sort(key=key_map.get(sort_by, key_map["name"]), reverse=descending)
+    return rows
+
+
+def _filter_directories(directories: list[dict[str, object]], query: dict[str, list[str]]) -> list[dict[str, object]]:
+    search = query.get("q", [""])[0].strip().lower()
+    risk = query.get("risk", [""])[0]
+    role = query.get("role", [""])[0]
+    rows = []
+    for item in directories:
+        if risk and item["risk"] != risk:
+            continue
+        if role and role not in item.get("roles", []):
+            continue
+        if search:
+            haystack = " ".join(
+                [
+                    str(item.get("name") or ""),
+                    str(item.get("path") or ""),
+                    str(item.get("description") or ""),
+                    " ".join(item.get("roles", [])),
+                    str(item.get("theme") or ""),
+                ]
+            ).lower()
+            if search not in haystack:
+                continue
+        rows.append(item)
+    rows.sort(key=lambda row: str(row.get("path") or ""))
+    return rows
 
 
 def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConfig) -> ThreadingHTTPServer:
@@ -93,6 +801,7 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
             chat_session = self._chat()
             inventory = chat_session.inventory.to_dict() if chat_session.inventory is not None else self._inventory()
             plan = chat_session.plan.to_dict() if chat_session.plan is not None else self._plan()
+            librarian = _build_librarian_dashboard(resolved_root)
             store = JobStore(resolved_root)
             jobs = [job.to_dict() for job in store.list()]
             active_job = jobs[0] if jobs else None
@@ -131,6 +840,7 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 "managed_sessions": [session.to_dict() for session in list_managed_sessions(resolved_root)],
                 "providers": _providers_payload(config),
                 "chat": chat_session.snapshot(),
+                "librarian": librarian,
             }
 
         def _read_root_artifact(self, artifact_path: str) -> dict[str, object]:
@@ -177,8 +887,41 @@ def create_server(root: str | Path, *, host: str, port: int, config: RuntimeConf
                 if parsed.path == "/api/dashboard":
                     self._json(200, self._dashboard())
                     return
+                if parsed.path == "/api/librarian/dashboard":
+                    self._json(200, _build_librarian_dashboard(self._root()))
+                    return
                 if parsed.path == "/api/inventory":
                     self._json(200, self._inventory())
+                    return
+                if parsed.path == "/api/librarian/files":
+                    query = parse_qs(parsed.query)
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"files": _filter_files(payload["files"], query)})
+                    return
+                if parsed.path == "/api/librarian/directories":
+                    query = parse_qs(parsed.query)
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"directories": _filter_directories(payload["directories"], query)})
+                    return
+                if parsed.path == "/api/librarian/entrypoints":
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"entrypoints": payload["code"]["entrypoints"]})
+                    return
+                if parsed.path == "/api/librarian/scripts":
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"scripts": payload["scripts"]})
+                    return
+                if parsed.path == "/api/librarian/risks":
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"risks": payload["risks"]})
+                    return
+                if parsed.path == "/api/librarian/graph-summary":
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, payload["graph"])
+                    return
+                if parsed.path == "/api/librarian/agent-brief":
+                    payload = _build_librarian_dashboard(self._root())
+                    self._json(200, {"brief": payload["agent_brief"]})
                     return
                 if parsed.path == "/api/plan":
                     query = parse_qs(parsed.query)
@@ -416,1254 +1159,394 @@ def _page() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TheLibrarian Dashboard</title>
+  <title>The Librarian Dashboard</title>
   <style>
     :root {
-      color-scheme: light;
-      --ink: #17201c;
-      --muted: #63736d;
-      --line: #d7ded4;
-      --panel: #fbfcf6;
-      --panel-strong: #ffffff;
-      --field: #f2f6ef;
-      --accent: #2f684e;
-      --accent-2: #1d5565;
-      --warn: #9c6a14;
-      --danger: #9b3430;
-      --ok: #26704c;
-      --shadow: 0 14px 32px rgba(35, 48, 41, 0.12);
-      font-family: "Aptos", "Segoe UI", sans-serif;
+      color-scheme: light dark;
+      --bg: #eef2ec;
+      --panel: rgba(255,255,255,.94);
+      --panel-strong: rgba(255,255,255,.99);
+      --line: #d5dbd2;
+      --text: #172119;
+      --muted: #5b6a60;
+      --accent: #12543f;
+      --info: #245f73;
+      --warn: #946112;
+      --danger: #a23c34;
+      --ok: #1d6a46;
+      --shadow: 0 18px 44px rgba(20,32,24,.12);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --font-ui: "Aptos", "Segoe UI", sans-serif;
+      --font-display: "Bahnschrift", "Segoe UI Semibold", sans-serif;
+      --font-mono: "Cascadia Code", Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1513;
+        --panel: rgba(20,28,24,.92);
+        --panel-strong: rgba(21,30,26,.98);
+        --line: #25332c;
+        --text: #edf3ee;
+        --muted: #9aac9f;
+        --accent: #5ec59d;
+        --info: #86bfcc;
+        --warn: #f1c36a;
+        --danger: #f08d86;
+        --ok: #77d89d;
+        --shadow: 0 24px 48px rgba(0,0,0,.28);
+      }
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-width: 320px;
-      background:
-        linear-gradient(135deg, rgba(47, 104, 78, 0.12), transparent 34%),
-        linear-gradient(315deg, rgba(29, 85, 101, 0.14), transparent 40%),
-        #eef3eb;
-      color: var(--ink);
+      font-family: var(--font-ui);
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(18,84,63,.10), transparent 18%), var(--bg);
     }
-    button, select, input {
-      font: inherit;
-    }
-    button {
-      min-height: 38px;
+    button, input, select { font: inherit; }
+    button, input, select {
       border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 40px;
+      padding: 0 12px;
       background: var(--panel-strong);
-      color: var(--ink);
-      padding: 9px 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    button:hover { border-color: var(--accent); }
-    button:disabled { opacity: 0.48; cursor: not-allowed; }
-    .button-primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #ffffff;
-    }
-    .button-blue {
-      background: var(--accent-2);
-      border-color: var(--accent-2);
-      color: #ffffff;
-    }
-    .button-danger {
-      background: #fff4f1;
-      border-color: #e0b1a8;
-      color: var(--danger);
-    }
-    .shell {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-    }
-    aside {
-      padding: 22px;
-      border-right: 1px solid var(--line);
-      background: rgba(251, 252, 246, 0.88);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow: auto;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-    .mark {
-      width: 42px;
-      height: 42px;
-      background: #17201c;
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      letter-spacing: 0;
-    }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { font-size: 24px; line-height: 1.1; margin-bottom: 2px; letter-spacing: 0; }
-    h2 { font-size: 20px; line-height: 1.25; margin-bottom: 12px; letter-spacing: 0; }
-    h3 { font-size: 15px; line-height: 1.25; margin-bottom: 8px; letter-spacing: 0; }
-    .subtle { color: var(--muted); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
-    .nav {
-      display: grid;
-      gap: 8px;
-      margin: 20px 0;
-    }
-    .nav button {
-      justify-content: flex-start;
-      width: 100%;
-      background: transparent;
-      border-color: transparent;
-      padding: 10px;
-    }
-    .nav button.active {
-      background: #e1ece3;
-      border-color: #c8d8ca;
-      color: #143823;
-    }
-    .side-panel {
-      border: 1px solid var(--line);
-      background: #f7faf4;
-      padding: 12px;
-      margin-top: 14px;
-    }
-    .side-panel select, .side-panel input {
-      width: 100%;
-      min-height: 38px;
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      padding: 8px;
-    }
-    main {
-      min-width: 0;
-      padding: 24px;
-    }
-    .topbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 18px;
-      align-items: start;
-      margin-bottom: 18px;
-    }
-    .title-block {
-      min-width: 0;
-    }
-    .title-block h2 {
-      font-size: 30px;
-      margin-bottom: 6px;
-    }
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .metric, .panel {
-      background: rgba(251, 252, 246, 0.92);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .metric {
-      padding: 14px;
-      min-height: 92px;
-      display: grid;
-      align-content: space-between;
-    }
-    .metric .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-    .metric .value { font-size: 28px; font-weight: 780; line-height: 1; margin-top: 10px; }
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
-      gap: 14px;
-      align-items: start;
-    }
-    .panel {
-      padding: 16px;
-      min-width: 0;
-    }
-    .panel-header {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .panel-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-    .filter-bar {
-      display: grid;
-      grid-template-columns: minmax(220px, 1fr) minmax(150px, 190px) minmax(150px, 190px);
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .filter-bar input, .filter-bar select {
-      width: 100%;
-      min-height: 38px;
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      padding: 8px;
-    }
-    .table-note {
-      margin-bottom: 8px;
-    }
-    .table-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      background: white;
-      max-height: 520px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 720px;
-    }
-    th, td {
-      text-align: left;
-      padding: 10px 12px;
-      border-bottom: 1px solid #ecf0e8;
-      vertical-align: top;
-      font-size: 13px;
-    }
-    th {
-      position: sticky;
-      top: 0;
-      background: #f6f8f1;
-      z-index: 1;
-      color: #3c4b45;
-      font-weight: 700;
-    }
-    td {
-      overflow-wrap: anywhere;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 3px 8px;
-      border: 1px solid var(--line);
-      background: #f7faf4;
-      font-size: 12px;
-      font-weight: 700;
-      color: #33413b;
-    }
-    .badge.ok { color: var(--ok); border-color: #bad9c9; background: #f0faf3; }
-    .badge.warn { color: var(--warn); border-color: #ead5a9; background: #fff9ea; }
-    .badge.danger { color: var(--danger); border-color: #e6b9b3; background: #fff4f1; }
-    .job-list {
-      display: grid;
-      gap: 10px;
-      max-height: 480px;
-      overflow: auto;
-      padding-right: 2px;
-    }
-    .job-card {
-      border: 1px solid var(--line);
-      background: #ffffff;
-      padding: 12px;
-      display: grid;
-      gap: 8px;
-      cursor: pointer;
-    }
-    .job-card.active {
-      border-color: var(--accent);
-      box-shadow: inset 4px 0 0 var(--accent);
-    }
-    .job-card code {
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-    .details {
-      display: grid;
-      gap: 10px;
-    }
-    .detail-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .detail-list span {
-      border: 1px solid var(--line);
-      background: #ffffff;
-      padding: 8px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-    .kv {
-      display: grid;
-      grid-template-columns: 118px minmax(0, 1fr);
-      gap: 10px;
-      font-size: 13px;
-      align-items: start;
-    }
-    .kv strong { color: #3c4b45; }
-    .kv span { overflow-wrap: anywhere; }
-    .status-line {
-      min-height: 36px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.82);
-      margin-bottom: 14px;
-      font-size: 13px;
-    }
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 99px;
-      background: var(--ok);
-      flex: 0 0 auto;
-    }
-    .workflow-strip {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .workflow-step {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.84);
-      padding: 11px;
-      min-height: 78px;
-    }
-    .workflow-step strong {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 5px;
-      color: #26352f;
-    }
-    .workflow-step span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-    .workflow-step.current {
-      border-color: #b7d0bf;
-      box-shadow: inset 3px 0 0 var(--accent);
-      background: #f6fbf5;
-    }
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .kpi-card {
-      border: 1px solid var(--line);
-      background: #ffffff;
-      padding: 11px;
-      min-height: 74px;
-    }
-    .kpi-card strong {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .kpi-card span {
-      display: block;
-      font-size: 22px;
-      line-height: 1.1;
-      font-weight: 760;
-    }
-    .empty {
-      border: 1px dashed #c9d4ca;
-      background: #f8fbf6;
-      padding: 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    pre {
-      margin: 0;
-      padding: 12px;
-      background: #17201c;
-      color: #ecf5eb;
-      overflow: auto;
-      max-height: 420px;
-      font-size: 12px;
-      line-height: 1.45;
-    }
-    .tree-preview {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .tree-preview pre {
-      min-height: 120px;
-      background: #f8fbf6;
-      color: var(--ink);
-      border: 1px solid var(--line);
-      max-height: 260px;
-    }
-    .report-frame {
-      width: 100%;
-      min-height: 420px;
-      border: 1px solid var(--line);
-      background: white;
-    }
-    .chat-transcript {
-      border: 1px solid var(--line);
-      background: #ffffff;
-      padding: 14px;
-      min-height: 320px;
-      max-height: 420px;
-      overflow: auto;
-      display: grid;
-      gap: 10px;
-    }
-    .chat-message {
-      border: 1px solid var(--line);
-      background: #f8fbf6;
-      padding: 10px 12px;
-    }
-    .chat-message.user {
-      background: #eef6f2;
-      border-color: #c9ddd1;
-    }
-    .chat-message strong {
-      display: block;
-      font-size: 12px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .chat-controls {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .chat-meta {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .view { display: none; }
-    .view.active { display: block; }
-    @media (max-width: 980px) {
-      .shell { grid-template-columns: 1fr; }
-      aside { position: static; height: auto; }
-      main { padding: 18px; }
-      .topbar, .layout { grid-template-columns: 1fr; }
-      .toolbar { justify-content: flex-start; }
-      .filter-bar { grid-template-columns: 1fr; }
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .workflow-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .tree-preview { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 560px) {
-      aside { padding: 16px; }
-      main { padding: 14px; }
-      .grid { grid-template-columns: 1fr; }
-      .workflow-strip, .kpi-grid { grid-template-columns: 1fr; }
-      .panel { padding: 12px; }
-      .title-block h2 { font-size: 24px; }
-      button { width: 100%; }
-      .panel-header { display: grid; }
-      .panel-actions { justify-content: stretch; }
-      .kv { grid-template-columns: 1fr; gap: 2px; }
-    }
+      color: var(--text);
+    }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(36,95,115,.28); outline-offset: 2px; }
+    .button-primary { background: var(--accent); color: #fff; }
+    .button-secondary { background: var(--info); color: #fff; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 260px minmax(0, 1fr) 340px; }
+    .sidebar, .details { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 20px; background: rgba(250,252,249,.84); }
+    .sidebar { border-right: 1px solid var(--line); }
+    .details { border-left: 1px solid var(--line); }
+    .content { min-width: 0; padding: 20px; display: grid; gap: 16px; }
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 14px; background: #18362a; color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; box-shadow: var(--shadow); }
+    .brand h1 { margin: 0; font-size: 1.1rem; font-family: var(--font-display); }
+    .muted { color: var(--muted); }
+    .stack { display: grid; gap: 10px; }
+    .card, .nav-button, .list-item, .metric-card, .status-line { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); }
+    .nav-button { width: 100%; text-align: left; padding: 12px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .nav-button.active { background: var(--panel-strong); }
+    .nav-left, .toolbar, .badge-row, .action-row, .breadcrumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .nav-icon { width: 28px; height: 28px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: rgba(18,84,63,.10); color: var(--accent); font-size: .75rem; font-weight: 700; }
+    .topbar, .card { padding: 18px; }
+    .topbar { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .breadcrumbs { color: var(--muted); font-size: .92rem; }
+    .crumb::after { content: '/'; margin-left: 8px; color: var(--muted); }
+    .crumb:last-child::after { content: ''; margin: 0; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: .83rem; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .danger { color: var(--danger); }
+    .neutral { color: var(--info); }
+    .path-chip, pre { font-family: var(--font-mono); }
+    .path-chip { display: inline-flex; padding: 4px 8px; border-radius: 8px; background: rgba(18,84,63,.08); color: var(--accent); word-break: break-all; }
+    .hero-grid, .grid-2 { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metrics { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .metric-card { padding: 16px; display: grid; gap: 6px; }
+    .metric-value { font-size: 1.9rem; font-weight: 700; }
+    .section-page { display: none; gap: 16px; }
+    .section-page.active { display: grid; }
+    .section-kicker { text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; color: var(--muted); margin-bottom: 8px; }
+    .section-header { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
+    .list-item { padding: 14px; }
+    .status-line { padding: 12px 14px; display: flex; gap: 10px; align-items: center; }
+    .status-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--info); }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; background: var(--panel-strong); }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: rgba(18,84,63,.06); color: var(--muted); font-size: .84rem; text-transform: uppercase; letter-spacing: .04em; }
+    .filters { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    .filters label { display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+    .empty-state, .detail-card { border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 16px; background: var(--panel-strong); }
+    pre { margin: 0; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: #13201a; color: #dff3e7; overflow: auto; white-space: pre-wrap; }
+    @media (max-width: 1440px) { .shell { grid-template-columns: 250px minmax(0, 1fr); } .details { display: none; } }
+    @media (max-width: 1100px) { .shell { grid-template-columns: 1fr; } .sidebar, .details { position: static; height: auto; border: none; } .hero-grid, .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
-<body>
-  <div class="shell" data-app="thelibrarian-dashboard">
-    <aside>
-      <div class="brand">
-        <div class="mark">TL</div>
-        <div>
-          <h1>TheLibrarian</h1>
-          <div class="subtle">Privacy-first file organization copilot</div>
-        </div>
-      </div>
-      <div class="subtle" id="rootPath">Loading root</div>
-      <nav class="nav" aria-label="Dashboard views">
-        <button type="button" class="active" data-view="overview">Overview</button>
-        <button type="button" data-view="inventory">Inventory</button>
-        <button type="button" data-view="plan">Plan</button>
-        <button type="button" data-view="review">Review</button>
-        <button type="button" data-view="warnings">Warnings</button>
-        <button type="button" data-view="jobs">Jobs</button>
-        <button type="button" data-view="chat">Chat</button>
-        <button type="button" data-view="packs">Policy Packs</button>
-        <button type="button" data-view="managed">Managed Cleanup</button>
-        <button type="button" data-view="providers">Providers</button>
-        <button type="button" data-view="policy">Policy</button>
-        <button type="button" data-view="events">Events</button>
-        <button type="button" data-view="manifest">Manifest</button>
-      </nav>
-      <div class="side-panel">
-        <h3>Target Root</h3>
-        <input id="rootInput" type="text" aria-label="Directory to reorganize" placeholder="C:\path\to\directory">
-        <button type="button" id="setRootBtn" style="width:100%;margin-top:8px">Set Directory</button>
-        <p class="subtle" style="margin:10px 0 0">Changing root switches the dashboard target. Operations remain confined to the selected directory.</p>
-      </div>
-      <div class="side-panel">
-        <h3>Run Policy</h3>
-        <select id="policySelect" aria-label="Policy mode">
-          <option value="dry_run_only">dry_run_only</option>
-          <option value="supervised_autonomy">supervised_autonomy</option>
-        </select>
-        <h3 style="margin-top:14px">Policy Pack</h3>
-        <select id="packSelect" aria-label="Policy pack"></select>
-        <p class="subtle" style="margin:10px 0 0">Dry-run remains the default. Apply and rollback always require confirmation.</p>
-      </div>
+<body data-app="thelibrarian-dashboard" data-shell="librarian-dev-dashboard">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">TL</div><div><h1>The Librarian</h1><p class="muted">Developer-first workspace dashboard</p></div></div>
+      <div class="list-item"><div class="section-kicker">Purpose</div><strong>Understand a workspace before touching it.</strong><p class="muted">Find entrypoints, risky files, generated artifacts, runnable scripts, notes, and graph context in one place.</p></div>
+      <nav class="stack" id="sidebarNav" aria-label="Primary"></nav>
+      <div class="list-item"><div class="section-kicker">Quick Actions</div><div class="stack"><button id="refreshBtn">Refresh dashboard</button><button id="copyAgentBriefSidebarBtn">Copy Agent Brief</button><button id="savePlanBtn">Save plan artifact</button><button id="downloadPlanBtn">Export plan JSON</button></div></div>
+      <p class="muted">The Librarian never edits original source code while indexing this workspace.</p>
     </aside>
-    <main>
-      <div class="topbar">
-        <div class="title-block">
-          <h2>Operations Dashboard</h2>
-          <p class="subtle">Scan, plan, review policy decisions, and run controlled job actions from one auditable surface.</p>
-        </div>
-        <div class="toolbar">
-          <button type="button" id="refreshBtn">Refresh</button>
-          <button type="button" id="savePlanBtn">Save Plan</button>
-          <button type="button" id="createJobBtn">Create Job</button>
-          <button type="button" class="button-primary" id="runJobBtn">Run Dry-Run Job</button>
-        </div>
-      </div>
-      <div class="status-line"><span class="dot" id="statusDot"></span><span id="statusText">Loading dashboard</span></div>
-      <section class="workflow-strip" aria-label="Safe workflow">
-        <div class="workflow-step current"><strong>1. Scan</strong><span>Read local metadata inside the selected root.</span></div>
-        <div class="workflow-step"><strong>2. Plan</strong><span>Create a dry-run organization proposal.</span></div>
-        <div class="workflow-step"><strong>3. Review</strong><span>Inspect low-confidence, risky, or conflicting rows.</span></div>
-        <div class="workflow-step"><strong>4. Approve</strong><span>Use policy gates before any apply action.</span></div>
-        <div class="workflow-step"><strong>5. Apply/Rollback</strong><span>Move only with confirmation and manifest support.</span></div>
-      </section>
-      <section class="grid" aria-label="Summary metrics">
-        <div class="metric"><span class="label">Files</span><span class="value" id="metricFiles">0</span></div>
-        <div class="metric"><span class="label">Planned</span><span class="value" id="metricPlanned">0</span></div>
-        <div class="metric"><span class="label">Review</span><span class="value" id="metricReview">0</span></div>
-        <div class="metric"><span class="label">Jobs</span><span class="value" id="metricJobs">0</span></div>
-      </section>
-      <section class="view active" data-view-panel="overview">
-        <div class="layout">
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Current Plan</h2><p class="subtle">Live deterministic/provider-backed plan preview for this root.</p></div>
-              <div class="panel-actions"><button type="button" data-view-jump="plan">Open Plan</button></div>
-            </div>
-            <div class="table-wrap"><table id="overviewPlanTable"></table></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Active Job</h2><p class="subtle">Latest checkpointed job and safe actions.</p></div>
-            </div>
-            <div class="details" id="activeJobDetails"></div>
-            <div class="panel-actions" style="margin-top:14px">
-              <button type="button" id="approveJobBtn">Approve</button>
-              <button type="button" class="button-blue" id="applyJobBtn">Apply</button>
-              <button type="button" class="button-danger" id="rollbackJobBtn">Rollback</button>
-              <button type="button" class="button-danger" id="deleteJobBtn">Delete Job</button>
-            </div>
-          </div>
-        </div>
-        <div class="panel" style="margin-top:14px">
-          <div class="panel-header">
-            <div><h2>Before / After Tree</h2><p class="subtle">Dry-run two-level preview. It compares current scanned locations with planned destinations without moving files.</p></div>
-          </div>
-          <div class="tree-preview">
-            <div><h3>Before</h3><pre id="beforeTreePreview">Loading</pre></div>
-            <div><h3>After</h3><pre id="afterTreePreview">Loading</pre></div>
-          </div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="inventory">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Inventory</h2><p class="subtle">Metadata only. File contents are never read for online providers.</p></div></div>
-          <div class="table-wrap"><table id="inventoryTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="plan">
-        <div class="panel">
-          <div class="panel-header">
-            <div><h2>Plan</h2><p class="subtle">Every row includes destination, confidence, reason, and status.</p></div>
-            <div class="panel-actions"><button type="button" id="downloadPlanBtn">Download JSON</button></div>
-          </div>
-          <div class="filter-bar" aria-label="Plan filters">
-            <input type="search" id="planSearchInput" placeholder="Search source, destination, reason">
-            <select id="planStatusFilter" aria-label="Plan status filter"><option value="">All statuses</option></select>
-            <select id="planCategoryFilter" aria-label="Plan category filter"><option value="">All categories</option></select>
-          </div>
-          <div class="subtle table-note" id="planFilterSummary"></div>
-          <div class="table-wrap"><table id="planTable"></table></div>
-        </div>
-      </section>
-        <section class="view" data-view-panel="jobs">
-        <div class="layout">
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Job Queue</h2><p class="subtle">Filesystem-backed jobs under .thelibrarian/jobs.</p></div>
-              <div class="panel-actions"><button type="button" class="button-danger" id="deleteAllJobsBtn">Delete All Jobs</button></div>
-            </div>
-            <div class="job-list" id="jobList"></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><div><h2>Job Record</h2><p class="subtle">Selected job JSON.</p></div></div>
-            <pre id="jobJson">{}</pre>
-          </div>
-        </div>
-        </section>
-        <section class="view" data-view-panel="chat">
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <h2>Chat Review</h2>
-                <p class="subtle">Parla con TheLibrarian per restringere l'analisi, rigenerare il piano e riassegnare file senza toccare i contenuti.</p>
-              </div>
-              <div class="panel-actions">
-                <button type="button" id="chatResetBtn">Reset Chat</button>
-              </div>
-            </div>
-            <div class="chat-transcript" id="chatTranscript"></div>
-            <div class="chat-controls">
-              <input id="chatInput" type="text" aria-label="Chat command" placeholder="Esempio: aggiungi directory Invoices oppure sposta report.pdf Documents/Reports/finale.pdf">
-              <button type="button" id="chatSendBtn" class="button-blue">Send</button>
-              <button type="button" id="chatPlanBtn">Plan</button>
-            </div>
-            <div class="chat-meta">
-              <div class="kv"><strong>Scope</strong><span id="chatScope">Root completa</span></div>
-              <div class="kv"><strong>Suggestions</strong><span id="chatSuggestions"></span></div>
-            </div>
-          </div>
-        </section>
-        <section class="view" data-view-panel="packs">
-        <div class="layout">
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Policy Packs</h2><p class="subtle">Data-driven vertical packs. Select one before creating a job or managed cleanup session.</p></div>
-            </div>
-            <div class="table-wrap"><table id="packsTable"></table></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Pack Detail</h2><p class="subtle">Current selected pack, template hints, and managed recommendations.</p></div>
-            </div>
-            <div class="details" id="packDetails"></div>
-          </div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="managed">
-        <div class="layout">
-          <div class="panel">
-            <div class="panel-header">
-              <div><h2>Managed Cleanup</h2><p class="subtle">Dry-run service sessions with KPI and client-readable reports.</p></div>
-              <div class="panel-actions"><button type="button" class="button-primary" id="startManagedBtn">Start Managed Session</button></div>
-            </div>
-            <div class="kv"><strong>Client</strong><input id="managedClientInput" type="text" value="Demo Client"></div>
-            <div class="kv"><strong>Operator</strong><input id="managedOperatorInput" type="text" value="Antonio"></div>
-            <p class="subtle">No file contents are sent. This action creates a dry-run job and report artifacts only.</p>
-            <div class="table-wrap"><table id="managedTable"></table></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><div><h2>KPI</h2><p class="subtle">Latest managed session metrics.</p></div></div>
-            <div class="kpi-grid" id="managedKpiCards"></div>
-            <pre id="managedKpiJson">{}</pre>
-          </div>
-        </div>
-        <div class="panel" style="margin-top:14px">
-          <div class="panel-header">
-            <div><h2>Client Report Preview</h2><p class="subtle">Local HTML report for the selected managed session. It is loaded from .thelibrarian/managed inside the current root.</p></div>
-            <div class="panel-actions"><button type="button" id="previewManagedReportBtn">Preview Latest Report</button></div>
-          </div>
-          <iframe class="report-frame" id="managedReportPreview" title="Managed cleanup report preview" sandbox=""></iframe>
-        </div>
-      </section>
-      <section class="view" data-view-panel="providers">
-        <div class="panel">
-          <div class="panel-header">
-            <div><h2>Providers</h2><p class="subtle" id="providerNotice">No file contents are sent.</p></div>
-          </div>
-          <div class="table-wrap"><table id="providersTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="review">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Review Queue</h2><p class="subtle">Ambiguous, low-confidence, or non-planned entries that should stay human-supervised.</p></div></div>
-          <div class="filter-bar" aria-label="Review filters">
-            <input type="search" id="reviewSearchInput" placeholder="Search source, destination, reason">
-            <select id="reviewStatusFilter" aria-label="Review status filter"><option value="">All statuses</option></select>
-            <select id="reviewCategoryFilter" aria-label="Review category filter"><option value="">All categories</option></select>
-          </div>
-          <div class="subtle table-note" id="reviewFilterSummary"></div>
-          <div class="table-wrap"><table id="reviewTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="warnings">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Warnings</h2><p class="subtle">Scanner, planner, and entry-level safety notes.</p></div></div>
-          <div class="table-wrap"><table id="warningsTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="policy">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Policy Decisions</h2><p class="subtle">Risk-scored decisions for the selected job.</p></div></div>
-          <div class="table-wrap"><table id="policyTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="events">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Events</h2><p class="subtle">Append-only event stream for the selected job.</p></div></div>
-          <div class="table-wrap"><table id="eventsTable"></table></div>
-        </div>
-      </section>
-      <section class="view" data-view-panel="manifest">
-        <div class="panel">
-          <div class="panel-header"><div><h2>Manifest</h2><p class="subtle">Rollback manifest for the selected job, available only after apply.</p></div></div>
-          <pre id="manifestJson">{}</pre>
-        </div>
-      </section>
+    <main class="content">
+      <header class="topbar card">
+        <div class="stack" style="gap:12px;"><div><div class="section-kicker">Workspace</div><h2 id="workspaceName" style="margin:0;font-family:var(--font-display);">Loading workspace...</h2><p id="workspaceSummary" class="muted">Reading .librarian artifacts and local dashboard state.</p></div><div class="breadcrumbs" id="breadcrumbs" aria-label="Breadcrumb"></div><div class="toolbar"><span id="workspaceStatusBadge" class="badge neutral">Loading</span><span id="workspacePath" class="path-chip">Waiting for root</span><span id="workspaceIndexedAt" class="badge neutral">No index yet</span></div></div>
+        <div class="stack" style="gap:12px;"><div class="toolbar"><button id="reindexBtn" class="button-primary">Re-index</button><button id="graphBtn" class="button-secondary">Generate Graph</button><button id="openRunbookBtn">Open Runbook</button><button id="exportDashboardBtn">Export</button><button id="copyAgentBriefBtn">Copy Agent Context</button></div><div class="toolbar"><input id="rootInput" style="min-width:min(420px,70vw);" type="text" placeholder="Switch dashboard to another local root"><button id="setRootBtn">Set root</button></div></div>
+      </header>
+      <div id="statusLine" class="status-line neutral" role="status" aria-live="polite"><span class="status-dot"></span><strong>Status</strong><span id="statusText">Loading dashboard...</span></div>
+      <section id="page-overview" class="section-page active"></section>
+      <section id="page-start-here" class="section-page"></section>
+      <section id="page-files" class="section-page"></section>
+      <section id="page-directories" class="section-page"></section>
+      <section id="page-code" class="section-page"></section>
+      <section id="page-entrypoints" class="section-page"></section>
+      <section id="page-tests" class="section-page"></section>
+      <section id="page-graph" class="section-page"></section>
+      <section id="page-risks" class="section-page"></section>
+      <section id="page-runbooks" class="section-page"></section>
+      <section id="page-scripts" class="section-page"></section>
+      <section id="page-operations" class="section-page"></section>
+      <section id="page-diagnostics" class="section-page"></section>
     </main>
+    <aside class="details"><h3 style="margin-top:0;font-family:var(--font-display);">Details</h3><p class="muted">Select a file, risk, script, graph node, or operation to inspect it here.</p><div id="detailPanelBody" class="stack"><div class="empty-state"><h4>No selection yet</h4><p class="muted">Use view-details actions in cards and tables to inspect metadata without losing your place.</p></div></div></aside>
   </div>
   <script>
-    const state = { dashboard: null, selectedJobId: null, policy: null, events: [], manifest: null, busy: false, planPackId: '' };
+    const navItems = [
+      { id: 'overview', label: 'Overview', icon: 'OV' },
+      { id: 'start-here', label: 'Start Here', icon: 'ST' },
+      { id: 'files', label: 'Files', icon: 'FI' },
+      { id: 'directories', label: 'Directories', icon: 'DI' },
+      { id: 'code', label: 'Code', icon: 'CO' },
+      { id: 'entrypoints', label: 'Entrypoints', icon: 'EP' },
+      { id: 'tests', label: 'Tests', icon: 'TS' },
+      { id: 'graph', label: 'Graph', icon: 'GR' },
+      { id: 'risks', label: 'Risks', icon: 'RK' },
+      { id: 'runbooks', label: 'Runbooks', icon: 'RB' },
+      { id: 'scripts', label: 'Scripts', icon: 'SC' },
+      { id: 'operations', label: 'Operations', icon: 'OP' },
+      { id: 'diagnostics', label: 'Diagnostics', icon: 'DG' },
+    ];
+    const state = {
+      dashboard: null,
+      page: 'overview',
+      busy: false,
+      selectedDetail: null,
+      filesView: 'table',
+      filters: {
+        files: { q: '', kind: '', language: '', risk: '', sort: 'name', desc: false },
+        directories: { q: '', role: '', risk: '' },
+      },
+    };
     const $ = selector => document.querySelector(selector);
-    const $$ = selector => Array.from(document.querySelectorAll(selector));
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-    }
+    const pageEl = id => document.getElementById(`page-${id}`);
+    const esc = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const badge = (text, variant = 'neutral') => `<span class="badge ${variant}">${esc(text)}</span>`;
+    const pathChip = value => `<span class="path-chip">${esc(value || '(missing path)')}</span>`;
+    const metricCard = metric => `<article class="metric-card">${badge(metric.label, metric.variant || 'neutral')}<div class="metric-value">${new Intl.NumberFormat().format(Number(metric.value || 0))}</div><strong>${esc(metric.label)}</strong></article>`;
+    const emptyState = (title, body) => `<div class="empty-state"><h4>${esc(title)}</h4><p class="muted">${esc(body)}</p></div>`;
+    const simpleTable = (headers, rows, emptyHtml) => `<div class="table-wrap"><table><thead><tr>${headers.map(h => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.map(row => `<tr>${row.join('')}</tr>`).join('') : `<tr><td colspan="${headers.length}">${emptyHtml}</td></tr>`}</tbody></table></div>`;
+    const statusVariant = value => {
+      const v = String(value || '').toLowerCase();
+      if (['error', 'errors', 'high', 'danger', 'missing'].includes(v)) return 'danger';
+      if (['warning', 'warnings', 'medium', 'stale', 'needs index'].includes(v)) return 'warn';
+      if (['healthy', 'ok', 'safe', 'read-only'].includes(v)) return 'ok';
+      return 'neutral';
+    };
+    const confidenceBadge = value => {
+      const n = Number(value || 0);
+      return badge(`${Math.round(n * 100)}% confidence`, n >= 0.8 ? 'ok' : n >= 0.6 ? 'neutral' : 'warn');
+    };
+    const getLibrarian = () => state.dashboard?.librarian || {
+      workspace: { name: 'Workspace', path: '', short_path: '', status: 'Needs Index', summary: '' },
+      overview: { hero: { description: '', languages: [], frameworks: [], project_type: 'Workspace', confidence: 0 }, metrics: [], do_not_touch: [], health: [], recent_operations: [], status: 'Needs Index' },
+      start_here: { recommended_reads: [], recommended_commands: [], runnable_scripts: [], important_files: [], main_entrypoints: [], main_risks: [], agent_instructions: {}, empty_message: '' },
+      files: [], directories: [],
+      code: { languages: [], frameworks: [], packages: [], modules: [], entrypoints: [], tests: [], config_files: [] },
+      graph: { available: false, summary: { nodes: 0, edges: 0, top_connected: [], top_tags: [], top_edge_types: [], isolated_nodes: [] }, nodes: [], edges: [], entrypoint_neighborhood: [], empty_message: 'Graph is missing.' },
+      risks: [], runbooks: [], scripts: [], operations: [],
+      diagnostics: { items: [], stale_index: false, suggestions: [], warnings: 0, errors: 0 },
+      agent_brief: '',
+    };
+    const getRecommendedFirstReads = () => getLibrarian().start_here?.recommended_reads || [];
+    const getEntrypoints = () => getLibrarian().code?.entrypoints || [];
+    const getRunnableScripts = () => getLibrarian().scripts || [];
+    const setStatus = (message, variant = 'neutral') => { $('#statusLine').className = `status-line ${variant}`; $('#statusText').textContent = message; };
     async function api(path, options = {}) {
-      const response = await fetch(path, {
-        headers: { 'Content-Type': 'application/json' },
-        ...options,
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || `Request failed: ${response.status}`);
-      return payload;
+      const response = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...options });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Request failed: ${response.status}`);
+      }
+      const contentType = response.headers.get('content-type') || '';
+      return contentType.includes('application/json') ? response.json() : response.text();
     }
-    function setStatus(message, variant = 'ok') {
-      $('#statusText').textContent = message;
-      $('#statusDot').style.background = variant === 'danger' ? 'var(--danger)' : variant === 'warn' ? 'var(--warn)' : 'var(--ok)';
-    }
-    function badge(value) {
-      const text = String(value ?? '');
-      const lowered = text.toLowerCase();
-      const kind = /completed|auto_approved|planned/.test(lowered) ? 'ok' : /failed|blocked|rollback/.test(lowered) ? 'danger' : /approval|review|paused|warning/.test(lowered) ? 'warn' : '';
-      return `<span class="badge ${kind}">${escapeHtml(text)}</span>`;
-    }
-    function table(headers, rows) {
-      if (!rows.length) return '<tbody><tr><td class="empty">No data available</td></tr></tbody>';
-      const head = `<thead><tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join('')}</tr></thead>`;
-      const body = `<tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`;
-      return head + body;
-    }
-    function updateFilterOptions(selectId, values, allLabel) {
-      const select = $(`#${selectId}`);
-      const current = select.value;
-      const unique = Array.from(new Set(values.map(value => String(value ?? '')).filter(Boolean))).sort();
-      select.replaceChildren(new Option(allLabel, ''), ...unique.map(value => new Option(value, value)));
-      select.value = unique.includes(current) ? current : '';
-    }
-    function filterValue(id) {
-      return $(`#${id}`).value;
-    }
-    function entryMatchesFilters(entry, prefix) {
-      const query = filterValue(`${prefix}SearchInput`).trim().toLowerCase();
-      const status = filterValue(`${prefix}StatusFilter`);
-      const category = filterValue(`${prefix}CategoryFilter`);
-      if (status && entry.status !== status) return false;
-      if (category && entry.category !== category) return false;
-      if (!query) return true;
-      return [
-        entry.source,
-        entry.destination,
-        entry.category,
-        entry.status,
-        entry.reason,
-        entry.warning,
-      ].some(value => String(value ?? '').toLowerCase().includes(query));
-    }
-    function reviewCandidate(entry) {
-      return entry.category === 'Review' || entry.status !== 'planned' || Number(entry.confidence) < 0.92;
-    }
-    function planRows(entries, reasonAccessor) {
-      return entries.map(entry => [
-        escapeHtml(entry.source),
-        escapeHtml(entry.destination),
-        badge(entry.category),
-        badge(entry.status),
-        escapeHtml(Number(entry.confidence).toFixed(2)),
-        escapeHtml(reasonAccessor(entry)),
-      ]);
-    }
-    function setFilterSummary(id, shown, total) {
-      $(`#${id}`).textContent = `${shown} of ${total} rows shown`;
+    async function copyText(value, message = 'Copied.') {
+      try {
+        await navigator.clipboard.writeText(String(value || ''));
+        setStatus(message, 'ok');
+      } catch (error) {
+        setStatus('Clipboard access failed. Copy manually from the detail panel.', 'warn');
+        setDetail('Clipboard fallback', { value });
+      }
     }
     function downloadJson(filename, payload) {
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
       URL.revokeObjectURL(url);
     }
-    function activeJob() {
-      const jobs = state.dashboard?.jobs || [];
-      return jobs.find(job => job.job_id === state.selectedJobId) || jobs[0] || null;
+    function setDetail(title, payload, description = 'Structured detail for the selected item.') {
+      state.selectedDetail = { title, payload, description };
+      renderDetail();
     }
-    function setView(view) {
-      $$('.nav button').forEach(button => button.classList.toggle('active', button.dataset.view === view));
-      $$('[data-view-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.viewPanel === view));
-    }
-    async function refresh({ keepSelection = true, silent = false } = {}) {
-      const previous = keepSelection ? state.selectedJobId : null;
-      state.dashboard = await api('/api/dashboard');
-      if (state.planPackId && !state.dashboard.chat?.has_plan) {
-        state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
-      }
-      const jobs = state.dashboard.jobs || [];
-      state.selectedJobId = jobs.some(job => job.job_id === previous) ? previous : (jobs[0]?.job_id || null);
-      await loadJobSideData();
-      render();
-      if (!silent) setStatus('Dashboard refreshed');
-    }
-    async function loadJobSideData() {
-      state.policy = null;
-      state.events = [];
-      state.manifest = null;
-      if (!state.selectedJobId) return;
-      const policyResult = await fetch(`/api/jobs/${state.selectedJobId}/policy`);
-      if (policyResult.ok) state.policy = await policyResult.json();
-      const eventResult = await fetch(`/api/jobs/${state.selectedJobId}/events`);
-      if (eventResult.ok) state.events = (await eventResult.json()).events || [];
-      const manifestResult = await fetch(`/api/jobs/${state.selectedJobId}/manifest`);
-      if (manifestResult.ok) state.manifest = await manifestResult.json();
-    }
-    function render() {
-      const dashboard = state.dashboard;
-      if (!dashboard) return;
-      const inventory = dashboard.inventory;
-      const plan = dashboard.plan;
-      const jobs = dashboard.jobs || [];
-      const selected = activeJob();
-      $('#rootPath').textContent = dashboard.root;
-      if (document.activeElement !== $('#rootInput')) $('#rootInput').value = dashboard.root;
-      $('#metricFiles').textContent = inventory.summary.total_files;
-      $('#metricPlanned').textContent = plan.entries.filter(entry => entry.status === 'planned').length;
-      $('#metricReview').textContent = plan.entries.filter(entry => entry.category === 'Review').length;
-      $('#metricJobs').textContent = jobs.length;
-      renderPlanTables(plan);
-      renderTreePreview(inventory, plan);
-      renderInventory(inventory);
-      renderJobs(jobs, selected);
-      renderPacks(dashboard.packs || []);
-      renderManaged(dashboard.managed_sessions || []);
-      renderProviders(dashboard.providers || {});
-      renderReview(plan);
-      renderWarnings(inventory, plan);
-      renderPolicy();
-      renderEvents();
-      renderManifest();
-      renderActiveJob(selected);
-      renderChat(dashboard.chat || {});
-    }
-    function renderPlanTables(plan) {
-      const rows = plan.entries.slice(0, 8).map(entry => [
-        escapeHtml(entry.source),
-        escapeHtml(entry.destination),
-        badge(entry.category),
-        badge(entry.status),
-        escapeHtml(Number(entry.confidence).toFixed(2)),
-      ]);
-      $('#overviewPlanTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence'], rows);
-      updateFilterOptions('planStatusFilter', plan.entries.map(entry => entry.status), 'All statuses');
-      updateFilterOptions('planCategoryFilter', plan.entries.map(entry => entry.category), 'All categories');
-      const filteredEntries = plan.entries.filter(entry => entryMatchesFilters(entry, 'plan'));
-      setFilterSummary('planFilterSummary', filteredEntries.length, plan.entries.length);
-      const fullRows = planRows(filteredEntries, entry => entry.reason);
-      $('#planTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Reason'], fullRows);
-    }
-    function renderTreePreview(inventory, plan) {
-      const beforePaths = inventory.files.map(file => file.relative_path);
-      const afterPaths = plan.entries.map(entry => entry.status === 'planned' ? entry.destination : entry.source);
-      $('#beforeTreePreview').textContent = previewTree(beforePaths);
-      $('#afterTreePreview').textContent = previewTree(afterPaths);
-    }
-    function previewTree(paths) {
-      if (!paths.length) return 'No files scanned.';
-      const topCounts = new Map();
-      const childCounts = new Map();
-      for (const path of paths) {
-        const parts = String(path).split('/').filter(Boolean);
-        const top = parts.length > 1 ? `${parts[0]}/` : '(root)';
-        topCounts.set(top, (topCounts.get(top) || 0) + 1);
-        if (parts.length > 2) {
-          const childKey = `${top}${parts[1]}/`;
-          childCounts.set(childKey, (childCounts.get(childKey) || 0) + 1);
-        }
-      }
-      return Array.from(topCounts.entries())
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([name, count]) => {
-          const children = Array.from(childCounts.entries())
-            .filter(([child]) => child.startsWith(name) && child !== name)
-            .sort(([left], [right]) => left.localeCompare(right))
-            .slice(0, 6)
-            .map(([child, childCount]) => `  ${child.replace(name, '')} ${childCount} file${childCount === 1 ? '' : 's'}`);
-          return [`${name} ${count} file${count === 1 ? '' : 's'}`, ...children].join('\n');
-        })
-        .join('\n');
-    }
-    function renderInventory(inventory) {
-      const rows = inventory.files.map(file => [
-        escapeHtml(file.relative_path),
-        escapeHtml(file.extension || '(none)'),
-        escapeHtml(file.size_bytes),
-        escapeHtml(file.parent),
-        escapeHtml(file.modified_at),
-      ]);
-      $('#inventoryTable').innerHTML = table(['Path', 'Ext', 'Bytes', 'Parent', 'Modified'], rows);
-    }
-    function renderJobs(jobs, selected) {
-      $('#jobList').innerHTML = jobs.length ? jobs.map(job => `
-        <button type="button" class="job-card ${selected?.job_id === job.job_id ? 'active' : ''}" data-job="${escapeHtml(job.job_id)}">
-          <div>${badge(job.status)} ${badge(job.phase)}</div>
-          <strong>${escapeHtml(job.job_name || job.job_id)}</strong>
-          <code>${escapeHtml(job.job_id)}</code>
-          <div class="subtle">${escapeHtml(job.updated_at)}</div>
-        </button>
-      `).join('') : '<div class="empty">No jobs yet. Run a dry-run job to create the first checkpoint.</div>';
-      $$('[data-job]').forEach(button => button.addEventListener('click', async () => {
-        state.selectedJobId = button.dataset.job;
-        await loadJobSideData();
-        render();
-      }));
-      $('#jobJson').textContent = selected ? JSON.stringify(selected, null, 2) : '{}';
-    }
-    function renderPacks(packs) {
-      const select = $('#packSelect');
-      const selected = select.value || 'general_office';
-      select.innerHTML = packs.map(pack => `<option value="${escapeHtml(pack.id)}">${escapeHtml(pack.name)} (${escapeHtml(pack.industry)})</option>`).join('');
-      if (packs.some(pack => pack.id === selected)) select.value = selected;
-      const activePack = packs.find(pack => pack.id === select.value) || packs[0];
-      const rows = packs.map(pack => [
-        escapeHtml(pack.id),
-        escapeHtml(pack.industry),
-        badge(pack.tier),
-        escapeHtml(pack.name),
-        escapeHtml(pack.recommended_policy),
-      ]);
-      $('#packsTable').innerHTML = table(['Pack', 'Industry', 'Tier', 'Name', 'Policy'], rows);
-      renderPackDetails(activePack);
-    }
-    function renderPackDetails(pack) {
-      if (!pack) {
-        $('#packDetails').innerHTML = '<div class="empty">No pack selected.</div>';
+    function renderDetail() {
+      const el = $('#detailPanelBody');
+      if (!state.selectedDetail) {
+        el.innerHTML = emptyState('No selection yet', 'Select an item to inspect its metadata here.');
         return;
       }
-      const templates = (pack.folder_templates || []).slice(0, 8).map(item => `<span>${escapeHtml(item)}</span>`).join('');
-      const useCases = (pack.use_cases || []).slice(0, 6).map(item => `<span>${escapeHtml(item)}</span>`).join('');
-      const recommendations = (pack.managed_service_recommendations || [])
-        .slice(0, 4)
-        .map(item => `<span><strong>${escapeHtml(item.title)}</strong><br>${escapeHtml(item.description)}</span>`)
-        .join('');
-      $('#packDetails').innerHTML = `
-        <div class="kv"><strong>Name</strong><span>${escapeHtml(pack.name)}</span></div>
-        <div class="kv"><strong>Industry</strong><span>${escapeHtml(pack.industry || 'general')}</span></div>
-        <div class="kv"><strong>Tier</strong><span>${badge(pack.tier)}</span></div>
-        <div class="kv"><strong>Policy</strong><span>${escapeHtml(pack.recommended_policy)}</span></div>
-        <div class="kv"><strong>Description</strong><span>${escapeHtml(pack.description || '(none)')}</span></div>
-        <h3>Use Cases</h3>
-        <div class="detail-list">${useCases || '<span>No use cases listed.</span>'}</div>
-        <h3>Folder Templates</h3>
-        <div class="detail-list">${templates || '<span>No folder templates listed.</span>'}</div>
-        <h3>Managed Recommendations</h3>
-        <div class="detail-list">${recommendations || '<span>No recommendations listed.</span>'}</div>
+      const payload = state.selectedDetail.payload;
+      const json = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+      el.innerHTML = `<div class="detail-card"><div class="section-kicker">Selection</div><h4>${esc(state.selectedDetail.title)}</h4><p class="muted">${esc(state.selectedDetail.description)}</p><pre>${esc(json)}</pre><div class="action-row" style="margin-top:10px;"><button data-copy="${esc(typeof payload === 'string' ? payload : json)}">Copy details</button></div></div>`;
+      el.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', () => copyText(button.dataset.copy, 'Copied details.')));
+    }
+    function setPage(page) {
+      state.page = page;
+      navItems.forEach(item => pageEl(item.id)?.classList.toggle('active', item.id === page));
+      document.querySelectorAll('.nav-button').forEach(button => button.classList.toggle('active', button.dataset.page === page));
+      renderBreadcrumbs();
+    }
+    function renderBreadcrumbs() {
+      const workspace = getLibrarian().workspace;
+      const title = navItems.find(item => item.id === state.page)?.label || 'Overview';
+      $('#breadcrumbs').innerHTML = `<span class="crumb">${esc(workspace.name || 'Workspace')}</span><span class="crumb">${esc(title)}</span>${state.selectedDetail?.title ? `<span class="crumb">${esc(state.selectedDetail.title)}</span>` : ''}`;
+    }
+    function wireSectionActions(root) {
+      root.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', () => copyText(button.dataset.copy, 'Copied.')));
+      root.querySelectorAll('[data-jump]').forEach(button => button.addEventListener('click', () => setPage(button.dataset.jump)));
+      root.querySelectorAll('[data-item]').forEach(button => button.addEventListener('click', () => setDetail(button.dataset.title || 'Details', JSON.parse(button.dataset.item))));
+      root.querySelectorAll('[data-graph-file]').forEach(button => button.addEventListener('click', () => { setPage('graph'); $('#graphSearch') && ($('#graphSearch').value = button.dataset.graphFile); renderGraph(button.dataset.graphFile); }));
+    }
+    function renderSidebar() {
+      const librarian = getLibrarian();
+      const counts = {
+        files: librarian.files.length, directories: librarian.directories.length, code: librarian.code.modules.length,
+        entrypoints: librarian.code.entrypoints.length, tests: librarian.code.tests.length, graph: librarian.graph.summary.nodes,
+        risks: librarian.risks.length, runbooks: librarian.runbooks.length, scripts: librarian.scripts.length,
+        operations: librarian.operations.length, diagnostics: librarian.diagnostics.errors + librarian.diagnostics.warnings,
+      };
+      $('#sidebarNav').innerHTML = navItems.map(item => `<button class="nav-button ${item.id === state.page ? 'active' : ''}" data-page="${esc(item.id)}"><span class="nav-left"><span class="nav-icon">${esc(item.icon)}</span><span>${esc(item.label)}</span></span>${counts[item.id] ? badge(counts[item.id], 'neutral') : ''}</button>`).join('');
+      document.querySelectorAll('.nav-button').forEach(button => button.addEventListener('click', () => setPage(button.dataset.page)));
+    }
+    function renderTopbar() {
+      const workspace = getLibrarian().workspace;
+      $('#workspaceName').textContent = workspace.name || 'Workspace';
+      $('#workspaceSummary').textContent = workspace.summary || 'Dashboard data not available yet.';
+      $('#workspacePath').textContent = workspace.short_path || workspace.path || 'Unknown path';
+      $('#workspaceIndexedAt').textContent = workspace.last_indexed ? `Last index: ${new Date(workspace.last_indexed).toLocaleString()}` : 'No index yet';
+      $('#workspaceStatusBadge').className = `badge ${statusVariant(workspace.status)}`;
+      $('#workspaceStatusBadge').textContent = workspace.status || 'Unknown';
+      $('#rootInput').value = state.dashboard?.root || workspace.path || '';
+    }
+    function renderOverview() {
+      const librarian = getLibrarian();
+      const overview = librarian.overview;
+      const health = overview.health || [];
+      pageEl('overview').innerHTML = `
+        <div class="hero-grid">
+          <article class="card"><div class="section-kicker">Overview</div><h3 id="overviewTitle" style="margin:0 0 10px;font-family:var(--font-display);">${esc(librarian.workspace.name || 'Workspace')}</h3><div class="badge-row">${badge(overview.status || 'Unknown', statusVariant(overview.status))}${confidenceBadge(overview.hero.confidence || 0)}${badge(overview.hero.project_type || 'Workspace', 'neutral')}${(overview.hero.languages || []).slice(0,4).map(item => badge(item, 'neutral')).join('')}${(overview.hero.frameworks || []).slice(0,4).map(item => badge(item, 'ok')).join('')}</div><p class="muted">${esc(overview.hero.description || 'Developer-first workspace dashboard for understanding structure, code intelligence, risk, and runnable context.')}</p><div class="action-row"><button data-jump="start-here" class="button-primary">Open Start Here</button><button data-copy="${esc(librarian.agent_brief || '')}">Copy Agent Brief</button><button data-jump="risks">Review risks</button></div></article>
+          <article class="card"><div class="section-kicker">Health</div><h4 style="margin:0 0 10px;">Above the fold checks</h4><div class="metrics">${health.length ? health.map(item => metricCard({ label: item.label, value: item.value, variant: item.variant || 'neutral' })).join('') : emptyState('No health data yet', 'Run librarian mark and librarian dev index to build workspace metadata.')}</div></article>
+        </div>
+        <div class="metrics">${(overview.metrics || []).map(metricCard).join('')}</div>
+        <div class="grid-2">
+          <article class="card"><div class="section-header"><div><div class="section-kicker">Start Here</div><h4 style="margin:0;">Recommended first reads</h4></div><button data-jump="start-here">View full guide</button></div><div class="stack">${getRecommendedFirstReads().length ? getRecommendedFirstReads().map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.label || item.path)}"><strong>${esc(item.label || item.path)}</strong><div class="badge-row">${pathChip(item.path)}${badge('First read','ok')}</div><p class="muted">${esc(item.reason || '')}</p></div>`).join('') : emptyState('No recommended reads yet', 'README files, notes, runbooks, and entrypoints will appear here.')}</div></article>
+          <article class="card"><div class="section-header"><div><div class="section-kicker">Do Not Touch</div><h4 style="margin:0;">Protected or risky files</h4></div><button data-jump="risks">Open risks</button></div><div class="stack">${(overview.do_not_touch || []).length ? overview.do_not_touch.map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.path)}"><strong>${esc(item.name)}</strong><div class="badge-row">${pathChip(item.path)}${badge(item.risk || 'risk', statusVariant(item.risk))}${item.generated ? badge('Generated', 'warn') : ''}${item.vendor ? badge('Vendor', 'warn') : ''}${item.lockfile ? badge('Lockfile', 'warn') : ''}</div><p class="muted">${esc(item.summary || 'Avoid editing unless you know why this file matters.')}</p></div>`).join('') : emptyState('No protected files flagged', 'Generated, vendor, lockfile, and high-risk items will appear here when indexed.')}</div></article>
+        </div>
       `;
+      wireSectionActions(pageEl('overview'));
     }
-    function renderManaged(sessions) {
-      const rows = sessions.map(session => [
-        escapeHtml(session.session_id),
-        badge(session.stage),
-        escapeHtml(session.client_name),
-        escapeHtml(session.pack_id),
-        `<code>${escapeHtml(session.artifacts?.report_html || session.artifacts?.report_md || '(pending)')}</code>`,
-        escapeHtml(session.updated_at),
-      ]);
-      $('#managedTable').innerHTML = table(['Session', 'Stage', 'Client', 'Pack', 'Client Report', 'Updated'], rows);
-      $('#managedKpiCards').innerHTML = sessions[0] ? managedKpiCards(sessions[0].kpi) : '<div class="empty">No managed sessions yet.</div>';
-      $('#managedKpiJson').textContent = sessions[0] ? JSON.stringify(sessions[0].kpi, null, 2) : '{}';
-      $('#previewManagedReportBtn').disabled = !sessions[0]?.artifacts?.report_html;
+    function renderStartHere() {
+      const librarian = getLibrarian();
+      const start = librarian.start_here;
+      pageEl('start-here').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Start Here</div><h3 id="startHereTitle" style="margin:0;">What to read first and what to run next</h3><p class="muted">This page helps a developer or agent get productive in less than 30 seconds.</p></div><button id="copyAgentBriefPageBtn" class="button-primary">Copy Agent Brief</button></div>${start.empty_message ? emptyState('Workspace context is still thin', start.empty_message) : ''}</article><div class="grid-2"><article class="card"><div class="section-header"><div><h4 style="margin:0;">Recommended commands</h4><p class="muted">Copyable CLI commands for the safest next steps.</p></div></div><div class="stack">${(start.recommended_commands || []).length ? start.recommended_commands.map(item => `<div class="list-item"><strong>${esc(item.label)}</strong><p class="muted">${esc(item.description || '')}</p><pre>${esc(item.command)}</pre><div class="action-row"><button data-copy="${esc(item.command)}">Copy command</button></div></div>`).join('') : emptyState('No recommended commands yet', 'Mark, index, status, and inspection commands appear here when metadata exists.')}</div></article><article class="card"><div class="section-header"><div><h4 style="margin:0;">Important files, entrypoints, and risks</h4><p class="muted">Useful context before making changes.</p></div></div><div class="stack">${(start.important_files || []).slice(0,4).map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.path)}"><strong>${esc(item.name)}</strong><div class="badge-row">${pathChip(item.path)}${item.language ? badge(item.language, 'neutral') : ''}</div></div>`).join('')}${(start.main_entrypoints || []).slice(0,3).map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.file)}"><strong>${esc(item.file)}</strong><div class="badge-row">${badge(item.symbol, 'ok')}${confidenceBadge(item.confidence)}</div></div>`).join('')}${(start.main_risks || []).slice(0,3).map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.item)}"><strong>${esc(item.item)}</strong><div class="badge-row">${badge(item.severity, statusVariant(item.severity))}${confidenceBadge(item.confidence)}</div><p class="muted">${esc(item.reason)}</p></div>`).join('') || emptyState('No highlighted items yet', 'Entrypoints and risks will surface here once metadata is available.')}</div></article></div><article class="card"><div class="section-header"><div><h4 style="margin:0;">Agent instructions</h4><p class="muted">Structured context that can be copied into another agent session.</p></div></div><pre>${esc(JSON.stringify(start.agent_instructions || {}, null, 2))}</pre></article>`;
+      wireSectionActions(pageEl('start-here'));
+      $('#copyAgentBriefPageBtn')?.addEventListener('click', () => copyText(librarian.agent_brief || '', 'Agent brief copied.'));
     }
-    function managedKpiCards(kpi) {
-      const cards = [
-        ['Safety', `${kpi.safety_score}/100`],
-        ['Planned', kpi.planned_moves],
-        ['Review', kpi.manual_review_moves],
-        ['Risk', `${kpi.risk_score}/100`],
-      ];
-      return cards.map(([label, value]) => `
-        <div class="kpi-card">
-          <strong>${escapeHtml(label)}</strong>
-          <span>${escapeHtml(value)}</span>
-        </div>
-      `).join('');
+    function renderFiles() {
+      const librarian = getLibrarian();
+      const files = librarian.files || [];
+      const filters = state.filters.files;
+      const filtered = files.filter(item => (!filters.kind || item.kind === filters.kind) && (!filters.language || String(item.language || '') === filters.language) && (!filters.risk || item.risk === filters.risk) && (!filters.q || [item.name, item.path, item.kind, item.language, item.summary].join(' ').toLowerCase().includes(filters.q.toLowerCase())));
+      const rows = filtered.map(item => [`<td><strong>${esc(item.name)}</strong><div class="muted">${esc(item.path)}</div></td>`, `<td>${esc(item.kind || 'unknown')}</td>`, `<td>${item.language ? badge(item.language, 'neutral') : badge('Unknown', 'neutral')}</td>`, `<td>${badge(item.risk || 'low', statusVariant(item.risk))}</td>`, `<td>${confidenceBadge(item.confidence)}</td>`, `<td>${esc(item.summary || '')}</td>`, `<td><div class="action-row"><button data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.path)}">View metadata</button><button data-copy="${esc(item.path)}">Copy path</button><button data-graph-file="${esc(item.path)}">Show in graph</button></div></td>`]);
+      pageEl('files').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Files & Directories</div><h3 id="filesTitle" style="margin:0;">Files explorer</h3><p class="muted">Searchable and filterable file inventory.</p></div></div><div class="filters"><label>Search<input id="filesSearch" value="${esc(filters.q)}" placeholder="Search path, summary, language"></label><label>File kind<select id="filesKind"><option value="">All kinds</option>${Array.from(new Set(files.map(item => item.kind).filter(Boolean))).sort().map(value => `<option value="${esc(value)}" ${value === filters.kind ? 'selected' : ''}>${esc(value)}</option>`).join('')}</select></label><label>Language<select id="filesLanguage"><option value="">All languages</option>${Array.from(new Set(files.map(item => item.language).filter(Boolean))).sort().map(value => `<option value="${esc(value)}" ${value === filters.language ? 'selected' : ''}>${esc(value)}</option>`).join('')}</select></label><label>Risk<select id="filesRisk"><option value="">All risks</option><option value="low" ${filters.risk === 'low' ? 'selected' : ''}>low</option><option value="medium" ${filters.risk === 'medium' ? 'selected' : ''}>medium</option><option value="high" ${filters.risk === 'high' ? 'selected' : ''}>high</option></select></label></div><p class="muted">${esc(`${filtered.length} of ${files.length} files shown`)}</p>${files.length ? simpleTable(['Name', 'Type', 'Language', 'Risk', 'Confidence', 'Summary', 'Actions'], rows, emptyState('No files match the current filters', 'Try clearing one or more filters.')) : emptyState('No files indexed yet', 'Run librarian mark to create file sidecars and manifest entries.')}</article>`;
+      wireSectionActions(pageEl('files'));
+      $('#filesSearch')?.addEventListener('input', event => { state.filters.files.q = event.target.value; renderFiles(); });
+      $('#filesKind')?.addEventListener('change', event => { state.filters.files.kind = event.target.value; renderFiles(); });
+      $('#filesLanguage')?.addEventListener('change', event => { state.filters.files.language = event.target.value; renderFiles(); });
+      $('#filesRisk')?.addEventListener('change', event => { state.filters.files.risk = event.target.value; renderFiles(); });
     }
-    function renderProviders(providers) {
-      $('#providerNotice').textContent = providers.notice || 'No file contents are sent.';
-      const available = providers.available || [];
-      const rows = available.map(name => [
-        escapeHtml(name),
-        name === providers.active ? badge('active') : badge('available'),
-        escapeHtml(providers.privacy_mode || 'metadata-only'),
-      ]);
-      $('#providersTable').innerHTML = table(['Provider', 'Status', 'Privacy'], rows);
+    function renderDirectories() {
+      const librarian = getLibrarian();
+      const directories = librarian.directories || [];
+      const filters = state.filters.directories;
+      const filtered = directories.filter(item => (!filters.role || (item.roles || []).includes(filters.role)) && (!filters.risk || item.risk === filters.risk) && (!filters.q || [item.name, item.path, item.description, (item.roles || []).join(' ')].join(' ').toLowerCase().includes(filters.q.toLowerCase())));
+      const rows = filtered.map(item => [`<td><strong>${esc(item.name)}</strong><div class="muted">${esc(item.path)}</div></td>`, `<td>${(item.roles || []).map(role => badge(role, 'neutral')).join('')}</td>`, `<td>${esc(item.total_file_count || 0)}</td>`, `<td>${(item.dominant_languages || []).slice(0,3).map(language => badge(language, 'neutral')).join('')}</td>`, `<td>${badge(item.risk || 'low', statusVariant(item.risk))}</td>`, `<td>${confidenceBadge(item.confidence)}</td>`, `<td><button data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.path)}">View details</button></td>`]);
+      pageEl('directories').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Files & Directories</div><h3 id="directoriesTitle" style="margin:0;">Directory explorer</h3><p class="muted">Understand the workspace shape before planning any move.</p></div></div><div class="filters"><label>Search<input id="directoriesSearch" value="${esc(filters.q)}" placeholder="Search path, role, description"></label><label>Role<select id="directoriesRole"><option value="">All roles</option>${Array.from(new Set(directories.flatMap(item => item.roles || []))).sort().map(value => `<option value="${esc(value)}" ${value === filters.role ? 'selected' : ''}>${esc(value)}</option>`).join('')}</select></label><label>Risk<select id="directoriesRisk"><option value="">All risks</option><option value="low" ${filters.risk === 'low' ? 'selected' : ''}>low</option><option value="medium" ${filters.risk === 'medium' ? 'selected' : ''}>medium</option><option value="high" ${filters.risk === 'high' ? 'selected' : ''}>high</option></select></label></div>${directories.length ? simpleTable(['Directory', 'Roles', 'Files', 'Languages', 'Risk', 'Confidence', 'Actions'], rows, emptyState('No directories match the current filters', 'Try clearing the search or role filter.')) : emptyState('No directories indexed yet', 'Directory analysis appears after librarian mark.')}</article>`;
+      wireSectionActions(pageEl('directories'));
+      $('#directoriesSearch')?.addEventListener('input', event => { state.filters.directories.q = event.target.value; renderDirectories(); });
+      $('#directoriesRole')?.addEventListener('change', event => { state.filters.directories.role = event.target.value; renderDirectories(); });
+      $('#directoriesRisk')?.addEventListener('change', event => { state.filters.directories.risk = event.target.value; renderDirectories(); });
     }
-    function renderReview(plan) {
-      const reviewEntries = plan.entries.filter(reviewCandidate);
-      updateFilterOptions('reviewStatusFilter', reviewEntries.map(entry => entry.status), 'All statuses');
-      updateFilterOptions('reviewCategoryFilter', reviewEntries.map(entry => entry.category), 'All categories');
-      const filteredEntries = reviewEntries.filter(entry => entryMatchesFilters(entry, 'review'));
-      setFilterSummary('reviewFilterSummary', filteredEntries.length, reviewEntries.length);
-      const reviewRows = planRows(filteredEntries, entry => entry.warning || entry.reason);
-      $('#reviewTable').innerHTML = table(['Source', 'Destination', 'Category', 'Status', 'Confidence', 'Why review'], reviewRows);
+    function renderCode() {
+      const code = getLibrarian().code;
+      pageEl('code').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Code Intelligence</div><h3 id="codeTitle" style="margin:0;">Languages, frameworks, modules, and config</h3><p class="muted">Static signals only. The Librarian does not execute project code while building this view.</p></div></div><div class="metrics">${code.languages.length ? code.languages.map(item => metricCard({ label: item.name, value: item.count, variant: 'neutral' })).join('') : metricCard({ label: 'Languages', value: 0, variant: 'neutral' })}${code.frameworks.length ? code.frameworks.slice(0,3).map(item => metricCard({ label: item.name, value: item.count, variant: 'ok' })).join('') : ''}</div><div class="grid-2"><div class="card"><div class="section-header"><div><h4 style="margin:0;">Main modules</h4></div></div>${code.modules.length ? simpleTable(['Module', 'File', 'Imports', 'Imported by', 'Risk'], code.modules.slice(0, 25).map(item => [`<td><strong>${esc(item.module)}</strong></td>`, `<td>${pathChip(item.file)}</td>`, `<td>${esc(item.imports_count)}</td>`, `<td>${esc(item.imported_by_count)}</td>`, `<td>${badge(item.risk || 'low', statusVariant(item.risk))}</td>`]), emptyState('No modules found', 'Static code analysis did not detect importable modules yet.')) : emptyState('No modules found', 'Static code analysis did not detect importable modules yet.')}</div><div class="card"><div class="section-header"><div><h4 style="margin:0;">Config files</h4></div></div><div class="stack">${(code.config_files || []).length ? code.config_files.map(path => `<div class="list-item"><strong>${esc(path)}</strong><div class="badge-row">${pathChip(path)}${badge('Configuration', 'neutral')}</div></div>`).join('') : emptyState('No config files detected', 'Configuration files will appear here when classification recognizes them.')}</div></div></div></article>`;
     }
-    function renderWarnings(inventory, plan) {
-      const rows = [
-        ...(inventory.warnings || []).map(warning => ['scanner', warning]),
-        ...(plan.warnings || []).map(warning => ['planner', warning]),
-        ...plan.entries.filter(entry => entry.warning).map(entry => [entry.source, entry.warning]),
-      ].map(([source, warning]) => [escapeHtml(source), escapeHtml(warning)]);
-      $('#warningsTable').innerHTML = table(['Source', 'Warning'], rows);
+    function renderEntrypoints() {
+      const entrypoints = getEntrypoints();
+      pageEl('entrypoints').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Code Intelligence</div><h3 id="entrypointsTitle" style="margin:0;">Entrypoints table</h3><p class="muted">Where execution likely starts and the first command worth trying.</p></div></div>${entrypoints.length ? simpleTable(['File', 'Symbol', 'Type', 'Confidence', 'Reason', 'Actions'], entrypoints.map(item => [`<td>${pathChip(item.file)}</td>`, `<td>${badge(item.symbol, 'ok')}</td>`, `<td>${esc(item.type)}</td>`, `<td>${confidenceBadge(item.confidence)}</td>`, `<td>${esc(item.reason || '')}</td>`, `<td><div class="action-row"><button data-copy="${esc(item.command || item.file)}">Copy command</button><button data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.file)}">Open details</button><button data-graph-file="${esc(item.file)}">Show graph</button></div></td>`]), emptyState('No entrypoints detected', 'Run librarian dev index after marking the workspace to strengthen entrypoint detection.')) : emptyState('No entrypoints detected', 'Run librarian dev index after marking the workspace to strengthen entrypoint detection.')}</article>`;
+      wireSectionActions(pageEl('entrypoints'));
     }
-    function renderActiveJob(job) {
-      if (!job) {
-        $('#activeJobDetails').innerHTML = '<div class="empty">No active job selected.</div>';
-        $('#approveJobBtn').disabled = true;
-        $('#applyJobBtn').disabled = true;
-        $('#rollbackJobBtn').disabled = true;
-        $('#deleteJobBtn').disabled = true;
-        return;
-      }
-      $('#activeJobDetails').innerHTML = [
-        ['Name', job.job_name || job.job_id],
-        ['Job', job.job_id],
-        ['Status', job.status],
-        ['Phase', job.phase],
-        ['Policy', job.policy_name || '(none)'],
-        ['Plan', job.plan_path || '(none)'],
-        ['Policy File', job.policy_path || '(none)'],
-        ['Manifest', job.manifest_path || '(none)'],
-      ].map(([key, value]) => `<div class="kv"><strong>${escapeHtml(key)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
-      $('#approveJobBtn').disabled = !job.policy_path;
-      $('#applyJobBtn').disabled = !job.policy_path;
-      $('#rollbackJobBtn').disabled = !job.manifest_path;
-      $('#deleteJobBtn').disabled = false;
+    function renderTests() {
+      const tests = getLibrarian().code.tests || [];
+      pageEl('tests').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Code Intelligence</div><h3 id="testsTitle" style="margin:0;">Tests table</h3><p class="muted">Detected test files and their likely targets.</p></div></div>${tests.length ? simpleTable(['Test file', 'Tested target', 'Framework', 'Confidence'], tests.map(item => [`<td>${pathChip(item.file)}</td>`, `<td>${esc(item.tested_target || 'Unknown')}</td>`, `<td>${esc(item.framework || 'Unknown')}</td>`, `<td>${confidenceBadge(item.confidence)}</td>`]), emptyState('No tests detected', 'No test hints were found in the current manifest.')) : emptyState('No tests detected', 'No test hints were found in the current manifest.')}</article>`;
     }
-    function renderChat(chat) {
-      const history = chat.history || [];
-      $('#chatTranscript').innerHTML = history.length ? history.map(message => `
-        <div class="chat-message ${escapeHtml(message.role)}">
-          <strong>${escapeHtml(message.role)}</strong>
-          <div>${escapeHtml(message.content).replace(/\n/g, '<br>')}</div>
-        </div>
-      `).join('') : '<div class="empty">No chat messages yet.</div>';
-      $('#chatScope').textContent = (chat.include_dirs || []).length ? chat.include_dirs.join(', ') : 'Root completa';
-      $('#chatSuggestions').textContent = (chat.suggestions || []).join(' | ');
+    function renderGraph(focus = '') {
+      const graph = getLibrarian().graph;
+      const query = (focus || '').toLowerCase();
+      const nodes = query ? graph.nodes.filter(node => [node.id, node.label, node.type, node.summary].join(' ').toLowerCase().includes(query)) : graph.nodes;
+      const neighborhood = query ? graph.entrypoint_neighborhood.filter(edge => [edge.source, edge.target, edge.type, edge.reason].join(' ').toLowerCase().includes(query)) : graph.entrypoint_neighborhood;
+      pageEl('graph').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Knowledge Graph</div><h3 id="graphTitle" style="margin:0;">Relationship view</h3><p class="muted">Summary, top connections, and entrypoint neighborhood without a heavy renderer.</p></div></div>${graph.available ? `<div class="metrics">${metricCard({ label: 'Nodes', value: graph.summary.nodes, variant: 'neutral' })}${metricCard({ label: 'Edges', value: graph.summary.edges, variant: 'neutral' })}${metricCard({ label: 'Connected files', value: graph.summary.top_connected.length, variant: 'ok' })}${metricCard({ label: 'Isolated nodes', value: graph.summary.isolated_nodes.length, variant: 'warn' })}</div><div class="filters"><label>Search node<input id="graphSearch" value="${esc(focus)}" placeholder="Search node label, path, type"></label></div><div class="grid-2"><div class="card"><div class="section-header"><div><h4 style="margin:0;">Graph summary</h4></div></div><div class="stack"><div class="list-item"><strong>Top connected files</strong><div class="badge-row">${graph.summary.top_connected.slice(0, 8).map(item => badge(`${item.label} (${item.degree})`, 'neutral')).join('') || badge('None', 'neutral')}</div></div><div class="list-item"><strong>Top node types</strong><div class="badge-row">${graph.summary.top_tags.map(item => badge(`${item.name} (${item.count})`, 'neutral')).join('') || badge('None', 'neutral')}</div></div><div class="list-item"><strong>Top edge types</strong><div class="badge-row">${graph.summary.top_edge_types.map(item => badge(`${item.name} (${item.count})`, 'neutral')).join('') || badge('None', 'neutral')}</div></div></div></div><div class="card"><div class="section-header"><div><h4 style="margin:0;">Entry point neighborhood</h4></div></div>${neighborhood.length ? simpleTable(['Source', 'Target', 'Type', 'Confidence'], neighborhood.slice(0, 30).map(edge => [`<td>${esc(edge.source)}</td>`, `<td>${esc(edge.target)}</td>`, `<td>${badge(edge.type, 'neutral')}</td>`, `<td>${confidenceBadge(edge.confidence)}</td>`]), emptyState('No neighborhood data', 'No graph edges are connected to the current focus.')) : emptyState('No neighborhood data', 'No graph edges are connected to the current focus.')}</div></div><div class="card"><div class="section-header"><div><h4 style="margin:0;">Nodes</h4></div></div>${nodes.length ? simpleTable(['Node', 'Type', 'Confidence', 'Summary'], nodes.slice(0, 25).map(node => [`<td>${esc(node.label)}</td>`, `<td>${badge(node.type || 'unknown', 'neutral')}</td>`, `<td>${confidenceBadge(node.confidence)}</td>`, `<td>${esc(node.summary || '')}</td>`]), emptyState('No nodes match', 'Try clearing the search box.')) : emptyState('No nodes match', 'Try clearing the search box.')}</div>` : emptyState('Graph is missing', graph.empty_message || 'Generate graph data to unlock relationship views.')}</article>`;
+      $('#graphSearch')?.addEventListener('input', event => renderGraph(event.target.value));
     }
-    function renderPolicy() {
-      const decisions = state.policy?.decisions || [];
-      const rows = decisions.map(decision => [
-        escapeHtml(decision.source),
-        escapeHtml(decision.destination),
-        badge(decision.category),
-        badge(decision.status),
-        escapeHtml(Number(decision.risk_score).toFixed(2)),
-        escapeHtml(decision.approved_by_user ? 'yes' : 'no'),
-        escapeHtml(decision.reason),
-      ]);
-      $('#policyTable').innerHTML = table(['Source', 'Destination', 'Category', 'Decision', 'Risk', 'Manual', 'Reason'], rows);
+    function renderRisks() {
+      const risks = getLibrarian().risks || [];
+      pageEl('risks').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Risks & Warnings</div><h3 id="risksTitle" style="margin:0;">What to avoid, inspect, or regenerate</h3><p class="muted">Risks are explicit and visible without needing to hunt for them.</p></div></div>${risks.length ? simpleTable(['Severity', 'Item', 'Reason', 'Recommended action', 'Source', 'Confidence'], risks.map(item => [`<td>${badge(item.severity, statusVariant(item.severity))}</td>`, `<td><strong>${esc(item.item)}</strong></td>`, `<td>${esc(item.reason)}</td>`, `<td>${esc(item.recommended_action)}</td>`, `<td>${esc(item.source)}</td>`, `<td>${confidenceBadge(item.confidence)}</td>`]), emptyState('No risks found', 'High-risk files, low-confidence classification, stale graph, unreadable files, and missing sidecars appear here.')) : emptyState('No risks found', 'High-risk files, low-confidence classification, stale graph, unreadable files, and missing sidecars appear here.')}</article>`;
     }
-    function renderEvents() {
-      const rows = state.events.map(event => [
-        escapeHtml(event.timestamp),
-        badge(event.status),
-        badge(event.phase),
-        escapeHtml(event.message),
-      ]);
-      $('#eventsTable').innerHTML = table(['Time', 'Status', 'Phase', 'Message'], rows);
+    function renderRunbooks() {
+      const runbooks = getLibrarian().runbooks || [];
+      pageEl('runbooks').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Runbooks & Scripts</div><h3 id="runbooksTitle" style="margin:0;">Runbooks</h3><p class="muted">Human-readable procedures for inspecting, extending, and operating the workspace safely.</p></div></div><div class="stack">${runbooks.length ? runbooks.map(item => `<div class="list-item" data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.name)}"><strong>${esc(item.name)}</strong><div class="badge-row">${pathChip(item.path)}${badge('Read-only', 'ok')}${item.validated ? badge('Generated', 'ok') : badge('Missing', 'warn')}</div><p class="muted">${esc(item.description)}</p><div class="action-row"><button data-copy="${esc(item.command)}">Copy command</button><button data-copy="${esc(item.path)}">Copy path</button></div></div>`).join('') : emptyState('No runbooks found', 'Run librarian dev runbook to generate step-by-step guides.')}</div></article>`;
+      wireSectionActions(pageEl('runbooks'));
     }
-    function renderManifest() {
-      $('#manifestJson').textContent = state.manifest ? JSON.stringify(state.manifest, null, 2) : '{}';
+    function renderScripts() {
+      const scripts = getRunnableScripts();
+      pageEl('scripts').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Runbooks & Scripts</div><h3 id="scriptsTitle" style="margin:0;">Runnable scripts</h3><p class="muted">Small Python helpers generated under .librarian/scripts for developers and agents.</p></div></div><div class="stack">${scripts.length ? scripts.map(item => `<div class="list-item"><strong>${esc(item.name)}</strong><div class="badge-row">${pathChip(item.path)}${item.read_only ? badge('Read-only', 'ok') : badge('Modifies files', 'warn')}${item.validated ? badge('Validated', 'ok') : badge('Not validated', 'warn')}</div><p class="muted">${esc(item.description)}</p><pre>${esc(item.command)}</pre><div class="action-row"><button data-copy="${esc(item.command)}">Copy command</button><button data-item='${esc(JSON.stringify(item))}' data-title="${esc(item.name)}">View details</button></div></div>`).join('') : emptyState('No scripts found', 'Run librarian dev init to generate runnable helpers.')}</div></article>`;
+      wireSectionActions(pageEl('scripts'));
     }
-    async function runAction(label, action, { refreshAfter = true } = {}) {
-      if (state.busy) return;
-      state.busy = true;
-      try {
-        setStatus(`${label} running`, 'warn');
-        await action();
-        if (refreshAfter) await refresh({ silent: true });
-        setStatus(`${label} completed`);
-      } catch (error) {
-        setStatus(error.message, 'danger');
-      } finally {
-        state.busy = false;
-      }
+    function renderOperations() {
+      const operations = getLibrarian().operations || [];
+      pageEl('operations').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Operations</div><h3 id="operationsTitle" style="margin:0;">Timeline</h3><p class="muted">Append-only operations from logs, including mark, plan, apply, rollback, and export.</p></div></div>${operations.length ? simpleTable(['Timestamp', 'Type', 'Item', 'Result', 'Rollback'], operations.map(item => [`<td>${esc(item.timestamp || 'Unknown time')}</td>`, `<td>${badge(item.type || 'operation', 'neutral')}</td>`, `<td>${esc(item.item || '')}</td>`, `<td>${badge(item.result || 'unknown', statusVariant(item.result))}</td>`, `<td>${item.rollback_available ? badge('Available', 'ok') : badge('No', 'neutral')}</td>`]), emptyState('No operations logged', 'Run mark, plan, apply, rollback, or export commands to build an audit trail.')) : emptyState('No operations logged', 'Run mark, plan, apply, rollback, or export commands to build an audit trail.')}</article>`;
     }
-    function confirmAction(text) {
-      return window.confirm(text);
+    function renderDiagnostics() {
+      const diagnostics = getLibrarian().diagnostics || { items: [], suggestions: [], parsing_errors: [] };
+      pageEl('diagnostics').innerHTML = `<article class="card"><div class="section-header"><div><div class="section-kicker">Settings / Diagnostics</div><h3 id="diagnosticsTitle" style="margin:0;">Diagnostics</h3><p class="muted">Artifact presence, parsing errors, stale index detection, and next steps.</p></div></div><div class="grid-2"><div class="card">${(diagnostics.items || []).length ? simpleTable(['Artifact', 'Status', 'Detail'], diagnostics.items.map(item => [`<td>${esc(item.label)}</td>`, `<td>${badge(item.status, statusVariant(item.status))}</td>`, `<td>${esc(item.detail)}</td>`]), emptyState('No diagnostics', 'No diagnostic items were produced.')) : emptyState('No diagnostics', 'No diagnostic items were produced.')}</div><div class="card"><h4 style="margin-top:0;">Suggestions</h4><div class="stack">${(diagnostics.suggestions || []).length ? diagnostics.suggestions.map(item => `<div class="list-item"><strong>${esc(item)}</strong></div>`).join('') : emptyState('No diagnostic suggestions', 'The workspace looks healthy enough to inspect directly.')}</div></div></div></article>`;
     }
-    $('#refreshBtn').addEventListener('click', () => runAction('Refresh', () => refresh({ silent: true }), { refreshAfter: false }));
-    $('#savePlanBtn').addEventListener('click', () => runAction('Save plan', async () => {
-      const body = state.planPackId ? JSON.stringify({ pack_id: state.planPackId }) : '{}';
-      const saved = await api('/api/plan/save', { method: 'POST', body });
-      setStatus(`Saved plan: ${saved.path}`);
-    }, { refreshAfter: false }));
-    $('#downloadPlanBtn').addEventListener('click', () => {
-      if (!state.dashboard?.plan) return;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      downloadJson(`thelibrarian-plan-${timestamp}.json`, state.dashboard.plan);
-      setStatus('Plan JSON downloaded');
-    });
-    $('#setRootBtn').addEventListener('click', () => {
-      const root = $('#rootInput').value.trim();
-      if (!root || !confirmAction('Switch dashboard to this directory? Existing files will not be moved.')) return;
-      runAction('Set directory', async () => {
-        await api('/api/root?confirm=true', { method: 'POST', body: JSON.stringify({ root }) });
-        state.selectedJobId = null;
-        state.planPackId = '';
-      });
-    });
-    $('#createJobBtn').addEventListener('click', () => runAction('Create job', async () => {
-      const policy = $('#policySelect').value;
-      const pack = $('#packSelect').value;
-      const job = await api('/api/jobs/create', { method: 'POST', body: JSON.stringify({ policy, pack }) });
-      state.selectedJobId = job.job_id;
-    }));
-    $('#runJobBtn').addEventListener('click', () => runAction('Dry-run job', async () => {
-      const policy = $('#policySelect').value;
-      const pack = $('#packSelect').value;
-      const job = await api('/api/jobs/run', { method: 'POST', body: JSON.stringify({ policy, pack }) });
-      state.selectedJobId = job.job_id;
-    }));
-    $('#startManagedBtn').addEventListener('click', () => {
-      if (!confirmAction('Start a managed cleanup dry-run session? No user files will be moved.')) return;
-      runAction('Managed cleanup', async () => {
-        const session = await api('/api/managed/start?confirm=true', {
-          method: 'POST',
-          body: JSON.stringify({
-            client_name: $('#managedClientInput').value || 'Client',
-            operator_name: $('#managedOperatorInput').value || 'Operator',
-            pack_id: $('#packSelect').value || 'general_office',
-          }),
-        });
-        state.selectedJobId = session.job_id;
-      });
-    });
-    $('#approveJobBtn').addEventListener('click', () => {
-      const job = activeJob();
-      if (!job || !confirmAction('Approve all review-required policy decisions for this job?')) return;
-      runAction('Approve job', () => api(`/api/jobs/${job.job_id}/approve?confirm=true`, { method: 'POST', body: '{}' }));
-    });
-    $('#applyJobBtn').addEventListener('click', () => {
-      const job = activeJob();
-      if (!job || !confirmAction('Apply policy-approved moves for this job? A rollback manifest will be required.')) return;
-      runAction('Apply job', () => api(`/api/jobs/${job.job_id}/apply?confirm=true`, { method: 'POST', body: '{}' }));
-    });
-    $('#rollbackJobBtn').addEventListener('click', () => {
-      const job = activeJob();
-      if (!job || !confirmAction('Rollback this job using its manifest?')) return;
-      runAction('Rollback job', () => api(`/api/jobs/${job.job_id}/rollback?confirm=true`, { method: 'POST', body: '{}' }));
-    });
-    $('#deleteJobBtn').addEventListener('click', () => {
-      const job = activeJob();
-      if (!job || !confirmAction('Delete this job record and its job artifacts? User files are not deleted.')) return;
-      runAction('Delete job', async () => {
-        await api(`/api/jobs/${job.job_id}/delete?confirm=true`, { method: 'POST', body: '{}' });
-        state.selectedJobId = null;
-      });
-    });
-    $('#deleteAllJobsBtn').addEventListener('click', () => {
-      if (!confirmAction('Delete all job records for this root? User files are not deleted.')) return;
-      runAction('Delete all jobs', async () => {
-        await api('/api/jobs/delete-all?confirm=true', { method: 'POST', body: '{}' });
-        state.selectedJobId = null;
-      });
-    });
-    $('#previewManagedReportBtn').addEventListener('click', () => runAction('Report preview', async () => {
-      const session = (state.dashboard?.managed_sessions || [])[0];
-      if (!session?.artifacts?.report_html) return;
-      const response = await fetch(`/api/managed/${encodeURIComponent(session.session_id)}/report-html`);
-      if (!response.ok) throw new Error('Managed report preview is not available.');
-      $('#managedReportPreview').srcdoc = await response.text();
-      setStatus(`Previewing report: ${session.session_id}`);
-    }, { refreshAfter: false }));
-    $('#packSelect').addEventListener('change', () => {
-      const pack = $('#packSelect').value;
-      state.planPackId = pack || '';
-      renderPackDetails((state.dashboard?.packs || []).find(item => item.id === state.planPackId));
-      runAction('Policy pack preview', async () => {
-        if (!state.dashboard || !state.planPackId || state.dashboard.chat?.has_plan) return;
-        state.dashboard.plan = await api(`/api/plan?pack_id=${encodeURIComponent(state.planPackId)}`);
-        setStatus(`Plan preview uses ${state.planPackId}`);
-      }, { refreshAfter: false });
-    });
-    $('#chatSendBtn').addEventListener('click', () => runAction('Chat command', async () => {
-      const command = $('#chatInput').value.trim();
-      if (!command) return;
-      await api('/api/chat', { method: 'POST', body: JSON.stringify({ command }) });
-      $('#chatInput').value = '';
-    }));
-    $('#chatPlanBtn').addEventListener('click', () => runAction('Chat plan', async () => {
-      await api('/api/chat', { method: 'POST', body: JSON.stringify({ command: 'piano' }) });
-      setView('chat');
-    }));
-    $('#chatResetBtn').addEventListener('click', () => {
-      if (!confirmAction('Azzerare la sessione chat e tornare al contesto di root?')) return;
-      runAction('Chat reset', async () => {
-        await api('/api/chat/reset', { method: 'POST', body: '{}' });
-      });
-    });
-    $('#chatInput').addEventListener('keydown', event => {
-      if (event.key !== 'Enter' || event.shiftKey) return;
-      event.preventDefault();
-      $('#chatSendBtn').click();
-    });
-    $$('.nav button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
-    $$('[data-view-jump]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewJump)));
-    [
-      '#planSearchInput',
-      '#planStatusFilter',
-      '#planCategoryFilter',
-      '#reviewSearchInput',
-      '#reviewStatusFilter',
-      '#reviewCategoryFilter',
-    ].forEach(selector => {
-      const element = $(selector);
-      element.addEventListener('input', render);
-      element.addEventListener('change', render);
-    });
-    refresh({ keepSelection: false }).catch(error => setStatus(error.message, 'danger'));
-    window.setInterval(() => {
-      if (!state.busy) refresh({ silent: true }).catch(error => setStatus(error.message, 'danger'));
-    }, 5000);
+    function renderAllSections() { renderSidebar(); renderTopbar(); renderBreadcrumbs(); renderOverview(); renderStartHere(); renderFiles(); renderDirectories(); renderCode(); renderEntrypoints(); renderTests(); renderGraph(); renderRisks(); renderRunbooks(); renderScripts(); renderOperations(); renderDiagnostics(); renderDetail(); setPage(state.page); }
+    async function refresh(silent = false) { if (!silent) setStatus('Refreshing dashboard...', 'neutral'); state.dashboard = await api('/api/dashboard'); renderAllSections(); if (!silent) setStatus('Dashboard refreshed.', 'ok'); }
+    async function runAction(label, action, refreshAfter = true) { if (state.busy) return; state.busy = true; try { setStatus(`${label} running...`, 'neutral'); await action(); if (refreshAfter) await refresh(true); } catch (error) { setStatus(error.message || `${label} failed.`, 'danger'); } finally { state.busy = false; } }
+    $('#refreshBtn').addEventListener('click', () => runAction('Refresh dashboard', () => refresh(true), false));
+    $('#copyAgentBriefSidebarBtn').addEventListener('click', () => copyText(getLibrarian().agent_brief || '', 'Agent brief copied.'));
+    $('#copyAgentBriefBtn').addEventListener('click', () => copyText(getLibrarian().agent_brief || '', 'Agent context copied.'));
+    $('#reindexBtn').addEventListener('click', () => copyText(`librarian dev index "${getLibrarian().workspace.path}"`, 'Re-index command copied.'));
+    $('#graphBtn').addEventListener('click', () => { setPage('graph'); if (!getLibrarian().graph.available) { setStatus('Graph data is missing. This build reads graph.json when present, but does not generate it yet.', 'warn'); setDetail('Graph guidance', { expected_path: '.librarian/graph.json', next_step: 'Produce graph.json externally, then refresh the dashboard.' }); } });
+    $('#openRunbookBtn').addEventListener('click', () => setPage('runbooks'));
+    $('#exportDashboardBtn').addEventListener('click', () => { if (state.dashboard) { downloadJson(`thelibrarian-dashboard-${new Date().toISOString().replace(/[:.]/g, '-')}.json`, state.dashboard); setStatus('Dashboard JSON exported.', 'ok'); } });
+    $('#savePlanBtn').addEventListener('click', () => runAction('Save plan artifact', async () => { const saved = await api('/api/plan/save', { method: 'POST', body: '{}' }); setDetail('Saved plan artifact', saved, 'Plan JSON was written to disk without applying any move.'); setStatus(`Saved plan artifact: ${saved.path}`, 'ok'); }, false));
+    $('#downloadPlanBtn').addEventListener('click', () => { if (!state.dashboard?.plan) { setStatus('No plan is available to export.', 'warn'); return; } downloadJson(`thelibrarian-plan-${new Date().toISOString().replace(/[:.]/g, '-')}.json`, state.dashboard.plan); setStatus('Plan JSON exported.', 'ok'); });
+    $('#setRootBtn').addEventListener('click', () => { const root = $('#rootInput').value.trim(); if (!root) { setStatus('Enter a root path first.', 'warn'); return; } if (!window.confirm('Switch the dashboard to this directory? Existing files will not be moved.')) return; runAction('Switch root', () => api('/api/root?confirm=true', { method: 'POST', body: JSON.stringify({ root }) })); });
+    refresh().catch(error => { setStatus(error.message || 'Dashboard failed to load.', 'danger'); pageEl('overview').innerHTML = emptyState('Dashboard failed to load', error.message || 'Unknown error'); });
+    window.setInterval(() => { if (!state.busy) refresh(true).catch(error => setStatus(error.message || 'Background refresh failed.', 'danger')); }, 10000);
   </script>
 </body>
 </html>"""
