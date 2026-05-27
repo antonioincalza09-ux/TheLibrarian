@@ -119,3 +119,4 @@ __marimo__/
 db.sqlite3
 db.sqlite3-journal
 local_settings.py
+**/.librarian/cache/*.sqlite

@@ -1,0 +1,5406 @@
+{
+  "nodes": [
+    {
+      "id": "agent_context:default",
+      "type": "AgentContext",
+      "label": "agent context",
+      "properties": {
+        "purpose": "recommended first reads for agents"
+      }
+    },
+    {
+      "id": "category:documents",
+      "type": "Category",
+      "label": "Documents",
+      "properties": {
+        "domain": "Documentation",
+        "category": "Documents",
+        "confidence": 0.7,
+        "reason": "Recognized document type."
+      }
+    },
+    {
+      "id": "category:project",
+      "type": "Category",
+      "label": "Project",
+      "properties": {
+        "domain": "Code",
+        "category": "Project",
+        "confidence": 0.9,
+        "reason": "Recognized source code."
+      }
+    },
+    {
+      "id": "category:projectconfig",
+      "type": "Category",
+      "label": "ProjectConfig",
+      "properties": {
+        "domain": "Configuration",
+        "category": "ProjectConfig",
+        "confidence": 0.85,
+        "reason": "Recognized config file."
+      }
+    },
+    {
+      "id": "category:tests",
+      "type": "Category",
+      "label": "Tests",
+      "properties": {
+        "domain": "Code",
+        "category": "Tests",
+        "confidence": 0.96,
+        "reason": "Looks like a test file."
+      }
+    },
+    {
+      "id": "class:d9656e43f9068e5f:Greeter",
+      "type": "Class",
+      "label": "Greeter",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "name": "Greeter",
+        "line_start": 6,
+        "line_end": 10
+      }
+    },
+    {
+      "id": "cluster:docs/documents/data",
+      "type": "Cluster",
+      "label": "docs/documents/data",
+      "properties": {
+        "proposed_parent": "docs/documents/data"
+      }
+    },
+    {
+      "id": "cluster:review/project",
+      "type": "Cluster",
+      "label": "review/project",
+      "properties": {
+        "proposed_parent": "review/project"
+      }
+    },
+    {
+      "id": "cluster:review/projectconfig",
+      "type": "Cluster",
+      "label": "review/projectconfig",
+      "properties": {
+        "proposed_parent": "review/projectconfig"
+      }
+    },
+    {
+      "id": "39f531939c26c939",
+      "type": "CodeFile",
+      "label": "test_main.py",
+      "properties": {
+        "librarian_id": "39f531939c26c939",
+        "type": "file",
+        "original_path": "tests/test_main.py",
+        "current_path": "tests/test_main.py",
+        "proposed_path": "review/tests/test-main.py",
+        "name": "test_main.py",
+        "extension": ".py",
+        "size_bytes": 110,
+        "created_at": "2026-05-27T08:23:05.804469+00:00",
+        "modified_at": "2026-05-27T08:23:05.804469+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "d326ff887663ccbd9bc3bdcb5ced9d97fdc035c670731371f487507a0e32ea3f",
+        "name_hash": "b3f46f7b70562c63e46bae252ec733f8a748fb67e540280715dc4ea5bdaa8375",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "test_main",
+        "summary": "Looks like a test file.",
+        "human_description": "File tests/test_main.py classified as Code/Tests.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Tests"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Tests",
+          "confidence": 0.96,
+          "reason": "Looks like a test file."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "test_main",
+          "package_name": "tests.test_main",
+          "imports": {
+            "internal": [
+              "src.graph_fixture_app.main"
+            ],
+            "external": [],
+            "standard_library": []
+          },
+          "symbols": {
+            "functions": [
+              {
+                "name": "test_main",
+                "line_start": 4,
+                "line_end": 5
+              }
+            ],
+            "classes": [],
+            "methods": []
+          },
+          "docstrings": {
+            "module": null,
+            "functions": {},
+            "classes": {}
+          },
+          "entrypoints": [],
+          "framework_hints": [],
+          "test_hints": [
+            "test_main"
+          ],
+          "config_hints": [],
+          "risk_level": "low",
+          "generated_file": false,
+          "vendor_file": false,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "tests",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "a82d493196e52d64",
+      "type": "CodeFile",
+      "label": "__init__.py",
+      "properties": {
+        "librarian_id": "a82d493196e52d64",
+        "type": "file",
+        "original_path": "src/graph_fixture_app/__init__.py",
+        "current_path": "src/graph_fixture_app/__init__.py",
+        "proposed_path": "review/project/init.py",
+        "name": "__init__.py",
+        "extension": ".py",
+        "size_bytes": 25,
+        "created_at": "2026-05-27T08:23:04.373531+00:00",
+        "modified_at": "2026-05-27T08:23:04.373531+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "bb37a0a2fd31bc10676d972b1fa1c232a752ac6fa72e0bd55a7aab08da44fc9b",
+        "name_hash": "8e2c1f727276d30ced72fa67cb848772a9802162bec39b42a8df5359fd063a4c",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "__init__",
+        "summary": "Recognized source code.",
+        "human_description": "File src/graph_fixture_app/__init__.py classified as Code/Project.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Project"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Project",
+          "confidence": 0.9,
+          "reason": "Recognized source code."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "__init__",
+          "package_name": "src.graph_fixture_app.__init__",
+          "imports": {
+            "internal": [],
+            "external": [],
+            "standard_library": []
+          },
+          "symbols": {
+            "functions": [],
+            "classes": [],
+            "methods": []
+          },
+          "docstrings": {
+            "module": "Graph fixture app.",
+            "functions": {},
+            "classes": {}
+          },
+          "entrypoints": [],
+          "framework_hints": [],
+          "test_hints": [],
+          "config_hints": [],
+          "risk_level": "low",
+          "generated_file": false,
+          "vendor_file": false,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 3,
+        "parent_path": "src/graph_fixture_app",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "bb695538ea8ba10a",
+      "type": "CodeFile",
+      "label": "utils.py",
+      "properties": {
+        "librarian_id": "bb695538ea8ba10a",
+        "type": "file",
+        "original_path": "src/graph_fixture_app/utils.py",
+        "current_path": "src/graph_fixture_app/utils.py",
+        "proposed_path": "review/project/utils.py",
+        "name": "utils.py",
+        "extension": ".py",
+        "size_bytes": 189,
+        "created_at": "2026-05-27T08:23:05.154286+00:00",
+        "modified_at": "2026-05-27T08:23:05.154286+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "48141355ffbba2e35bb32ffa74fa444642ac62dc7d431e483d639a1e948039a9",
+        "name_hash": "09d0cbaf891d623ac245ccf84485a687b554217349ca55557c60b33234b969ae",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "utils",
+        "summary": "Recognized source code.",
+        "human_description": "File src/graph_fixture_app/utils.py classified as Code/Project.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Project"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Project",
+          "confidence": 0.9,
+          "reason": "Recognized source code."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "utils",
+          "package_name": "src.graph_fixture_app.utils",
+          "imports": {
+            "internal": [],
+            "external": [],
+            "standard_library": [
+              "json"
+            ]
+          },
+          "symbols": {
+            "functions": [
+              {
+                "name": "normalize",
+                "line_start": 6,
+                "line_end": 7
+              },
+              {
+                "name": "to_json",
+                "line_start": 10,
+                "line_end": 11
+              }
+            ],
+            "classes": [],
+            "methods": []
+          },
+          "docstrings": {
+            "module": "Utility helpers.",
+            "functions": {},
+            "classes": {}
+          },
+          "entrypoints": [],
+          "framework_hints": [],
+          "test_hints": [],
+          "config_hints": [],
+          "risk_level": "low",
+          "generated_file": false,
+          "vendor_file": false,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 3,
+        "parent_path": "src/graph_fixture_app",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "d9656e43f9068e5f",
+      "type": "CodeFile",
+      "label": "main.py",
+      "properties": {
+        "librarian_id": "d9656e43f9068e5f",
+        "type": "file",
+        "original_path": "src/graph_fixture_app/main.py",
+        "current_path": "src/graph_fixture_app/main.py",
+        "proposed_path": "review/project/main.py",
+        "name": "main.py",
+        "extension": ".py",
+        "size_bytes": 322,
+        "created_at": "2026-05-27T08:23:04.756253+00:00",
+        "modified_at": "2026-05-27T08:23:04.756253+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "6f4075a1789b949c55f93365419abbae1edb3bd65caf606ddcca5c242b72cb2e",
+        "name_hash": "b10564ab7d2c520cdd0243874879fb0a782862c3c902ab535faabe57d5a505e1",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "main",
+        "summary": "Recognized source code.",
+        "human_description": "File src/graph_fixture_app/main.py classified as Code/Project.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Project"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Project",
+          "confidence": 0.9,
+          "reason": "Recognized source code."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "main",
+          "package_name": "src.graph_fixture_app.main",
+          "imports": {
+            "internal": [
+              "utils"
+            ],
+            "external": [],
+            "standard_library": []
+          },
+          "symbols": {
+            "functions": [
+              {
+                "name": "main",
+                "line_start": 13,
+                "line_end": 14
+              },
+              {
+                "name": "greet",
+                "line_start": 9,
+                "line_end": 10
+              }
+            ],
+            "classes": [
+              {
+                "name": "Greeter",
+                "line_start": 6,
+                "line_end": 10
+              }
+            ],
+            "methods": [
+              {
+                "name": "Greeter.greet",
+                "line_start": 9,
+                "line_end": 10
+              }
+            ]
+          },
+          "docstrings": {
+            "module": "Application entrypoint for graph fixture.",
+            "functions": {},
+            "classes": {
+              "Greeter": "Simple greeting component."
+            }
+          },
+          "entrypoints": [
+            "function:main",
+            "guard:if __name__ == \"__main__\""
+          ],
+          "framework_hints": [],
+          "test_hints": [],
+          "config_hints": [],
+          "risk_level": "low",
+          "generated_file": false,
+          "vendor_file": false,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 3,
+        "parent_path": "src/graph_fixture_app",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "component:docs",
+      "type": "Component",
+      "label": "docs",
+      "properties": {
+        "role": "docs"
+      }
+    },
+    {
+      "id": "component:general",
+      "type": "Component",
+      "label": "general",
+      "properties": {
+        "role": "general"
+      }
+    },
+    {
+      "id": "component:generated",
+      "type": "Component",
+      "label": "generated",
+      "properties": {
+        "role": "generated"
+      }
+    },
+    {
+      "id": "component:source",
+      "type": "Component",
+      "label": "source",
+      "properties": {
+        "role": "source"
+      }
+    },
+    {
+      "id": "component:tests",
+      "type": "Component",
+      "label": "tests",
+      "properties": {
+        "role": "tests"
+      }
+    },
+    {
+      "id": "component:vendor",
+      "type": "Component",
+      "label": "vendor",
+      "properties": {
+        "role": "vendor"
+      }
+    },
+    {
+      "id": "90d5d08d3a6b3fd1",
+      "type": "ConfigFile",
+      "label": "pyproject.toml",
+      "properties": {
+        "librarian_id": "90d5d08d3a6b3fd1",
+        "type": "file",
+        "original_path": "pyproject.toml",
+        "current_path": "pyproject.toml",
+        "proposed_path": "review/projectconfig/pyproject.toml",
+        "name": "pyproject.toml",
+        "extension": ".toml",
+        "size_bytes": 77,
+        "created_at": "2026-05-27T08:23:03.297606+00:00",
+        "modified_at": "2026-05-27T08:23:03.297606+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "application/octet-stream",
+        "content_hash": "39e51fcc377f15324cee081110793c818f096e6f30fc85c2dc59f89b6eae6190",
+        "name_hash": "50c86b7ed8ac2cf95bd48334961bf0530cdc77b5a56f852c5c61b89d735fd711",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "config",
+        "detected_language": null,
+        "title": "pyproject",
+        "summary": "Recognized config file.",
+        "human_description": "File pyproject.toml classified as Configuration/ProjectConfig.",
+        "developer_notes": [],
+        "tags": [
+          "Configuration",
+          "ProjectConfig"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "current_path:.",
+      "type": "CurrentPath",
+      "label": ".",
+      "properties": {
+        "path": "."
+      }
+    },
+    {
+      "id": "current_path:README.md",
+      "type": "CurrentPath",
+      "label": "README.md",
+      "properties": {
+        "path": "README.md"
+      }
+    },
+    {
+      "id": "current_path:build",
+      "type": "CurrentPath",
+      "label": "build",
+      "properties": {
+        "path": "build"
+      }
+    },
+    {
+      "id": "current_path:build/generated.py",
+      "type": "CurrentPath",
+      "label": "build/generated.py",
+      "properties": {
+        "path": "build/generated.py"
+      }
+    },
+    {
+      "id": "current_path:data",
+      "type": "CurrentPath",
+      "label": "data",
+      "properties": {
+        "path": "data"
+      }
+    },
+    {
+      "id": "current_path:data/duplicate_a.txt",
+      "type": "CurrentPath",
+      "label": "data/duplicate_a.txt",
+      "properties": {
+        "path": "data/duplicate_a.txt"
+      }
+    },
+    {
+      "id": "current_path:data/duplicate_b.txt",
+      "type": "CurrentPath",
+      "label": "data/duplicate_b.txt",
+      "properties": {
+        "path": "data/duplicate_b.txt"
+      }
+    },
+    {
+      "id": "current_path:docs",
+      "type": "CurrentPath",
+      "label": "docs",
+      "properties": {
+        "path": "docs"
+      }
+    },
+    {
+      "id": "current_path:docs/overview.md",
+      "type": "CurrentPath",
+      "label": "docs/overview.md",
+      "properties": {
+        "path": "docs/overview.md"
+      }
+    },
+    {
+      "id": "current_path:poetry.lock",
+      "type": "CurrentPath",
+      "label": "poetry.lock",
+      "properties": {
+        "path": "poetry.lock"
+      }
+    },
+    {
+      "id": "current_path:pyproject.toml",
+      "type": "CurrentPath",
+      "label": "pyproject.toml",
+      "properties": {
+        "path": "pyproject.toml"
+      }
+    },
+    {
+      "id": "current_path:src",
+      "type": "CurrentPath",
+      "label": "src",
+      "properties": {
+        "path": "src"
+      }
+    },
+    {
+      "id": "current_path:src/graph_fixture_app",
+      "type": "CurrentPath",
+      "label": "src/graph_fixture_app",
+      "properties": {
+        "path": "src/graph_fixture_app"
+      }
+    },
+    {
+      "id": "current_path:src/graph_fixture_app/__init__.py",
+      "type": "CurrentPath",
+      "label": "src/graph_fixture_app/__init__.py",
+      "properties": {
+        "path": "src/graph_fixture_app/__init__.py"
+      }
+    },
+    {
+      "id": "current_path:src/graph_fixture_app/main.py",
+      "type": "CurrentPath",
+      "label": "src/graph_fixture_app/main.py",
+      "properties": {
+        "path": "src/graph_fixture_app/main.py"
+      }
+    },
+    {
+      "id": "current_path:src/graph_fixture_app/utils.py",
+      "type": "CurrentPath",
+      "label": "src/graph_fixture_app/utils.py",
+      "properties": {
+        "path": "src/graph_fixture_app/utils.py"
+      }
+    },
+    {
+      "id": "current_path:tests",
+      "type": "CurrentPath",
+      "label": "tests",
+      "properties": {
+        "path": "tests"
+      }
+    },
+    {
+      "id": "current_path:tests/test_main.py",
+      "type": "CurrentPath",
+      "label": "tests/test_main.py",
+      "properties": {
+        "path": "tests/test_main.py"
+      }
+    },
+    {
+      "id": "current_path:vendor",
+      "type": "CurrentPath",
+      "label": "vendor",
+      "properties": {
+        "path": "vendor"
+      }
+    },
+    {
+      "id": "current_path:vendor/library.py",
+      "type": "CurrentPath",
+      "label": "vendor/library.py",
+      "properties": {
+        "path": "vendor/library.py"
+      }
+    },
+    {
+      "id": "date:2026-05-27",
+      "type": "Date",
+      "label": "2026-05-27",
+      "properties": {
+        "value": "2026-05-27"
+      }
+    },
+    {
+      "id": "05d33df776ab85ff",
+      "type": "Directory",
+      "label": "graph_fixture_app",
+      "properties": {
+        "librarian_id": "05d33df776ab85ff",
+        "type": "directory",
+        "original_path": "src/graph_fixture_app",
+        "current_path": "src/graph_fixture_app",
+        "proposed_path": "src/graph_fixture_app",
+        "name": "graph_fixture_app",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "graph_fixture_app",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory src/graph_fixture_app analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: general"
+        ],
+        "tags": [
+          "general"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "general"
+          ],
+          "theme": "General",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "src",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "0b27d7de365e6dfa",
+      "type": "Directory",
+      "label": "src",
+      "properties": {
+        "librarian_id": "0b27d7de365e6dfa",
+        "type": "directory",
+        "original_path": "src",
+        "current_path": "src",
+        "proposed_path": "src",
+        "name": "src",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "src",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory src analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: source"
+        ],
+        "tags": [
+          "source"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 1,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "source"
+          ],
+          "theme": "Source",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "1ebc26f279153617",
+      "type": "Directory",
+      "label": "graph_fixture",
+      "properties": {
+        "librarian_id": "1ebc26f279153617",
+        "type": "directory",
+        "original_path": ".",
+        "current_path": ".",
+        "proposed_path": ".",
+        "name": "graph_fixture",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "graph_fixture",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory . analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: general"
+        ],
+        "tags": [
+          "general"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 6,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "general"
+          ],
+          "theme": "General",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 0,
+        "parent_path": null,
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "325f20910680c21b",
+      "type": "Directory",
+      "label": "build",
+      "properties": {
+        "librarian_id": "325f20910680c21b",
+        "type": "directory",
+        "original_path": "build",
+        "current_path": "build",
+        "proposed_path": "build",
+        "name": "build",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "build",
+        "summary": "Generated directory.",
+        "human_description": "Directory build analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: generated"
+        ],
+        "tags": [
+          "generated"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "generated"
+          ],
+          "theme": "Generated",
+          "should_reorganize": false,
+          "should_modify": false,
+          "reason": "Generated directory."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "5df2d1f509df03a8",
+      "type": "Directory",
+      "label": "vendor",
+      "properties": {
+        "librarian_id": "5df2d1f509df03a8",
+        "type": "directory",
+        "original_path": "vendor",
+        "current_path": "vendor",
+        "proposed_path": "vendor",
+        "name": "vendor",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "vendor",
+        "summary": "Vendor directory.",
+        "human_description": "Directory vendor analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: vendor"
+        ],
+        "tags": [
+          "vendor"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "vendor"
+          ],
+          "theme": "Vendor",
+          "should_reorganize": false,
+          "should_modify": false,
+          "reason": "Vendor directory."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "69e2c19e4c0eb2ff",
+      "type": "Directory",
+      "label": "docs",
+      "properties": {
+        "librarian_id": "69e2c19e4c0eb2ff",
+        "type": "directory",
+        "original_path": "docs",
+        "current_path": "docs",
+        "proposed_path": "organized/documents/docs",
+        "name": "docs",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "docs",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory docs analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: docs"
+        ],
+        "tags": [
+          "docs"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "docs"
+          ],
+          "theme": "Docs",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "ed6fb5e73a88929c",
+      "type": "Directory",
+      "label": "data",
+      "properties": {
+        "librarian_id": "ed6fb5e73a88929c",
+        "type": "directory",
+        "original_path": "data",
+        "current_path": "data",
+        "proposed_path": "docs/documents/data",
+        "name": "data",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "data",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory data analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: general"
+        ],
+        "tags": [
+          "general"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "general"
+          ],
+          "theme": "General",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "f4fbc015ac0e0132",
+      "type": "Directory",
+      "label": "tests",
+      "properties": {
+        "librarian_id": "f4fbc015ac0e0132",
+        "type": "directory",
+        "original_path": "tests",
+        "current_path": "tests",
+        "proposed_path": "tests",
+        "name": "tests",
+        "extension": null,
+        "size_bytes": null,
+        "created_at": null,
+        "modified_at": null,
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": null,
+        "content_hash": null,
+        "name_hash": null,
+        "readable": true,
+        "read_error": null,
+        "file_kind": "unknown",
+        "detected_language": null,
+        "title": "tests",
+        "summary": "Default conservative directory analysis.",
+        "human_description": "Directory tests analyzed for structure and role.",
+        "developer_notes": [
+          "Roles: tests"
+        ],
+        "tags": [
+          "tests"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": {
+          "direct_file_count": 0,
+          "direct_subdirectory_count": 0,
+          "total_file_count": 0,
+          "dominant_extensions": [],
+          "dominant_languages": [],
+          "recurring_name_tokens": [],
+          "possible_roles": [
+            "tests"
+          ],
+          "theme": "Tests",
+          "should_reorganize": true,
+          "should_modify": false,
+          "reason": "Default conservative directory analysis."
+        },
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "domain:code",
+      "type": "Domain",
+      "label": "Code",
+      "properties": {
+        "domain": "Code"
+      }
+    },
+    {
+      "id": "domain:configuration",
+      "type": "Domain",
+      "label": "Configuration",
+      "properties": {
+        "domain": "Configuration"
+      }
+    },
+    {
+      "id": "domain:documentation",
+      "type": "Domain",
+      "label": "Documentation",
+      "properties": {
+        "domain": "Documentation"
+      }
+    },
+    {
+      "id": "entrypoint:d9656e43f9068e5f:function:main",
+      "type": "Entrypoint",
+      "label": "function:main",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "entrypoint": "function:main"
+      }
+    },
+    {
+      "id": "entrypoint:d9656e43f9068e5f:guard:if-__name__-__main__",
+      "type": "Entrypoint",
+      "label": "guard:if __name__ == \"__main__\"",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "entrypoint": "guard:if __name__ == \"__main__\""
+      }
+    },
+    {
+      "id": "extension:lock",
+      "type": "Extension",
+      "label": ".lock",
+      "properties": {
+        "extension": ".lock"
+      }
+    },
+    {
+      "id": "extension:md",
+      "type": "Extension",
+      "label": ".md",
+      "properties": {
+        "extension": ".md"
+      }
+    },
+    {
+      "id": "extension:py",
+      "type": "Extension",
+      "label": ".py",
+      "properties": {
+        "extension": ".py"
+      }
+    },
+    {
+      "id": "extension:toml",
+      "type": "Extension",
+      "label": ".toml",
+      "properties": {
+        "extension": ".toml"
+      }
+    },
+    {
+      "id": "extension:txt",
+      "type": "Extension",
+      "label": ".txt",
+      "properties": {
+        "extension": ".txt"
+      }
+    },
+    {
+      "id": "42c59af8a4bae559",
+      "type": "File",
+      "label": "README.md",
+      "properties": {
+        "librarian_id": "42c59af8a4bae559",
+        "type": "file",
+        "original_path": "README.md",
+        "current_path": "README.md",
+        "proposed_path": "docs/documents/readme.md",
+        "name": "README.md",
+        "extension": ".md",
+        "size_bytes": 76,
+        "created_at": "2026-05-27T08:23:03.718608+00:00",
+        "modified_at": "2026-05-27T08:23:03.718608+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/markdown",
+        "content_hash": "38a94cad870803adda6973829baeec16c0c2d0ffcf56afca2155d6c52246afca",
+        "name_hash": "b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "document",
+        "detected_language": null,
+        "title": "README",
+        "summary": "Recognized document type.",
+        "human_description": "File README.md classified as Documentation/Documents.",
+        "developer_notes": [],
+        "tags": [
+          "Documentation",
+          "Documents"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Documentation",
+          "category": "Documents",
+          "confidence": 0.7,
+          "reason": "Recognized document type."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "6afa18c42ded2eac",
+      "type": "File",
+      "label": "overview.md",
+      "properties": {
+        "librarian_id": "6afa18c42ded2eac",
+        "type": "file",
+        "original_path": "docs/overview.md",
+        "current_path": "docs/overview.md",
+        "proposed_path": "organized/documents/docs/overview.md",
+        "name": "overview.md",
+        "extension": ".md",
+        "size_bytes": 99,
+        "created_at": "2026-05-27T08:23:06.465827+00:00",
+        "modified_at": "2026-05-27T08:23:06.481454+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/markdown",
+        "content_hash": "eb16660bf30c09a2b3826c48b771eba2358514557761a778319a7d94f81decc0",
+        "name_hash": "7a7987404e86a043b133f56a86fd282421f207557d254dc43ac4bb0bae8e7915",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "document",
+        "detected_language": null,
+        "title": "overview",
+        "summary": "Recognized document type.",
+        "human_description": "File docs/overview.md classified as Documentation/Documents.",
+        "developer_notes": [],
+        "tags": [
+          "Documentation",
+          "Documents"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [
+            "OpenAI"
+          ],
+          "places": [
+            "Rome"
+          ],
+          "dates": [
+            "2026-05-27"
+          ]
+        },
+        "classification": {
+          "domain": "Documentation",
+          "category": "Documents",
+          "confidence": 0.7,
+          "reason": "Recognized document type."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "docs",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "6ed4ab48d02451d6",
+      "type": "File",
+      "label": "duplicate_b.txt",
+      "properties": {
+        "librarian_id": "6ed4ab48d02451d6",
+        "type": "file",
+        "original_path": "data/duplicate_b.txt",
+        "current_path": "data/duplicate_b.txt",
+        "proposed_path": "docs/documents/data/duplicate_b.txt",
+        "name": "duplicate_b.txt",
+        "extension": ".txt",
+        "size_bytes": 23,
+        "created_at": "2026-05-27T08:23:07.517098+00:00",
+        "modified_at": "2026-05-27T08:23:07.517098+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/plain",
+        "content_hash": "205d0c35c0fb8f0f032e773a23e321ab7eb51b47d2b0dd8de086b60eb24f9661",
+        "name_hash": "0f3cb63ac51a467a044765dc9528fd65da895558b3ec791cbe9de7ef884c7635",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "document",
+        "detected_language": null,
+        "title": "duplicate_b",
+        "summary": "Recognized document type.",
+        "human_description": "File data/duplicate_b.txt classified as Documentation/Documents.",
+        "developer_notes": [],
+        "tags": [
+          "Documentation",
+          "Documents"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Documentation",
+          "category": "Documents",
+          "confidence": 0.7,
+          "reason": "Recognized document type."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "data",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "a409cae4453813f9",
+      "type": "File",
+      "label": "duplicate_a.txt",
+      "properties": {
+        "librarian_id": "a409cae4453813f9",
+        "type": "file",
+        "original_path": "data/duplicate_a.txt",
+        "current_path": "data/duplicate_a.txt",
+        "proposed_path": "docs/documents/data/duplicate_a.txt",
+        "name": "duplicate_a.txt",
+        "extension": ".txt",
+        "size_bytes": 23,
+        "created_at": "2026-05-27T08:23:07.107351+00:00",
+        "modified_at": "2026-05-27T08:23:07.107351+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/plain",
+        "content_hash": "205d0c35c0fb8f0f032e773a23e321ab7eb51b47d2b0dd8de086b60eb24f9661",
+        "name_hash": "c78247ca592b3065b57ebb78d3be8702aefb07215a9faf29bbc07b3239fd37a6",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "document",
+        "detected_language": null,
+        "title": "duplicate_a",
+        "summary": "Recognized document type.",
+        "human_description": "File data/duplicate_a.txt classified as Documentation/Documents.",
+        "developer_notes": [],
+        "tags": [
+          "Documentation",
+          "Documents"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Documentation",
+          "category": "Documents",
+          "confidence": 0.7,
+          "reason": "Recognized document type."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "data",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": true,
+        "risk_level": "low"
+      }
+    },
+    {
+      "id": "function:2bbf49ed22545db1:vendored",
+      "type": "Function",
+      "label": "vendored",
+      "properties": {
+        "file": "vendor/library.py",
+        "name": "vendored",
+        "line_start": 1,
+        "line_end": 2
+      }
+    },
+    {
+      "id": "function:39f531939c26c939:test_main",
+      "type": "Function",
+      "label": "test_main",
+      "properties": {
+        "file": "tests/test_main.py",
+        "name": "test_main",
+        "line_start": 4,
+        "line_end": 5
+      }
+    },
+    {
+      "id": "function:76e98e6cca982c82:generated",
+      "type": "Function",
+      "label": "generated",
+      "properties": {
+        "file": "build/generated.py",
+        "name": "generated",
+        "line_start": 1,
+        "line_end": 2
+      }
+    },
+    {
+      "id": "function:bb695538ea8ba10a:normalize",
+      "type": "Function",
+      "label": "normalize",
+      "properties": {
+        "file": "src/graph_fixture_app/utils.py",
+        "name": "normalize",
+        "line_start": 6,
+        "line_end": 7
+      }
+    },
+    {
+      "id": "function:bb695538ea8ba10a:to_json",
+      "type": "Function",
+      "label": "to_json",
+      "properties": {
+        "file": "src/graph_fixture_app/utils.py",
+        "name": "to_json",
+        "line_start": 10,
+        "line_end": 11
+      }
+    },
+    {
+      "id": "function:d9656e43f9068e5f:greet",
+      "type": "Function",
+      "label": "greet",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "name": "greet",
+        "line_start": 9,
+        "line_end": 10
+      }
+    },
+    {
+      "id": "function:d9656e43f9068e5f:main",
+      "type": "Function",
+      "label": "main",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "name": "main",
+        "line_start": 13,
+        "line_end": 14
+      }
+    },
+    {
+      "id": "76e98e6cca982c82",
+      "type": "GeneratedFile",
+      "label": "generated.py",
+      "properties": {
+        "librarian_id": "76e98e6cca982c82",
+        "type": "file",
+        "original_path": "build/generated.py",
+        "current_path": "build/generated.py",
+        "proposed_path": "review/project/generated.py",
+        "name": "generated.py",
+        "extension": ".py",
+        "size_bytes": 47,
+        "created_at": "2026-05-27T08:23:08.140469+00:00",
+        "modified_at": "2026-05-27T08:23:08.140469+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "3fd613419ccb7bb9c9e918e3b74d293e83fcb1377c6e6e1937941dcd2bc4fd8d",
+        "name_hash": "a8c94365ad9a8afbddabe5a5c0fd874600dee4288b87513deab178237832c506",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "generated",
+        "summary": "Recognized source code.",
+        "human_description": "File build/generated.py classified as Code/Project.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Project"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Project",
+          "confidence": 0.9,
+          "reason": "Recognized source code."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "generated",
+          "package_name": "build.generated",
+          "imports": {
+            "internal": [],
+            "external": [],
+            "standard_library": []
+          },
+          "symbols": {
+            "functions": [
+              {
+                "name": "generated",
+                "line_start": 1,
+                "line_end": 2
+              }
+            ],
+            "classes": [],
+            "methods": []
+          },
+          "docstrings": {
+            "module": null,
+            "functions": {},
+            "classes": {}
+          },
+          "entrypoints": [],
+          "framework_hints": [],
+          "test_hints": [],
+          "config_hints": [],
+          "risk_level": "medium",
+          "generated_file": true,
+          "vendor_file": false,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "build",
+        "generated_file": true,
+        "vendor_file": false,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "medium"
+      }
+    },
+    {
+      "id": "artifact:graph",
+      "type": "Graph",
+      "label": "graph.json",
+      "properties": {
+        "path": ".librarian/graph.json"
+      }
+    },
+    {
+      "id": "import:json",
+      "type": "Import",
+      "label": "json",
+      "properties": {
+        "module": "json",
+        "kind": "standard_library"
+      }
+    },
+    {
+      "id": "41412bcc86bd18f3",
+      "type": "LockFile",
+      "label": "poetry.lock",
+      "properties": {
+        "librarian_id": "41412bcc86bd18f3",
+        "type": "file",
+        "original_path": "poetry.lock",
+        "current_path": "poetry.lock",
+        "proposed_path": "review/projectconfig/poetry.lock",
+        "name": "poetry.lock",
+        "extension": ".lock",
+        "size_bytes": 15,
+        "created_at": "2026-05-27T08:23:09.158912+00:00",
+        "modified_at": "2026-05-27T08:23:09.158912+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "application/octet-stream",
+        "content_hash": "1f92ef7e33a2ac29f43fe27b389eeed9dd0e585ee200c9754d1c96ca06dbe926",
+        "name_hash": "f53a023eedfa3fbf2925ec7dc76eecdc954ea94b7e47065393dbad519613dc89",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "config",
+        "detected_language": null,
+        "title": "poetry",
+        "summary": "Recognized config file.",
+        "human_description": "File poetry.lock classified as Configuration/ProjectConfig.",
+        "developer_notes": [],
+        "tags": [
+          "Configuration",
+          "ProjectConfig"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Configuration",
+          "category": "ProjectConfig",
+          "confidence": 0.85,
+          "reason": "Recognized config file."
+        },
+        "code_metadata": null,
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 1,
+        "parent_path": ".",
+        "generated_file": false,
+        "vendor_file": false,
+        "lock_file": true,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "high"
+      }
+    },
+    {
+      "id": "mime:application-octet-stream",
+      "type": "MIMEType",
+      "label": "application/octet-stream",
+      "properties": {
+        "mime_type": "application/octet-stream"
+      }
+    },
+    {
+      "id": "mime:text-markdown",
+      "type": "MIMEType",
+      "label": "text/markdown",
+      "properties": {
+        "mime_type": "text/markdown"
+      }
+    },
+    {
+      "id": "mime:text-plain",
+      "type": "MIMEType",
+      "label": "text/plain",
+      "properties": {
+        "mime_type": "text/plain"
+      }
+    },
+    {
+      "id": "mime:text-x-python",
+      "type": "MIMEType",
+      "label": "text/x-python",
+      "properties": {
+        "mime_type": "text/x-python"
+      }
+    },
+    {
+      "id": "artifact:manifest",
+      "type": "Manifest",
+      "label": "manifest.json",
+      "properties": {
+        "path": ".librarian/manifest.json"
+      }
+    },
+    {
+      "id": "note:.librarian/README.librarian.md",
+      "type": "MarkdownNote",
+      "label": "README.librarian.md",
+      "properties": {
+        "path": ".librarian/README.librarian.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/code.md",
+      "type": "MarkdownNote",
+      "label": "code.md",
+      "properties": {
+        "path": ".librarian/notes/code.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/directories.md",
+      "type": "MarkdownNote",
+      "label": "directories.md",
+      "properties": {
+        "path": ".librarian/notes/directories.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/entrypoints.md",
+      "type": "MarkdownNote",
+      "label": "entrypoints.md",
+      "properties": {
+        "path": ".librarian/notes/entrypoints.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/files.md",
+      "type": "MarkdownNote",
+      "label": "files.md",
+      "properties": {
+        "path": ".librarian/notes/files.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/index.md",
+      "type": "MarkdownNote",
+      "label": "index.md",
+      "properties": {
+        "path": ".librarian/notes/index.md"
+      }
+    },
+    {
+      "id": "note:.librarian/notes/risks.md",
+      "type": "MarkdownNote",
+      "label": "risks.md",
+      "properties": {
+        "path": ".librarian/notes/risks.md"
+      }
+    },
+    {
+      "id": "method:d9656e43f9068e5f:Greeter.greet",
+      "type": "Method",
+      "label": "Greeter.greet",
+      "properties": {
+        "file": "src/graph_fixture_app/main.py",
+        "name": "Greeter.greet",
+        "line_start": 9,
+        "line_end": 10
+      }
+    },
+    {
+      "id": "module:build.generated",
+      "type": "Module",
+      "label": "build.generated",
+      "properties": {
+        "module_name": "generated",
+        "package_name": "build.generated"
+      }
+    },
+    {
+      "id": "module:src.graph_fixture_app.__init__",
+      "type": "Module",
+      "label": "src.graph_fixture_app.__init__",
+      "properties": {
+        "module_name": "__init__",
+        "package_name": "src.graph_fixture_app.__init__"
+      }
+    },
+    {
+      "id": "module:src.graph_fixture_app.main",
+      "type": "Module",
+      "label": "src.graph_fixture_app.main",
+      "properties": {
+        "module": "src.graph_fixture_app.main",
+        "kind": "internal"
+      }
+    },
+    {
+      "id": "module:src.graph_fixture_app.utils",
+      "type": "Module",
+      "label": "src.graph_fixture_app.utils",
+      "properties": {
+        "module_name": "utils",
+        "package_name": "src.graph_fixture_app.utils"
+      }
+    },
+    {
+      "id": "module:tests.test_main",
+      "type": "Module",
+      "label": "tests.test_main",
+      "properties": {
+        "module_name": "test_main",
+        "package_name": "tests.test_main"
+      }
+    },
+    {
+      "id": "module:vendor.library",
+      "type": "Module",
+      "label": "vendor.library",
+      "properties": {
+        "module_name": "library",
+        "package_name": "vendor.library"
+      }
+    },
+    {
+      "id": "organization:openai",
+      "type": "Organization",
+      "label": "OpenAI",
+      "properties": {
+        "value": "OpenAI"
+      }
+    },
+    {
+      "id": "original_path:.",
+      "type": "OriginalPath",
+      "label": ".",
+      "properties": {
+        "path": "."
+      }
+    },
+    {
+      "id": "original_path:README.md",
+      "type": "OriginalPath",
+      "label": "README.md",
+      "properties": {
+        "path": "README.md"
+      }
+    },
+    {
+      "id": "original_path:build",
+      "type": "OriginalPath",
+      "label": "build",
+      "properties": {
+        "path": "build"
+      }
+    },
+    {
+      "id": "original_path:build/generated.py",
+      "type": "OriginalPath",
+      "label": "build/generated.py",
+      "properties": {
+        "path": "build/generated.py"
+      }
+    },
+    {
+      "id": "original_path:data",
+      "type": "OriginalPath",
+      "label": "data",
+      "properties": {
+        "path": "data"
+      }
+    },
+    {
+      "id": "original_path:data/duplicate_a.txt",
+      "type": "OriginalPath",
+      "label": "data/duplicate_a.txt",
+      "properties": {
+        "path": "data/duplicate_a.txt"
+      }
+    },
+    {
+      "id": "original_path:data/duplicate_b.txt",
+      "type": "OriginalPath",
+      "label": "data/duplicate_b.txt",
+      "properties": {
+        "path": "data/duplicate_b.txt"
+      }
+    },
+    {
+      "id": "original_path:docs",
+      "type": "OriginalPath",
+      "label": "docs",
+      "properties": {
+        "path": "docs"
+      }
+    },
+    {
+      "id": "original_path:docs/overview.md",
+      "type": "OriginalPath",
+      "label": "docs/overview.md",
+      "properties": {
+        "path": "docs/overview.md"
+      }
+    },
+    {
+      "id": "original_path:poetry.lock",
+      "type": "OriginalPath",
+      "label": "poetry.lock",
+      "properties": {
+        "path": "poetry.lock"
+      }
+    },
+    {
+      "id": "original_path:pyproject.toml",
+      "type": "OriginalPath",
+      "label": "pyproject.toml",
+      "properties": {
+        "path": "pyproject.toml"
+      }
+    },
+    {
+      "id": "original_path:src",
+      "type": "OriginalPath",
+      "label": "src",
+      "properties": {
+        "path": "src"
+      }
+    },
+    {
+      "id": "original_path:src/graph_fixture_app",
+      "type": "OriginalPath",
+      "label": "src/graph_fixture_app",
+      "properties": {
+        "path": "src/graph_fixture_app"
+      }
+    },
+    {
+      "id": "original_path:src/graph_fixture_app/__init__.py",
+      "type": "OriginalPath",
+      "label": "src/graph_fixture_app/__init__.py",
+      "properties": {
+        "path": "src/graph_fixture_app/__init__.py"
+      }
+    },
+    {
+      "id": "original_path:src/graph_fixture_app/main.py",
+      "type": "OriginalPath",
+      "label": "src/graph_fixture_app/main.py",
+      "properties": {
+        "path": "src/graph_fixture_app/main.py"
+      }
+    },
+    {
+      "id": "original_path:src/graph_fixture_app/utils.py",
+      "type": "OriginalPath",
+      "label": "src/graph_fixture_app/utils.py",
+      "properties": {
+        "path": "src/graph_fixture_app/utils.py"
+      }
+    },
+    {
+      "id": "original_path:tests",
+      "type": "OriginalPath",
+      "label": "tests",
+      "properties": {
+        "path": "tests"
+      }
+    },
+    {
+      "id": "original_path:tests/test_main.py",
+      "type": "OriginalPath",
+      "label": "tests/test_main.py",
+      "properties": {
+        "path": "tests/test_main.py"
+      }
+    },
+    {
+      "id": "original_path:vendor",
+      "type": "OriginalPath",
+      "label": "vendor",
+      "properties": {
+        "path": "vendor"
+      }
+    },
+    {
+      "id": "original_path:vendor/library.py",
+      "type": "OriginalPath",
+      "label": "vendor/library.py",
+      "properties": {
+        "path": "vendor/library.py"
+      }
+    },
+    {
+      "id": "package:build",
+      "type": "Package",
+      "label": "build",
+      "properties": {
+        "package_name": "build"
+      }
+    },
+    {
+      "id": "package:src.graph_fixture_app",
+      "type": "Package",
+      "label": "src.graph_fixture_app",
+      "properties": {
+        "package_name": "src.graph_fixture_app"
+      }
+    },
+    {
+      "id": "package:tests",
+      "type": "Package",
+      "label": "tests",
+      "properties": {
+        "package_name": "tests"
+      }
+    },
+    {
+      "id": "package:vendor",
+      "type": "Package",
+      "label": "vendor",
+      "properties": {
+        "package_name": "vendor"
+      }
+    },
+    {
+      "id": "place:rome",
+      "type": "Place",
+      "label": "Rome",
+      "properties": {
+        "value": "Rome"
+      }
+    },
+    {
+      "id": "project:workspace",
+      "type": "Project",
+      "label": "graph_fixture",
+      "properties": {
+        "workspace_root": "C:\\Users\\batti\\Documents\\Codex\\2026-05-27\\apri-la-repository-antonioincalza09-ux-thelibrarian\\examples\\graph_fixture"
+      }
+    },
+    {
+      "id": "prompt_pack:default",
+      "type": "PromptPack",
+      "label": "default prompt pack",
+      "properties": {
+        "purpose": "agent navigation prompts and runbooks"
+      }
+    },
+    {
+      "id": "proposed_path:.",
+      "type": "ProposedPath",
+      "label": ".",
+      "properties": {
+        "path": "."
+      }
+    },
+    {
+      "id": "proposed_path:build",
+      "type": "ProposedPath",
+      "label": "build",
+      "properties": {
+        "path": "build"
+      }
+    },
+    {
+      "id": "proposed_path:docs/documents/data",
+      "type": "ProposedPath",
+      "label": "docs/documents/data",
+      "properties": {
+        "path": "docs/documents/data"
+      }
+    },
+    {
+      "id": "proposed_path:docs/documents/data/duplicate_a.txt",
+      "type": "ProposedPath",
+      "label": "docs/documents/data/duplicate_a.txt",
+      "properties": {
+        "path": "docs/documents/data/duplicate_a.txt"
+      }
+    },
+    {
+      "id": "proposed_path:docs/documents/data/duplicate_b.txt",
+      "type": "ProposedPath",
+      "label": "docs/documents/data/duplicate_b.txt",
+      "properties": {
+        "path": "docs/documents/data/duplicate_b.txt"
+      }
+    },
+    {
+      "id": "proposed_path:docs/documents/readme.md",
+      "type": "ProposedPath",
+      "label": "docs/documents/readme.md",
+      "properties": {
+        "path": "docs/documents/readme.md"
+      }
+    },
+    {
+      "id": "proposed_path:organized/documents/docs",
+      "type": "ProposedPath",
+      "label": "organized/documents/docs",
+      "properties": {
+        "path": "organized/documents/docs"
+      }
+    },
+    {
+      "id": "proposed_path:organized/documents/docs/overview.md",
+      "type": "ProposedPath",
+      "label": "organized/documents/docs/overview.md",
+      "properties": {
+        "path": "organized/documents/docs/overview.md"
+      }
+    },
+    {
+      "id": "proposed_path:review/project/generated.py",
+      "type": "ProposedPath",
+      "label": "review/project/generated.py",
+      "properties": {
+        "path": "review/project/generated.py"
+      }
+    },
+    {
+      "id": "proposed_path:review/project/init.py",
+      "type": "ProposedPath",
+      "label": "review/project/init.py",
+      "properties": {
+        "path": "review/project/init.py"
+      }
+    },
+    {
+      "id": "proposed_path:review/project/library.py",
+      "type": "ProposedPath",
+      "label": "review/project/library.py",
+      "properties": {
+        "path": "review/project/library.py"
+      }
+    },
+    {
+      "id": "proposed_path:review/project/main.py",
+      "type": "ProposedPath",
+      "label": "review/project/main.py",
+      "properties": {
+        "path": "review/project/main.py"
+      }
+    },
+    {
+      "id": "proposed_path:review/project/utils.py",
+      "type": "ProposedPath",
+      "label": "review/project/utils.py",
+      "properties": {
+        "path": "review/project/utils.py"
+      }
+    },
+    {
+      "id": "proposed_path:review/projectconfig/poetry.lock",
+      "type": "ProposedPath",
+      "label": "review/projectconfig/poetry.lock",
+      "properties": {
+        "path": "review/projectconfig/poetry.lock"
+      }
+    },
+    {
+      "id": "proposed_path:review/projectconfig/pyproject.toml",
+      "type": "ProposedPath",
+      "label": "review/projectconfig/pyproject.toml",
+      "properties": {
+        "path": "review/projectconfig/pyproject.toml"
+      }
+    },
+    {
+      "id": "proposed_path:review/tests/test-main.py",
+      "type": "ProposedPath",
+      "label": "review/tests/test-main.py",
+      "properties": {
+        "path": "review/tests/test-main.py"
+      }
+    },
+    {
+      "id": "proposed_path:src",
+      "type": "ProposedPath",
+      "label": "src",
+      "properties": {
+        "path": "src"
+      }
+    },
+    {
+      "id": "proposed_path:src/graph_fixture_app",
+      "type": "ProposedPath",
+      "label": "src/graph_fixture_app",
+      "properties": {
+        "path": "src/graph_fixture_app"
+      }
+    },
+    {
+      "id": "proposed_path:tests",
+      "type": "ProposedPath",
+      "label": "tests",
+      "properties": {
+        "path": "tests"
+      }
+    },
+    {
+      "id": "proposed_path:vendor",
+      "type": "ProposedPath",
+      "label": "vendor",
+      "properties": {
+        "path": "vendor"
+      }
+    },
+    {
+      "id": "risk:high",
+      "type": "Risk",
+      "label": "high risk",
+      "properties": {
+        "risk_level": "high"
+      }
+    },
+    {
+      "id": "risk:medium",
+      "type": "Risk",
+      "label": "medium risk",
+      "properties": {
+        "risk_level": "medium"
+      }
+    },
+    {
+      "id": "risk:should-not-modify",
+      "type": "Risk",
+      "label": "should not modify",
+      "properties": {
+        "policy": "read-only unless explicitly requested"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/agent_start_here.md",
+      "type": "Runbook",
+      "label": "agent_start_here.md",
+      "properties": {
+        "path": ".librarian/runbooks/agent_start_here.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/developer_start_here.md",
+      "type": "Runbook",
+      "label": "developer_start_here.md",
+      "properties": {
+        "path": ".librarian/runbooks/developer_start_here.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/how_to_extend_classifiers.md",
+      "type": "Runbook",
+      "label": "how_to_extend_classifiers.md",
+      "properties": {
+        "path": ".librarian/runbooks/how_to_extend_classifiers.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/how_to_inspect.md",
+      "type": "Runbook",
+      "label": "how_to_inspect.md",
+      "properties": {
+        "path": ".librarian/runbooks/how_to_inspect.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/how_to_query_graph.md",
+      "type": "Runbook",
+      "label": "how_to_query_graph.md",
+      "properties": {
+        "path": ".librarian/runbooks/how_to_query_graph.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/how_to_run_python_tools.md",
+      "type": "Runbook",
+      "label": "how_to_run_python_tools.md",
+      "properties": {
+        "path": ".librarian/runbooks/how_to_run_python_tools.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/how_to_use_runnable_scripts.md",
+      "type": "Runbook",
+      "label": "how_to_use_runnable_scripts.md",
+      "properties": {
+        "path": ".librarian/runbooks/how_to_use_runnable_scripts.md"
+      }
+    },
+    {
+      "id": "runbook:.librarian/runbooks/index.md",
+      "type": "Runbook",
+      "label": "index.md",
+      "properties": {
+        "path": ".librarian/runbooks/index.md"
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_dependencies.py",
+      "type": "RunnableScript",
+      "label": "query_dependencies.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_dependencies.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_entrypoints.py",
+      "type": "RunnableScript",
+      "label": "query_entrypoints.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_entrypoints.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_files_by_tag.py",
+      "type": "RunnableScript",
+      "label": "query_files_by_tag.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_files_by_tag.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_graph_summary.py",
+      "type": "RunnableScript",
+      "label": "query_graph_summary.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_graph_summary.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_orphans.py",
+      "type": "RunnableScript",
+      "label": "query_orphans.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_orphans.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_risks.py",
+      "type": "RunnableScript",
+      "label": "query_risks.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_risks.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/graph_scripts/query_tests.py",
+      "type": "RunnableScript",
+      "label": "query_tests.py",
+      "properties": {
+        "path": ".librarian/graph_scripts/query_tests.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/scripts/find_entrypoints.py",
+      "type": "RunnableScript",
+      "label": "find_entrypoints.py",
+      "properties": {
+        "path": ".librarian/scripts/find_entrypoints.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/scripts/find_unmarked.py",
+      "type": "RunnableScript",
+      "label": "find_unmarked.py",
+      "properties": {
+        "path": ".librarian/scripts/find_unmarked.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/scripts/inspect_workspace.py",
+      "type": "RunnableScript",
+      "label": "inspect_workspace.py",
+      "properties": {
+        "path": ".librarian/scripts/inspect_workspace.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "script:.librarian/scripts/print_manifest_summary.py",
+      "type": "RunnableScript",
+      "label": "print_manifest_summary.py",
+      "properties": {
+        "path": ".librarian/scripts/print_manifest_summary.py",
+        "read_only": true
+      }
+    },
+    {
+      "id": "artifact:sidecars",
+      "type": "SidecarCollection",
+      "label": "sidecars",
+      "properties": {
+        "pattern": "*.librarian.yaml"
+      }
+    },
+    {
+      "id": "tag:code",
+      "type": "Tag",
+      "label": "Code",
+      "properties": {
+        "value": "Code"
+      }
+    },
+    {
+      "id": "tag:configuration",
+      "type": "Tag",
+      "label": "Configuration",
+      "properties": {
+        "value": "Configuration"
+      }
+    },
+    {
+      "id": "tag:docs",
+      "type": "Tag",
+      "label": "docs",
+      "properties": {
+        "value": "docs"
+      }
+    },
+    {
+      "id": "tag:documentation",
+      "type": "Tag",
+      "label": "Documentation",
+      "properties": {
+        "value": "Documentation"
+      }
+    },
+    {
+      "id": "tag:documents",
+      "type": "Tag",
+      "label": "Documents",
+      "properties": {
+        "value": "Documents"
+      }
+    },
+    {
+      "id": "tag:general",
+      "type": "Tag",
+      "label": "general",
+      "properties": {
+        "value": "general"
+      }
+    },
+    {
+      "id": "tag:generated",
+      "type": "Tag",
+      "label": "generated",
+      "properties": {
+        "value": "generated"
+      }
+    },
+    {
+      "id": "tag:project",
+      "type": "Tag",
+      "label": "Project",
+      "properties": {
+        "value": "Project"
+      }
+    },
+    {
+      "id": "tag:projectconfig",
+      "type": "Tag",
+      "label": "ProjectConfig",
+      "properties": {
+        "value": "ProjectConfig"
+      }
+    },
+    {
+      "id": "tag:source",
+      "type": "Tag",
+      "label": "source",
+      "properties": {
+        "value": "source"
+      }
+    },
+    {
+      "id": "tag:tests",
+      "type": "Tag",
+      "label": "Tests",
+      "properties": {
+        "value": "Tests"
+      }
+    },
+    {
+      "id": "tag:vendor",
+      "type": "Tag",
+      "label": "vendor",
+      "properties": {
+        "value": "vendor"
+      }
+    },
+    {
+      "id": "test:39f531939c26c939",
+      "type": "Test",
+      "label": "tests/test_main.py",
+      "properties": {
+        "file": "tests/test_main.py",
+        "test_hints": [
+          "test_main"
+        ]
+      }
+    },
+    {
+      "id": "2bbf49ed22545db1",
+      "type": "VendorFile",
+      "label": "library.py",
+      "properties": {
+        "librarian_id": "2bbf49ed22545db1",
+        "type": "file",
+        "original_path": "vendor/library.py",
+        "current_path": "vendor/library.py",
+        "proposed_path": "review/project/library.py",
+        "name": "library.py",
+        "extension": ".py",
+        "size_bytes": 43,
+        "created_at": "2026-05-27T08:23:08.784212+00:00",
+        "modified_at": "2026-05-27T08:23:08.784212+00:00",
+        "indexed_at": "2026-05-27T08:25:28.874736+00:00",
+        "mime_type": "text/x-python",
+        "content_hash": "901e4a2b807319d69a6918d6f9760789892936950cf95922a7837c80c118ec06",
+        "name_hash": "28a6639936adbe82d553956fda9862c21d26e9ea1a4463e376c3777a4229ab48",
+        "readable": true,
+        "read_error": null,
+        "file_kind": "source_code",
+        "detected_language": "Python",
+        "title": "library",
+        "summary": "Recognized source code.",
+        "human_description": "File vendor/library.py classified as Code/Project.",
+        "developer_notes": [
+          "Python AST analysis completed."
+        ],
+        "tags": [
+          "Code",
+          "Project"
+        ],
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "places": [],
+          "dates": []
+        },
+        "classification": {
+          "domain": "Code",
+          "category": "Project",
+          "confidence": 0.9,
+          "reason": "Recognized source code."
+        },
+        "code_metadata": {
+          "language": "Python",
+          "module_name": "library",
+          "package_name": "vendor.library",
+          "imports": {
+            "internal": [],
+            "external": [],
+            "standard_library": []
+          },
+          "symbols": {
+            "functions": [
+              {
+                "name": "vendored",
+                "line_start": 1,
+                "line_end": 2
+              }
+            ],
+            "classes": [],
+            "methods": []
+          },
+          "docstrings": {
+            "module": null,
+            "functions": {},
+            "classes": {}
+          },
+          "entrypoints": [],
+          "framework_hints": [],
+          "test_hints": [],
+          "config_hints": [],
+          "risk_level": "high",
+          "generated_file": false,
+          "vendor_file": true,
+          "lock_file": false,
+          "should_modify": false,
+          "should_move": false,
+          "reason": "Python AST analysis completed."
+        },
+        "directory_analysis": null,
+        "relations": [],
+        "status": [],
+        "errors": [],
+        "depth": 2,
+        "parent_path": "vendor",
+        "generated_file": false,
+        "vendor_file": true,
+        "lock_file": false,
+        "should_modify": false,
+        "should_move": false,
+        "risk_level": "high"
+      }
+    },
+    {
+      "id": "workspace",
+      "type": "Workspace",
+      "label": "graph_fixture",
+      "properties": {
+        "path": "C:\\Users\\batti\\Documents\\Codex\\2026-05-27\\apri-la-repository-antonioincalza09-ux-thelibrarian\\examples\\graph_fixture"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "agent_context:default",
+      "target": "0b27d7de365e6dfa",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "1ebc26f279153617",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "42c59af8a4bae559",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "69e2c19e4c0eb2ff",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "d9656e43f9068e5f",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "f4fbc015ac0e0132",
+      "type": "AGENT_SHOULD_START_FROM",
+      "confidence": 0.9,
+      "reason": "Recommended first read for fast workspace orientation.",
+      "properties": {}
+    },
+    {
+      "source": "category:documents",
+      "target": "domain:documentation",
+      "type": "BELONGS_TO_DOMAIN",
+      "confidence": 0.7,
+      "reason": "Category domain comes from classification metadata.",
+      "properties": {}
+    },
+    {
+      "source": "category:project",
+      "target": "domain:code",
+      "type": "BELONGS_TO_DOMAIN",
+      "confidence": 0.9,
+      "reason": "Category domain comes from classification metadata.",
+      "properties": {}
+    },
+    {
+      "source": "category:projectconfig",
+      "target": "domain:configuration",
+      "type": "BELONGS_TO_DOMAIN",
+      "confidence": 0.85,
+      "reason": "Category domain comes from classification metadata.",
+      "properties": {}
+    },
+    {
+      "source": "category:tests",
+      "target": "domain:code",
+      "type": "BELONGS_TO_DOMAIN",
+      "confidence": 0.96,
+      "reason": "Category domain comes from classification metadata.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "component:general",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "component:source",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "component:general",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "category:project",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.9,
+      "reason": "Recognized source code.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "component:generated",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "category:tests",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.96,
+      "reason": "Looks like a test file.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "category:documents",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.7,
+      "reason": "Recognized document type.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "component:vendor",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "component:docs",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "category:documents",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.7,
+      "reason": "Recognized document type.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "category:documents",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.7,
+      "reason": "Recognized document type.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "category:project",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.9,
+      "reason": "Recognized source code.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "category:documents",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.7,
+      "reason": "Recognized document type.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "category:project",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.9,
+      "reason": "Recognized source code.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "category:project",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.9,
+      "reason": "Recognized source code.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "category:project",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.9,
+      "reason": "Recognized source code.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "component:general",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "category:projectconfig",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.85,
+      "reason": "Recognized config file.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "component:tests",
+      "type": "CLASSIFIED_AS",
+      "confidence": 0.75,
+      "reason": "Directory role inferred by offline analysis.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "a82d493196e52d64",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "bb695538ea8ba10a",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "d9656e43f9068e5f",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "05d33df776ab85ff",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "0b27d7de365e6dfa",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "325f20910680c21b",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "41412bcc86bd18f3",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "5df2d1f509df03a8",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "69e2c19e4c0eb2ff",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "90d5d08d3a6b3fd1",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "ed6fb5e73a88929c",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "f4fbc015ac0e0132",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "76e98e6cca982c82",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "2bbf49ed22545db1",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "6ed4ab48d02451d6",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "a409cae4453813f9",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "39f531939c26c939",
+      "type": "CONTAINS",
+      "confidence": 1.0,
+      "reason": "Parent path comes from manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "function:2bbf49ed22545db1:vendored",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "function:39f531939c26c939:test_main",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "function:76e98e6cca982c82:generated",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "function:bb695538ea8ba10a:normalize",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "function:bb695538ea8ba10a:to_json",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "class:d9656e43f9068e5f:Greeter",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "function:d9656e43f9068e5f:greet",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "function:d9656e43f9068e5f:main",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "method:d9656e43f9068e5f:Greeter.greet",
+      "type": "DEFINES",
+      "confidence": 1.0,
+      "reason": "Symbol found by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "42c59af8a4bae559",
+      "type": "DOCUMENTED_BY",
+      "confidence": 0.7,
+      "reason": "README/docs file is near the directory it documents.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "6afa18c42ded2eac",
+      "type": "DOCUMENTED_BY",
+      "confidence": 0.7,
+      "reason": "README/docs file is near the directory it documents.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/README.librarian.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Runtime README documents the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/code.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/directories.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/entrypoints.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/files.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/index.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "note:.librarian/notes/risks.md",
+      "type": "DOCUMENTED_BY",
+      "confidence": 1.0,
+      "reason": "Markdown note generated by The Librarian runtime.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "agent_context:default",
+      "type": "DOCUMENTED_BY",
+      "confidence": 0.8,
+      "reason": "Agent context summarizes the graph and runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "agent_context:default",
+      "target": "prompt_pack:default",
+      "type": "EXPLAINED_IN",
+      "confidence": 0.75,
+      "reason": "Prompt pack documents how an agent should use the graph.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "90d5d08d3a6b3fd1",
+      "type": "HAS_CONFIG",
+      "confidence": 0.9,
+      "reason": "Configuration file detected in the workspace.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "entrypoint:d9656e43f9068e5f:function:main",
+      "type": "HAS_ENTRYPOINT",
+      "confidence": 1.0,
+      "reason": "Entrypoint detected by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "entrypoint:d9656e43f9068e5f:guard:if-__name__-__main__",
+      "type": "HAS_ENTRYPOINT",
+      "confidence": 1.0,
+      "reason": "Entrypoint detected by static code analysis.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "extension:lock",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "extension:md",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "extension:md",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "extension:txt",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "extension:toml",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "extension:txt",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "extension:py",
+      "type": "HAS_EXTENSION",
+      "confidence": 1.0,
+      "reason": "Extension detected from file name.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "mime:application-octet-stream",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "mime:text-markdown",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "mime:text-markdown",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "mime:text-plain",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "mime:application-octet-stream",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "mime:text-plain",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "mime:text-x-python",
+      "type": "HAS_MIME_TYPE",
+      "confidence": 1.0,
+      "reason": "MIME type detected during scan.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "risk:high",
+      "type": "HAS_RISK",
+      "confidence": 1.0,
+      "reason": "Risk level is recorded on the workspace node.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "risk:high",
+      "type": "HAS_RISK",
+      "confidence": 1.0,
+      "reason": "Risk level is recorded on the workspace node.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "risk:medium",
+      "type": "HAS_RISK",
+      "confidence": 1.0,
+      "reason": "Risk level is recorded on the workspace node.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/agent_start_here.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/developer_start_here.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/how_to_extend_classifiers.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/how_to_inspect.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/how_to_query_graph.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/how_to_run_python_tools.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/how_to_use_runnable_scripts.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "project:workspace",
+      "target": "runbook:.librarian/runbooks/index.md",
+      "type": "HAS_RUNBOOK",
+      "confidence": 1.0,
+      "reason": "Runbook exists in the developer runtime.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_dependencies.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_entrypoints.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_files_by_tag.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_graph_summary.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_orphans.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_risks.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/graph_scripts/query_tests.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/scripts/find_entrypoints.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/scripts/find_unmarked.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/scripts/inspect_workspace.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "script:.librarian/scripts/print_manifest_summary.py",
+      "type": "HAS_RUNNABLE_HELPER",
+      "confidence": 1.0,
+      "reason": "Runnable helper script exists under .librarian.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "tag:general",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "tag:source",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "tag:general",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "tag:project",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "tag:generated",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "tag:tests",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "tag:configuration",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "tag:projectconfig",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "tag:documentation",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "tag:documents",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "tag:vendor",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "tag:docs",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "tag:documentation",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "tag:documents",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "tag:documentation",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "tag:documents",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "tag:project",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "tag:configuration",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "tag:projectconfig",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "tag:documentation",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "tag:documents",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "tag:project",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "tag:project",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "tag:code",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "tag:project",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "tag:general",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "tag:tests",
+      "type": "HAS_TAG",
+      "confidence": 1.0,
+      "reason": "Tag declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "module:src.graph_fixture_app.main",
+      "type": "IMPORTS",
+      "confidence": 0.9,
+      "reason": "Internal import detected statically.",
+      "properties": {
+        "module": "src.graph_fixture_app.main",
+        "kind": "internal",
+        "resolved_path": "src/graph_fixture_app/main.py"
+      }
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "import:json",
+      "type": "IMPORTS",
+      "confidence": 0.9,
+      "reason": "Standard Library import detected statically.",
+      "properties": {
+        "module": "json",
+        "kind": "standard_library"
+      }
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "module:src.graph_fixture_app.utils",
+      "type": "IMPORTS",
+      "confidence": 0.9,
+      "reason": "Internal import detected statically.",
+      "properties": {
+        "module": "utils",
+        "kind": "internal",
+        "resolved_path": "src/graph_fixture_app/utils.py"
+      }
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "date:2026-05-27",
+      "type": "MENTIONS_DATE",
+      "confidence": 1.0,
+      "reason": "Entity declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "organization:openai",
+      "type": "MENTIONS_ORGANIZATION",
+      "confidence": 1.0,
+      "reason": "Entity declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "place:rome",
+      "type": "MENTIONS_PLACE",
+      "confidence": 1.0,
+      "reason": "Entity declared in sidecar or manifest metadata.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:.",
+      "target": "current_path:.",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:README.md",
+      "target": "current_path:README.md",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:build",
+      "target": "current_path:build",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:build/generated.py",
+      "target": "current_path:build/generated.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:data",
+      "target": "current_path:data",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:data/duplicate_a.txt",
+      "target": "current_path:data/duplicate_a.txt",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:data/duplicate_b.txt",
+      "target": "current_path:data/duplicate_b.txt",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:docs",
+      "target": "current_path:docs",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:docs/overview.md",
+      "target": "current_path:docs/overview.md",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:poetry.lock",
+      "target": "current_path:poetry.lock",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:pyproject.toml",
+      "target": "current_path:pyproject.toml",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:src",
+      "target": "current_path:src",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:src/graph_fixture_app",
+      "target": "current_path:src/graph_fixture_app",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:src/graph_fixture_app/__init__.py",
+      "target": "current_path:src/graph_fixture_app/__init__.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:src/graph_fixture_app/main.py",
+      "target": "current_path:src/graph_fixture_app/main.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:src/graph_fixture_app/utils.py",
+      "target": "current_path:src/graph_fixture_app/utils.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:tests",
+      "target": "current_path:tests",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:tests/test_main.py",
+      "target": "current_path:tests/test_main.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:vendor",
+      "target": "current_path:vendor",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "original_path:vendor/library.py",
+      "target": "current_path:vendor/library.py",
+      "type": "MOVED_TO",
+      "confidence": 1.0,
+      "reason": "Original and current path mapping.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "5df2d1f509df03a8",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "f4fbc015ac0e0132",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "1ebc26f279153617",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "1ebc26f279153617",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "1ebc26f279153617",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "69e2c19e4c0eb2ff",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "ed6fb5e73a88929c",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "325f20910680c21b",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "1ebc26f279153617",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "ed6fb5e73a88929c",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "05d33df776ab85ff",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "05d33df776ab85ff",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "05d33df776ab85ff",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "1ebc26f279153617",
+      "type": "ORIGINAL_PARENT",
+      "confidence": 1.0,
+      "reason": "Original parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "module:vendor.library",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "module:tests.test_main",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "module:build.generated",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "module:src.graph_fixture_app.__init__",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "module:src.graph_fixture_app.utils",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "module:src.graph_fixture_app.main",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 1.0,
+      "reason": "Code file module metadata was detected statically.",
+      "properties": {}
+    },
+    {
+      "source": "module:build.generated",
+      "target": "package:build",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "module:src.graph_fixture_app.__init__",
+      "target": "package:src.graph_fixture_app",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "module:src.graph_fixture_app.main",
+      "target": "package:src.graph_fixture_app",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "module:src.graph_fixture_app.utils",
+      "target": "package:src.graph_fixture_app",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "module:tests.test_main",
+      "target": "package:tests",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "module:vendor.library",
+      "target": "package:vendor",
+      "type": "PART_OF_PACKAGE",
+      "confidence": 0.95,
+      "reason": "Package inferred from module path.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "1ebc26f279153617",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "69e2c19e4c0eb2ff",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "6afa18c42ded2eac",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "File belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "ed6fb5e73a88929c",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Directory belongs to the indexed workspace.",
+      "properties": {}
+    },
+    {
+      "source": "workspace",
+      "target": "project:workspace",
+      "type": "PART_OF_PROJECT",
+      "confidence": 1.0,
+      "reason": "Workspace root is represented as the project.",
+      "properties": {}
+    },
+    {
+      "source": "05d33df776ab85ff",
+      "target": "0b27d7de365e6dfa",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.95,
+      "reason": "Proposed parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "0b27d7de365e6dfa",
+      "target": "1ebc26f279153617",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.95,
+      "reason": "Proposed parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "cluster:review/project",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "325f20910680c21b",
+      "target": "1ebc26f279153617",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.95,
+      "reason": "Proposed parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "cluster:review/projectconfig",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "5df2d1f509df03a8",
+      "target": "1ebc26f279153617",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.95,
+      "reason": "Proposed parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "cluster:docs/documents/data",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "cluster:review/project",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "90d5d08d3a6b3fd1",
+      "target": "cluster:review/projectconfig",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "cluster:docs/documents/data",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "cluster:review/project",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "cluster:review/project",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "cluster:review/project",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.65,
+      "reason": "Files cluster under the same proposed parent.",
+      "properties": {}
+    },
+    {
+      "source": "f4fbc015ac0e0132",
+      "target": "1ebc26f279153617",
+      "type": "PROPOSED_PARENT",
+      "confidence": 0.95,
+      "reason": "Proposed parent path is known.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_dependencies.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_dependencies.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_dependencies.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_entrypoints.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_entrypoints.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_entrypoints.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_files_by_tag.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_files_by_tag.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_files_by_tag.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_graph_summary.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_graph_summary.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_graph_summary.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_orphans.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_orphans.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_orphans.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_risks.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_risks.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_risks.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_tests.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_tests.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/graph_scripts/query_tests.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_entrypoints.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_entrypoints.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_entrypoints.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_unmarked.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_unmarked.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/find_unmarked.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/inspect_workspace.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/inspect_workspace.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/inspect_workspace.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/print_manifest_summary.py",
+      "target": "artifact:graph",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Graph helper scripts read graph.json when present.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/print_manifest_summary.py",
+      "target": "artifact:manifest",
+      "type": "SCRIPT_READS",
+      "confidence": 0.85,
+      "reason": "Helper scripts read Librarian runtime artifacts.",
+      "properties": {}
+    },
+    {
+      "source": "script:.librarian/scripts/print_manifest_summary.py",
+      "target": "artifact:sidecars",
+      "type": "SCRIPT_READS",
+      "confidence": 0.6,
+      "reason": "Some helpers inspect sidecar coverage.",
+      "properties": {}
+    },
+    {
+      "source": "2bbf49ed22545db1",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "risk:should-not-modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "confidence": 1.0,
+      "reason": "Original source and protected files are read-only by default.",
+      "properties": {}
+    },
+    {
+      "source": "39f531939c26c939",
+      "target": "2bbf49ed22545db1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Code.",
+      "properties": {
+        "shared_tag": "Code"
+      }
+    },
+    {
+      "source": "41412bcc86bd18f3",
+      "target": "90d5d08d3a6b3fd1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent ..",
+      "properties": {
+        "original_parent": "."
+      }
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "41412bcc86bd18f3",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent ..",
+      "properties": {
+        "original_parent": "."
+      }
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "6afa18c42ded2eac",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Documents.",
+      "properties": {
+        "shared_tag": "Documents"
+      }
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "6ed4ab48d02451d6",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Documents.",
+      "properties": {
+        "shared_tag": "Documents"
+      }
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "90d5d08d3a6b3fd1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent ..",
+      "properties": {
+        "original_parent": "."
+      }
+    },
+    {
+      "source": "42c59af8a4bae559",
+      "target": "a409cae4453813f9",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Documents.",
+      "properties": {
+        "shared_tag": "Documents"
+      }
+    },
+    {
+      "source": "6ed4ab48d02451d6",
+      "target": "6afa18c42ded2eac",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Documents.",
+      "properties": {
+        "shared_tag": "Documents"
+      }
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "2bbf49ed22545db1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "39f531939c26c939",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Code.",
+      "properties": {
+        "shared_tag": "Code"
+      }
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "a82d493196e52d64",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "bb695538ea8ba10a",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "76e98e6cca982c82",
+      "target": "d9656e43f9068e5f",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "6afa18c42ded2eac",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Documents.",
+      "properties": {
+        "shared_tag": "Documents"
+      }
+    },
+    {
+      "source": "a409cae4453813f9",
+      "target": "6ed4ab48d02451d6",
+      "type": "SIMILAR_TO",
+      "confidence": 1.0,
+      "reason": "Files share the same content hash.",
+      "properties": {
+        "duplicate": true
+      }
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "2bbf49ed22545db1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "39f531939c26c939",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Code.",
+      "properties": {
+        "shared_tag": "Code"
+      }
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "bb695538ea8ba10a",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent src/graph_fixture_app.",
+      "properties": {
+        "original_parent": "src/graph_fixture_app"
+      }
+    },
+    {
+      "source": "a82d493196e52d64",
+      "target": "d9656e43f9068e5f",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent src/graph_fixture_app.",
+      "properties": {
+        "original_parent": "src/graph_fixture_app"
+      }
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "2bbf49ed22545db1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "bb695538ea8ba10a",
+      "target": "39f531939c26c939",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Code.",
+      "properties": {
+        "shared_tag": "Code"
+      }
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "2bbf49ed22545db1",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Project.",
+      "properties": {
+        "shared_tag": "Project"
+      }
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "39f531939c26c939",
+      "type": "SIMILAR_TO",
+      "confidence": 0.45,
+      "reason": "Files share tag Code.",
+      "properties": {
+        "shared_tag": "Code"
+      }
+    },
+    {
+      "source": "d9656e43f9068e5f",
+      "target": "bb695538ea8ba10a",
+      "type": "SIMILAR_TO",
+      "confidence": 0.35,
+      "reason": "Files share original parent src/graph_fixture_app.",
+      "properties": {
+        "original_parent": "src/graph_fixture_app"
+      }
+    },
+    {
+      "source": "test:39f531939c26c939",
+      "target": "d9656e43f9068e5f",
+      "type": "TESTS",
+      "confidence": 0.65,
+      "reason": "Test target inferred from nearby source path and filename.",
+      "properties": {}
+    }
+  ]
+}

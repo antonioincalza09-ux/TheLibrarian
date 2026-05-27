@@ -1,0 +1,60 @@
+librarian_id: 5df2d1f509df03a8
+type: directory
+original_path: vendor
+current_path: vendor
+proposed_path: vendor
+name: vendor
+extension: null
+size_bytes: null
+created_at: null
+modified_at: null
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: null
+content_hash: null
+name_hash: null
+readable: true
+read_error: null
+file_kind: unknown
+detected_language: null
+title: vendor
+summary: Vendor directory.
+human_description: Directory vendor analyzed for structure and role.
+developer_notes:
+- 'Roles: vendor'
+tags:
+- vendor
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Configuration
+  category: ProjectConfig
+  confidence: 0.85
+  reason: Recognized config file.
+code_metadata: null
+directory_analysis:
+  direct_file_count: 0
+  direct_subdirectory_count: 0
+  total_file_count: 0
+  dominant_extensions: []
+  dominant_languages: []
+  recurring_name_tokens: []
+  possible_roles:
+  - vendor
+  theme: Vendor
+  should_reorganize: false
+  should_modify: false
+  reason: Vendor directory.
+relations: []
+status: []
+errors: []
+depth: 1
+parent_path: .
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: low

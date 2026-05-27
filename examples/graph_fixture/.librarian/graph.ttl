@@ -1,0 +1,3054 @@
+@prefix lib: <https://thelibrarian.local/schema#> .
+@prefix node: <https://thelibrarian.local/node/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+node:agent_context_default a lib:AgentContext ;
+  lib:id "agent_context:default" ;
+  lib:label "agent context" ;
+  lib:properties "{\"purpose\": \"recommended first reads for agents\"}" .
+
+node:category_documents a lib:Category ;
+  lib:id "category:documents" ;
+  lib:label "Documents" ;
+  lib:properties "{\"category\": \"Documents\", \"confidence\": 0.7, \"domain\": \"Documentation\", \"reason\": \"Recognized document type.\"}" .
+
+node:category_project a lib:Category ;
+  lib:id "category:project" ;
+  lib:label "Project" ;
+  lib:properties "{\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}" .
+
+node:category_projectconfig a lib:Category ;
+  lib:id "category:projectconfig" ;
+  lib:label "ProjectConfig" ;
+  lib:properties "{\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}" .
+
+node:category_tests a lib:Category ;
+  lib:id "category:tests" ;
+  lib:label "Tests" ;
+  lib:properties "{\"category\": \"Tests\", \"confidence\": 0.96, \"domain\": \"Code\", \"reason\": \"Looks like a test file.\"}" .
+
+node:class_d9656e43f9068e5f_Greeter a lib:Class ;
+  lib:id "class:d9656e43f9068e5f:Greeter" ;
+  lib:label "Greeter" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/main.py\", \"line_end\": 10, \"line_start\": 6, \"name\": \"Greeter\"}" .
+
+node:cluster_docs_documents_data a lib:Cluster ;
+  lib:id "cluster:docs/documents/data" ;
+  lib:label "docs/documents/data" ;
+  lib:properties "{\"proposed_parent\": \"docs/documents/data\"}" .
+
+node:cluster_review_project a lib:Cluster ;
+  lib:id "cluster:review/project" ;
+  lib:label "review/project" ;
+  lib:properties "{\"proposed_parent\": \"review/project\"}" .
+
+node:cluster_review_projectconfig a lib:Cluster ;
+  lib:id "cluster:review/projectconfig" ;
+  lib:label "review/projectconfig" ;
+  lib:properties "{\"proposed_parent\": \"review/projectconfig\"}" .
+
+node:39f531939c26c939 a lib:CodeFile ;
+  lib:id "39f531939c26c939" ;
+  lib:label "test_main.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Tests\", \"confidence\": 0.96, \"domain\": \"Code\", \"reason\": \"Looks like a test file.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {}, \"functions\": {}, \"module\": null}, \"entrypoints\": [], \"framework_hints\": [], \"generated_file\": false, \"imports\": {\"external\": [], \"internal\": [\"src.graph_fixture_app.main\"], \"standard_library\": []}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"test_main\", \"package_name\": \"tests.test_main\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [], \"functions\": [{\"line_end\": 5, \"line_start\": 4, \"name\": \"test_main\"}], \"methods\": []}, \"test_hints\": [\"test_main\"], \"vendor_file\": false}, \"content_hash\": \"d326ff887663ccbd9bc3bdcb5ced9d97fdc035c670731371f487507a0e32ea3f\", \"created_at\": \"2026-05-27T08:23:05.804469+00:00\", \"current_path\": \"tests/test_main.py\", \"depth\": 2, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": false, \"human_description\": \"File tests/test_main.py classified as Code/Tests.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"39f531939c26c939\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:05.804469+00:00\", \"name\": \"test_main.py\", \"name_hash\": \"b3f46f7b70562c63e46bae252ec733f8a748fb67e540280715dc4ea5bdaa8375\", \"original_path\": \"tests/test_main.py\", \"parent_path\": \"tests\", \"proposed_path\": \"review/tests/test-main.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 110, \"status\": [], \"summary\": \"Looks like a test file.\", \"tags\": [\"Code\", \"Tests\"], \"title\": \"test_main\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:a82d493196e52d64 a lib:CodeFile ;
+  lib:id "a82d493196e52d64" ;
+  lib:label "__init__.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {}, \"functions\": {}, \"module\": \"Graph fixture app.\"}, \"entrypoints\": [], \"framework_hints\": [], \"generated_file\": false, \"imports\": {\"external\": [], \"internal\": [], \"standard_library\": []}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"__init__\", \"package_name\": \"src.graph_fixture_app.__init__\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [], \"functions\": [], \"methods\": []}, \"test_hints\": [], \"vendor_file\": false}, \"content_hash\": \"bb37a0a2fd31bc10676d972b1fa1c232a752ac6fa72e0bd55a7aab08da44fc9b\", \"created_at\": \"2026-05-27T08:23:04.373531+00:00\", \"current_path\": \"src/graph_fixture_app/__init__.py\", \"depth\": 3, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": false, \"human_description\": \"File src/graph_fixture_app/__init__.py classified as Code/Project.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"a82d493196e52d64\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:04.373531+00:00\", \"name\": \"__init__.py\", \"name_hash\": \"8e2c1f727276d30ced72fa67cb848772a9802162bec39b42a8df5359fd063a4c\", \"original_path\": \"src/graph_fixture_app/__init__.py\", \"parent_path\": \"src/graph_fixture_app\", \"proposed_path\": \"review/project/init.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 25, \"status\": [], \"summary\": \"Recognized source code.\", \"tags\": [\"Code\", \"Project\"], \"title\": \"__init__\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:bb695538ea8ba10a a lib:CodeFile ;
+  lib:id "bb695538ea8ba10a" ;
+  lib:label "utils.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {}, \"functions\": {}, \"module\": \"Utility helpers.\"}, \"entrypoints\": [], \"framework_hints\": [], \"generated_file\": false, \"imports\": {\"external\": [], \"internal\": [], \"standard_library\": [\"json\"]}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"utils\", \"package_name\": \"src.graph_fixture_app.utils\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [], \"functions\": [{\"line_end\": 7, \"line_start\": 6, \"name\": \"normalize\"}, {\"line_end\": 11, \"line_start\": 10, \"name\": \"to_json\"}], \"methods\": []}, \"test_hints\": [], \"vendor_file\": false}, \"content_hash\": \"48141355ffbba2e35bb32ffa74fa444642ac62dc7d431e483d639a1e948039a9\", \"created_at\": \"2026-05-27T08:23:05.154286+00:00\", \"current_path\": \"src/graph_fixture_app/utils.py\", \"depth\": 3, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": false, \"human_description\": \"File src/graph_fixture_app/utils.py classified as Code/Project.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"bb695538ea8ba10a\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:05.154286+00:00\", \"name\": \"utils.py\", \"name_hash\": \"09d0cbaf891d623ac245ccf84485a687b554217349ca55557c60b33234b969ae\", \"original_path\": \"src/graph_fixture_app/utils.py\", \"parent_path\": \"src/graph_fixture_app\", \"proposed_path\": \"review/project/utils.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 189, \"status\": [], \"summary\": \"Recognized source code.\", \"tags\": [\"Code\", \"Project\"], \"title\": \"utils\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:d9656e43f9068e5f a lib:CodeFile ;
+  lib:id "d9656e43f9068e5f" ;
+  lib:label "main.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {\"Greeter\": \"Simple greeting component.\"}, \"functions\": {}, \"module\": \"Application entrypoint for graph fixture.\"}, \"entrypoints\": [\"function:main\", \"guard:if __name__ == \\\"__main__\\\"\"], \"framework_hints\": [], \"generated_file\": false, \"imports\": {\"external\": [], \"internal\": [\"utils\"], \"standard_library\": []}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"main\", \"package_name\": \"src.graph_fixture_app.main\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [{\"line_end\": 10, \"line_start\": 6, \"name\": \"Greeter\"}], \"functions\": [{\"line_end\": 14, \"line_start\": 13, \"name\": \"main\"}, {\"line_end\": 10, \"line_start\": 9, \"name\": \"greet\"}], \"methods\": [{\"line_end\": 10, \"line_start\": 9, \"name\": \"Greeter.greet\"}]}, \"test_hints\": [], \"vendor_file\": false}, \"content_hash\": \"6f4075a1789b949c55f93365419abbae1edb3bd65caf606ddcca5c242b72cb2e\", \"created_at\": \"2026-05-27T08:23:04.756253+00:00\", \"current_path\": \"src/graph_fixture_app/main.py\", \"depth\": 3, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": false, \"human_description\": \"File src/graph_fixture_app/main.py classified as Code/Project.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"d9656e43f9068e5f\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:04.756253+00:00\", \"name\": \"main.py\", \"name_hash\": \"b10564ab7d2c520cdd0243874879fb0a782862c3c902ab535faabe57d5a505e1\", \"original_path\": \"src/graph_fixture_app/main.py\", \"parent_path\": \"src/graph_fixture_app\", \"proposed_path\": \"review/project/main.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 322, \"status\": [], \"summary\": \"Recognized source code.\", \"tags\": [\"Code\", \"Project\"], \"title\": \"main\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:component_docs a lib:Component ;
+  lib:id "component:docs" ;
+  lib:label "docs" ;
+  lib:properties "{\"role\": \"docs\"}" .
+
+node:component_general a lib:Component ;
+  lib:id "component:general" ;
+  lib:label "general" ;
+  lib:properties "{\"role\": \"general\"}" .
+
+node:component_generated a lib:Component ;
+  lib:id "component:generated" ;
+  lib:label "generated" ;
+  lib:properties "{\"role\": \"generated\"}" .
+
+node:component_source a lib:Component ;
+  lib:id "component:source" ;
+  lib:label "source" ;
+  lib:properties "{\"role\": \"source\"}" .
+
+node:component_tests a lib:Component ;
+  lib:id "component:tests" ;
+  lib:label "tests" ;
+  lib:properties "{\"role\": \"tests\"}" .
+
+node:component_vendor a lib:Component ;
+  lib:id "component:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"role\": \"vendor\"}" .
+
+node:90d5d08d3a6b3fd1 a lib:ConfigFile ;
+  lib:id "90d5d08d3a6b3fd1" ;
+  lib:label "pyproject.toml" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": \"39e51fcc377f15324cee081110793c818f096e6f30fc85c2dc59f89b6eae6190\", \"created_at\": \"2026-05-27T08:23:03.297606+00:00\", \"current_path\": \"pyproject.toml\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".toml\", \"file_kind\": \"config\", \"generated_file\": false, \"human_description\": \"File pyproject.toml classified as Configuration/ProjectConfig.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"90d5d08d3a6b3fd1\", \"lock_file\": false, \"mime_type\": \"application/octet-stream\", \"modified_at\": \"2026-05-27T08:23:03.297606+00:00\", \"name\": \"pyproject.toml\", \"name_hash\": \"50c86b7ed8ac2cf95bd48334961bf0530cdc77b5a56f852c5c61b89d735fd711\", \"original_path\": \"pyproject.toml\", \"parent_path\": \".\", \"proposed_path\": \"review/projectconfig/pyproject.toml\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 77, \"status\": [], \"summary\": \"Recognized config file.\", \"tags\": [\"Configuration\", \"ProjectConfig\"], \"title\": \"pyproject\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:current_path_. a lib:CurrentPath ;
+  lib:id "current_path:." ;
+  lib:label "." ;
+  lib:properties "{\"path\": \".\"}" .
+
+node:current_path_README.md a lib:CurrentPath ;
+  lib:id "current_path:README.md" ;
+  lib:label "README.md" ;
+  lib:properties "{\"path\": \"README.md\"}" .
+
+node:current_path_build a lib:CurrentPath ;
+  lib:id "current_path:build" ;
+  lib:label "build" ;
+  lib:properties "{\"path\": \"build\"}" .
+
+node:current_path_build_generated.py a lib:CurrentPath ;
+  lib:id "current_path:build/generated.py" ;
+  lib:label "build/generated.py" ;
+  lib:properties "{\"path\": \"build/generated.py\"}" .
+
+node:current_path_data a lib:CurrentPath ;
+  lib:id "current_path:data" ;
+  lib:label "data" ;
+  lib:properties "{\"path\": \"data\"}" .
+
+node:current_path_data_duplicate_a.txt a lib:CurrentPath ;
+  lib:id "current_path:data/duplicate_a.txt" ;
+  lib:label "data/duplicate_a.txt" ;
+  lib:properties "{\"path\": \"data/duplicate_a.txt\"}" .
+
+node:current_path_data_duplicate_b.txt a lib:CurrentPath ;
+  lib:id "current_path:data/duplicate_b.txt" ;
+  lib:label "data/duplicate_b.txt" ;
+  lib:properties "{\"path\": \"data/duplicate_b.txt\"}" .
+
+node:current_path_docs a lib:CurrentPath ;
+  lib:id "current_path:docs" ;
+  lib:label "docs" ;
+  lib:properties "{\"path\": \"docs\"}" .
+
+node:current_path_docs_overview.md a lib:CurrentPath ;
+  lib:id "current_path:docs/overview.md" ;
+  lib:label "docs/overview.md" ;
+  lib:properties "{\"path\": \"docs/overview.md\"}" .
+
+node:current_path_poetry.lock a lib:CurrentPath ;
+  lib:id "current_path:poetry.lock" ;
+  lib:label "poetry.lock" ;
+  lib:properties "{\"path\": \"poetry.lock\"}" .
+
+node:current_path_pyproject.toml a lib:CurrentPath ;
+  lib:id "current_path:pyproject.toml" ;
+  lib:label "pyproject.toml" ;
+  lib:properties "{\"path\": \"pyproject.toml\"}" .
+
+node:current_path_src a lib:CurrentPath ;
+  lib:id "current_path:src" ;
+  lib:label "src" ;
+  lib:properties "{\"path\": \"src\"}" .
+
+node:current_path_src_graph_fixture_app a lib:CurrentPath ;
+  lib:id "current_path:src/graph_fixture_app" ;
+  lib:label "src/graph_fixture_app" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app\"}" .
+
+node:current_path_src_graph_fixture_app___init__.py a lib:CurrentPath ;
+  lib:id "current_path:src/graph_fixture_app/__init__.py" ;
+  lib:label "src/graph_fixture_app/__init__.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/__init__.py\"}" .
+
+node:current_path_src_graph_fixture_app_main.py a lib:CurrentPath ;
+  lib:id "current_path:src/graph_fixture_app/main.py" ;
+  lib:label "src/graph_fixture_app/main.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/main.py\"}" .
+
+node:current_path_src_graph_fixture_app_utils.py a lib:CurrentPath ;
+  lib:id "current_path:src/graph_fixture_app/utils.py" ;
+  lib:label "src/graph_fixture_app/utils.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/utils.py\"}" .
+
+node:current_path_tests a lib:CurrentPath ;
+  lib:id "current_path:tests" ;
+  lib:label "tests" ;
+  lib:properties "{\"path\": \"tests\"}" .
+
+node:current_path_tests_test_main.py a lib:CurrentPath ;
+  lib:id "current_path:tests/test_main.py" ;
+  lib:label "tests/test_main.py" ;
+  lib:properties "{\"path\": \"tests/test_main.py\"}" .
+
+node:current_path_vendor a lib:CurrentPath ;
+  lib:id "current_path:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"path\": \"vendor\"}" .
+
+node:current_path_vendor_library.py a lib:CurrentPath ;
+  lib:id "current_path:vendor/library.py" ;
+  lib:label "vendor/library.py" ;
+  lib:properties "{\"path\": \"vendor/library.py\"}" .
+
+node:date_2026-05-27 a lib:Date ;
+  lib:id "date:2026-05-27" ;
+  lib:label "2026-05-27" ;
+  lib:properties "{\"value\": \"2026-05-27\"}" .
+
+node:05d33df776ab85ff a lib:Directory ;
+  lib:id "05d33df776ab85ff" ;
+  lib:label "graph_fixture_app" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"src/graph_fixture_app\", \"depth\": 2, \"detected_language\": null, \"developer_notes\": [\"Roles: general\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"general\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"General\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory src/graph_fixture_app analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"05d33df776ab85ff\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"graph_fixture_app\", \"name_hash\": null, \"original_path\": \"src/graph_fixture_app\", \"parent_path\": \"src\", \"proposed_path\": \"src/graph_fixture_app\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"general\"], \"title\": \"graph_fixture_app\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:0b27d7de365e6dfa a lib:Directory ;
+  lib:id "0b27d7de365e6dfa" ;
+  lib:label "src" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"src\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: source\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 1, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"source\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"Source\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory src analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"0b27d7de365e6dfa\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"src\", \"name_hash\": null, \"original_path\": \"src\", \"parent_path\": \".\", \"proposed_path\": \"src\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"source\"], \"title\": \"src\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:1ebc26f279153617 a lib:Directory ;
+  lib:id "1ebc26f279153617" ;
+  lib:label "graph_fixture" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \".\", \"depth\": 0, \"detected_language\": null, \"developer_notes\": [\"Roles: general\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 6, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"general\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"General\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory . analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"1ebc26f279153617\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"graph_fixture\", \"name_hash\": null, \"original_path\": \".\", \"parent_path\": null, \"proposed_path\": \".\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"general\"], \"title\": \"graph_fixture\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:325f20910680c21b a lib:Directory ;
+  lib:id "325f20910680c21b" ;
+  lib:label "build" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"build\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: generated\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"generated\"], \"reason\": \"Generated directory.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": false, \"theme\": \"Generated\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory build analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"325f20910680c21b\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"build\", \"name_hash\": null, \"original_path\": \"build\", \"parent_path\": \".\", \"proposed_path\": \"build\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": null, \"status\": [], \"summary\": \"Generated directory.\", \"tags\": [\"generated\"], \"title\": \"build\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:5df2d1f509df03a8 a lib:Directory ;
+  lib:id "5df2d1f509df03a8" ;
+  lib:label "vendor" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"vendor\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: vendor\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"vendor\"], \"reason\": \"Vendor directory.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": false, \"theme\": \"Vendor\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory vendor analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"5df2d1f509df03a8\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"vendor\", \"name_hash\": null, \"original_path\": \"vendor\", \"parent_path\": \".\", \"proposed_path\": \"vendor\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": null, \"status\": [], \"summary\": \"Vendor directory.\", \"tags\": [\"vendor\"], \"title\": \"vendor\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:69e2c19e4c0eb2ff a lib:Directory ;
+  lib:id "69e2c19e4c0eb2ff" ;
+  lib:label "docs" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"docs\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: docs\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"docs\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"Docs\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory docs analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"69e2c19e4c0eb2ff\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"docs\", \"name_hash\": null, \"original_path\": \"docs\", \"parent_path\": \".\", \"proposed_path\": \"organized/documents/docs\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"docs\"], \"title\": \"docs\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:ed6fb5e73a88929c a lib:Directory ;
+  lib:id "ed6fb5e73a88929c" ;
+  lib:label "data" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"data\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: general\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"general\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"General\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory data analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"ed6fb5e73a88929c\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"data\", \"name_hash\": null, \"original_path\": \"data\", \"parent_path\": \".\", \"proposed_path\": \"docs/documents/data\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"general\"], \"title\": \"data\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:f4fbc015ac0e0132 a lib:Directory ;
+  lib:id "f4fbc015ac0e0132" ;
+  lib:label "tests" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": null, \"created_at\": null, \"current_path\": \"tests\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [\"Roles: tests\"], \"directory_analysis\": {\"direct_file_count\": 0, \"direct_subdirectory_count\": 0, \"dominant_extensions\": [], \"dominant_languages\": [], \"possible_roles\": [\"tests\"], \"reason\": \"Default conservative directory analysis.\", \"recurring_name_tokens\": [], \"should_modify\": false, \"should_reorganize\": true, \"theme\": \"Tests\", \"total_file_count\": 0}, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": null, \"file_kind\": \"unknown\", \"generated_file\": false, \"human_description\": \"Directory tests analyzed for structure and role.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"f4fbc015ac0e0132\", \"lock_file\": false, \"mime_type\": null, \"modified_at\": null, \"name\": \"tests\", \"name_hash\": null, \"original_path\": \"tests\", \"parent_path\": \".\", \"proposed_path\": \"tests\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": null, \"status\": [], \"summary\": \"Default conservative directory analysis.\", \"tags\": [\"tests\"], \"title\": \"tests\", \"type\": \"directory\", \"vendor_file\": false}" .
+
+node:domain_code a lib:Domain ;
+  lib:id "domain:code" ;
+  lib:label "Code" ;
+  lib:properties "{\"domain\": \"Code\"}" .
+
+node:domain_configuration a lib:Domain ;
+  lib:id "domain:configuration" ;
+  lib:label "Configuration" ;
+  lib:properties "{\"domain\": \"Configuration\"}" .
+
+node:domain_documentation a lib:Domain ;
+  lib:id "domain:documentation" ;
+  lib:label "Documentation" ;
+  lib:properties "{\"domain\": \"Documentation\"}" .
+
+node:entrypoint_d9656e43f9068e5f_function_main a lib:Entrypoint ;
+  lib:id "entrypoint:d9656e43f9068e5f:function:main" ;
+  lib:label "function:main" ;
+  lib:properties "{\"entrypoint\": \"function:main\", \"file\": \"src/graph_fixture_app/main.py\"}" .
+
+node:entrypoint_d9656e43f9068e5f_guard_if-__name__-__main__ a lib:Entrypoint ;
+  lib:id "entrypoint:d9656e43f9068e5f:guard:if-__name__-__main__" ;
+  lib:label "guard:if __name__ == \"__main__\"" ;
+  lib:properties "{\"entrypoint\": \"guard:if __name__ == \\\"__main__\\\"\", \"file\": \"src/graph_fixture_app/main.py\"}" .
+
+node:extension_lock a lib:Extension ;
+  lib:id "extension:lock" ;
+  lib:label ".lock" ;
+  lib:properties "{\"extension\": \".lock\"}" .
+
+node:extension_md a lib:Extension ;
+  lib:id "extension:md" ;
+  lib:label ".md" ;
+  lib:properties "{\"extension\": \".md\"}" .
+
+node:extension_py a lib:Extension ;
+  lib:id "extension:py" ;
+  lib:label ".py" ;
+  lib:properties "{\"extension\": \".py\"}" .
+
+node:extension_toml a lib:Extension ;
+  lib:id "extension:toml" ;
+  lib:label ".toml" ;
+  lib:properties "{\"extension\": \".toml\"}" .
+
+node:extension_txt a lib:Extension ;
+  lib:id "extension:txt" ;
+  lib:label ".txt" ;
+  lib:properties "{\"extension\": \".txt\"}" .
+
+node:42c59af8a4bae559 a lib:File ;
+  lib:id "42c59af8a4bae559" ;
+  lib:label "README.md" ;
+  lib:properties "{\"classification\": {\"category\": \"Documents\", \"confidence\": 0.7, \"domain\": \"Documentation\", \"reason\": \"Recognized document type.\"}, \"code_metadata\": null, \"content_hash\": \"38a94cad870803adda6973829baeec16c0c2d0ffcf56afca2155d6c52246afca\", \"created_at\": \"2026-05-27T08:23:03.718608+00:00\", \"current_path\": \"README.md\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".md\", \"file_kind\": \"document\", \"generated_file\": false, \"human_description\": \"File README.md classified as Documentation/Documents.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"42c59af8a4bae559\", \"lock_file\": false, \"mime_type\": \"text/markdown\", \"modified_at\": \"2026-05-27T08:23:03.718608+00:00\", \"name\": \"README.md\", \"name_hash\": \"b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5\", \"original_path\": \"README.md\", \"parent_path\": \".\", \"proposed_path\": \"docs/documents/readme.md\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": 76, \"status\": [], \"summary\": \"Recognized document type.\", \"tags\": [\"Documentation\", \"Documents\"], \"title\": \"README\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:6afa18c42ded2eac a lib:File ;
+  lib:id "6afa18c42ded2eac" ;
+  lib:label "overview.md" ;
+  lib:properties "{\"classification\": {\"category\": \"Documents\", \"confidence\": 0.7, \"domain\": \"Documentation\", \"reason\": \"Recognized document type.\"}, \"code_metadata\": null, \"content_hash\": \"eb16660bf30c09a2b3826c48b771eba2358514557761a778319a7d94f81decc0\", \"created_at\": \"2026-05-27T08:23:06.465827+00:00\", \"current_path\": \"docs/overview.md\", \"depth\": 2, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [\"2026-05-27\"], \"organizations\": [\"OpenAI\"], \"people\": [], \"places\": [\"Rome\"]}, \"errors\": [], \"extension\": \".md\", \"file_kind\": \"document\", \"generated_file\": false, \"human_description\": \"File docs/overview.md classified as Documentation/Documents.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"6afa18c42ded2eac\", \"lock_file\": false, \"mime_type\": \"text/markdown\", \"modified_at\": \"2026-05-27T08:23:06.481454+00:00\", \"name\": \"overview.md\", \"name_hash\": \"7a7987404e86a043b133f56a86fd282421f207557d254dc43ac4bb0bae8e7915\", \"original_path\": \"docs/overview.md\", \"parent_path\": \"docs\", \"proposed_path\": \"organized/documents/docs/overview.md\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": 99, \"status\": [], \"summary\": \"Recognized document type.\", \"tags\": [\"Documentation\", \"Documents\"], \"title\": \"overview\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:6ed4ab48d02451d6 a lib:File ;
+  lib:id "6ed4ab48d02451d6" ;
+  lib:label "duplicate_b.txt" ;
+  lib:properties "{\"classification\": {\"category\": \"Documents\", \"confidence\": 0.7, \"domain\": \"Documentation\", \"reason\": \"Recognized document type.\"}, \"code_metadata\": null, \"content_hash\": \"205d0c35c0fb8f0f032e773a23e321ab7eb51b47d2b0dd8de086b60eb24f9661\", \"created_at\": \"2026-05-27T08:23:07.517098+00:00\", \"current_path\": \"data/duplicate_b.txt\", \"depth\": 2, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".txt\", \"file_kind\": \"document\", \"generated_file\": false, \"human_description\": \"File data/duplicate_b.txt classified as Documentation/Documents.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"6ed4ab48d02451d6\", \"lock_file\": false, \"mime_type\": \"text/plain\", \"modified_at\": \"2026-05-27T08:23:07.517098+00:00\", \"name\": \"duplicate_b.txt\", \"name_hash\": \"0f3cb63ac51a467a044765dc9528fd65da895558b3ec791cbe9de7ef884c7635\", \"original_path\": \"data/duplicate_b.txt\", \"parent_path\": \"data\", \"proposed_path\": \"docs/documents/data/duplicate_b.txt\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": 23, \"status\": [], \"summary\": \"Recognized document type.\", \"tags\": [\"Documentation\", \"Documents\"], \"title\": \"duplicate_b\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:a409cae4453813f9 a lib:File ;
+  lib:id "a409cae4453813f9" ;
+  lib:label "duplicate_a.txt" ;
+  lib:properties "{\"classification\": {\"category\": \"Documents\", \"confidence\": 0.7, \"domain\": \"Documentation\", \"reason\": \"Recognized document type.\"}, \"code_metadata\": null, \"content_hash\": \"205d0c35c0fb8f0f032e773a23e321ab7eb51b47d2b0dd8de086b60eb24f9661\", \"created_at\": \"2026-05-27T08:23:07.107351+00:00\", \"current_path\": \"data/duplicate_a.txt\", \"depth\": 2, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".txt\", \"file_kind\": \"document\", \"generated_file\": false, \"human_description\": \"File data/duplicate_a.txt classified as Documentation/Documents.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"a409cae4453813f9\", \"lock_file\": false, \"mime_type\": \"text/plain\", \"modified_at\": \"2026-05-27T08:23:07.107351+00:00\", \"name\": \"duplicate_a.txt\", \"name_hash\": \"c78247ca592b3065b57ebb78d3be8702aefb07215a9faf29bbc07b3239fd37a6\", \"original_path\": \"data/duplicate_a.txt\", \"parent_path\": \"data\", \"proposed_path\": \"docs/documents/data/duplicate_a.txt\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"low\", \"should_modify\": false, \"should_move\": true, \"size_bytes\": 23, \"status\": [], \"summary\": \"Recognized document type.\", \"tags\": [\"Documentation\", \"Documents\"], \"title\": \"duplicate_a\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:function_2bbf49ed22545db1_vendored a lib:Function ;
+  lib:id "function:2bbf49ed22545db1:vendored" ;
+  lib:label "vendored" ;
+  lib:properties "{\"file\": \"vendor/library.py\", \"line_end\": 2, \"line_start\": 1, \"name\": \"vendored\"}" .
+
+node:function_39f531939c26c939_test_main a lib:Function ;
+  lib:id "function:39f531939c26c939:test_main" ;
+  lib:label "test_main" ;
+  lib:properties "{\"file\": \"tests/test_main.py\", \"line_end\": 5, \"line_start\": 4, \"name\": \"test_main\"}" .
+
+node:function_76e98e6cca982c82_generated a lib:Function ;
+  lib:id "function:76e98e6cca982c82:generated" ;
+  lib:label "generated" ;
+  lib:properties "{\"file\": \"build/generated.py\", \"line_end\": 2, \"line_start\": 1, \"name\": \"generated\"}" .
+
+node:function_bb695538ea8ba10a_normalize a lib:Function ;
+  lib:id "function:bb695538ea8ba10a:normalize" ;
+  lib:label "normalize" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/utils.py\", \"line_end\": 7, \"line_start\": 6, \"name\": \"normalize\"}" .
+
+node:function_bb695538ea8ba10a_to_json a lib:Function ;
+  lib:id "function:bb695538ea8ba10a:to_json" ;
+  lib:label "to_json" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/utils.py\", \"line_end\": 11, \"line_start\": 10, \"name\": \"to_json\"}" .
+
+node:function_d9656e43f9068e5f_greet a lib:Function ;
+  lib:id "function:d9656e43f9068e5f:greet" ;
+  lib:label "greet" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/main.py\", \"line_end\": 10, \"line_start\": 9, \"name\": \"greet\"}" .
+
+node:function_d9656e43f9068e5f_main a lib:Function ;
+  lib:id "function:d9656e43f9068e5f:main" ;
+  lib:label "main" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/main.py\", \"line_end\": 14, \"line_start\": 13, \"name\": \"main\"}" .
+
+node:76e98e6cca982c82 a lib:GeneratedFile ;
+  lib:id "76e98e6cca982c82" ;
+  lib:label "generated.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {}, \"functions\": {}, \"module\": null}, \"entrypoints\": [], \"framework_hints\": [], \"generated_file\": true, \"imports\": {\"external\": [], \"internal\": [], \"standard_library\": []}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"generated\", \"package_name\": \"build.generated\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"medium\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [], \"functions\": [{\"line_end\": 2, \"line_start\": 1, \"name\": \"generated\"}], \"methods\": []}, \"test_hints\": [], \"vendor_file\": false}, \"content_hash\": \"3fd613419ccb7bb9c9e918e3b74d293e83fcb1377c6e6e1937941dcd2bc4fd8d\", \"created_at\": \"2026-05-27T08:23:08.140469+00:00\", \"current_path\": \"build/generated.py\", \"depth\": 2, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": true, \"human_description\": \"File build/generated.py classified as Code/Project.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"76e98e6cca982c82\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:08.140469+00:00\", \"name\": \"generated.py\", \"name_hash\": \"a8c94365ad9a8afbddabe5a5c0fd874600dee4288b87513deab178237832c506\", \"original_path\": \"build/generated.py\", \"parent_path\": \"build\", \"proposed_path\": \"review/project/generated.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"medium\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 47, \"status\": [], \"summary\": \"Recognized source code.\", \"tags\": [\"Code\", \"Project\"], \"title\": \"generated\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:artifact_graph a lib:Graph ;
+  lib:id "artifact:graph" ;
+  lib:label "graph.json" ;
+  lib:properties "{\"path\": \".librarian/graph.json\"}" .
+
+node:import_json a lib:Import ;
+  lib:id "import:json" ;
+  lib:label "json" ;
+  lib:properties "{\"kind\": \"standard_library\", \"module\": \"json\"}" .
+
+node:41412bcc86bd18f3 a lib:LockFile ;
+  lib:id "41412bcc86bd18f3" ;
+  lib:label "poetry.lock" ;
+  lib:properties "{\"classification\": {\"category\": \"ProjectConfig\", \"confidence\": 0.85, \"domain\": \"Configuration\", \"reason\": \"Recognized config file.\"}, \"code_metadata\": null, \"content_hash\": \"1f92ef7e33a2ac29f43fe27b389eeed9dd0e585ee200c9754d1c96ca06dbe926\", \"created_at\": \"2026-05-27T08:23:09.158912+00:00\", \"current_path\": \"poetry.lock\", \"depth\": 1, \"detected_language\": null, \"developer_notes\": [], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".lock\", \"file_kind\": \"config\", \"generated_file\": false, \"human_description\": \"File poetry.lock classified as Configuration/ProjectConfig.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"41412bcc86bd18f3\", \"lock_file\": true, \"mime_type\": \"application/octet-stream\", \"modified_at\": \"2026-05-27T08:23:09.158912+00:00\", \"name\": \"poetry.lock\", \"name_hash\": \"f53a023eedfa3fbf2925ec7dc76eecdc954ea94b7e47065393dbad519613dc89\", \"original_path\": \"poetry.lock\", \"parent_path\": \".\", \"proposed_path\": \"review/projectconfig/poetry.lock\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"high\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 15, \"status\": [], \"summary\": \"Recognized config file.\", \"tags\": [\"Configuration\", \"ProjectConfig\"], \"title\": \"poetry\", \"type\": \"file\", \"vendor_file\": false}" .
+
+node:mime_application-octet-stream a lib:MIMEType ;
+  lib:id "mime:application-octet-stream" ;
+  lib:label "application/octet-stream" ;
+  lib:properties "{\"mime_type\": \"application/octet-stream\"}" .
+
+node:mime_text-markdown a lib:MIMEType ;
+  lib:id "mime:text-markdown" ;
+  lib:label "text/markdown" ;
+  lib:properties "{\"mime_type\": \"text/markdown\"}" .
+
+node:mime_text-plain a lib:MIMEType ;
+  lib:id "mime:text-plain" ;
+  lib:label "text/plain" ;
+  lib:properties "{\"mime_type\": \"text/plain\"}" .
+
+node:mime_text-x-python a lib:MIMEType ;
+  lib:id "mime:text-x-python" ;
+  lib:label "text/x-python" ;
+  lib:properties "{\"mime_type\": \"text/x-python\"}" .
+
+node:artifact_manifest a lib:Manifest ;
+  lib:id "artifact:manifest" ;
+  lib:label "manifest.json" ;
+  lib:properties "{\"path\": \".librarian/manifest.json\"}" .
+
+node:note_.librarian_README.librarian.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/README.librarian.md" ;
+  lib:label "README.librarian.md" ;
+  lib:properties "{\"path\": \".librarian/README.librarian.md\"}" .
+
+node:note_.librarian_notes_code.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/code.md" ;
+  lib:label "code.md" ;
+  lib:properties "{\"path\": \".librarian/notes/code.md\"}" .
+
+node:note_.librarian_notes_directories.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/directories.md" ;
+  lib:label "directories.md" ;
+  lib:properties "{\"path\": \".librarian/notes/directories.md\"}" .
+
+node:note_.librarian_notes_entrypoints.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/entrypoints.md" ;
+  lib:label "entrypoints.md" ;
+  lib:properties "{\"path\": \".librarian/notes/entrypoints.md\"}" .
+
+node:note_.librarian_notes_files.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/files.md" ;
+  lib:label "files.md" ;
+  lib:properties "{\"path\": \".librarian/notes/files.md\"}" .
+
+node:note_.librarian_notes_index.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/index.md" ;
+  lib:label "index.md" ;
+  lib:properties "{\"path\": \".librarian/notes/index.md\"}" .
+
+node:note_.librarian_notes_risks.md a lib:MarkdownNote ;
+  lib:id "note:.librarian/notes/risks.md" ;
+  lib:label "risks.md" ;
+  lib:properties "{\"path\": \".librarian/notes/risks.md\"}" .
+
+node:method_d9656e43f9068e5f_Greeter.greet a lib:Method ;
+  lib:id "method:d9656e43f9068e5f:Greeter.greet" ;
+  lib:label "Greeter.greet" ;
+  lib:properties "{\"file\": \"src/graph_fixture_app/main.py\", \"line_end\": 10, \"line_start\": 9, \"name\": \"Greeter.greet\"}" .
+
+node:module_build.generated a lib:Module ;
+  lib:id "module:build.generated" ;
+  lib:label "build.generated" ;
+  lib:properties "{\"module_name\": \"generated\", \"package_name\": \"build.generated\"}" .
+
+node:module_src.graph_fixture_app.__init__ a lib:Module ;
+  lib:id "module:src.graph_fixture_app.__init__" ;
+  lib:label "src.graph_fixture_app.__init__" ;
+  lib:properties "{\"module_name\": \"__init__\", \"package_name\": \"src.graph_fixture_app.__init__\"}" .
+
+node:module_src.graph_fixture_app.main a lib:Module ;
+  lib:id "module:src.graph_fixture_app.main" ;
+  lib:label "src.graph_fixture_app.main" ;
+  lib:properties "{\"kind\": \"internal\", \"module\": \"src.graph_fixture_app.main\"}" .
+
+node:module_src.graph_fixture_app.utils a lib:Module ;
+  lib:id "module:src.graph_fixture_app.utils" ;
+  lib:label "src.graph_fixture_app.utils" ;
+  lib:properties "{\"module_name\": \"utils\", \"package_name\": \"src.graph_fixture_app.utils\"}" .
+
+node:module_tests.test_main a lib:Module ;
+  lib:id "module:tests.test_main" ;
+  lib:label "tests.test_main" ;
+  lib:properties "{\"module_name\": \"test_main\", \"package_name\": \"tests.test_main\"}" .
+
+node:module_vendor.library a lib:Module ;
+  lib:id "module:vendor.library" ;
+  lib:label "vendor.library" ;
+  lib:properties "{\"module_name\": \"library\", \"package_name\": \"vendor.library\"}" .
+
+node:organization_openai a lib:Organization ;
+  lib:id "organization:openai" ;
+  lib:label "OpenAI" ;
+  lib:properties "{\"value\": \"OpenAI\"}" .
+
+node:original_path_. a lib:OriginalPath ;
+  lib:id "original_path:." ;
+  lib:label "." ;
+  lib:properties "{\"path\": \".\"}" .
+
+node:original_path_README.md a lib:OriginalPath ;
+  lib:id "original_path:README.md" ;
+  lib:label "README.md" ;
+  lib:properties "{\"path\": \"README.md\"}" .
+
+node:original_path_build a lib:OriginalPath ;
+  lib:id "original_path:build" ;
+  lib:label "build" ;
+  lib:properties "{\"path\": \"build\"}" .
+
+node:original_path_build_generated.py a lib:OriginalPath ;
+  lib:id "original_path:build/generated.py" ;
+  lib:label "build/generated.py" ;
+  lib:properties "{\"path\": \"build/generated.py\"}" .
+
+node:original_path_data a lib:OriginalPath ;
+  lib:id "original_path:data" ;
+  lib:label "data" ;
+  lib:properties "{\"path\": \"data\"}" .
+
+node:original_path_data_duplicate_a.txt a lib:OriginalPath ;
+  lib:id "original_path:data/duplicate_a.txt" ;
+  lib:label "data/duplicate_a.txt" ;
+  lib:properties "{\"path\": \"data/duplicate_a.txt\"}" .
+
+node:original_path_data_duplicate_b.txt a lib:OriginalPath ;
+  lib:id "original_path:data/duplicate_b.txt" ;
+  lib:label "data/duplicate_b.txt" ;
+  lib:properties "{\"path\": \"data/duplicate_b.txt\"}" .
+
+node:original_path_docs a lib:OriginalPath ;
+  lib:id "original_path:docs" ;
+  lib:label "docs" ;
+  lib:properties "{\"path\": \"docs\"}" .
+
+node:original_path_docs_overview.md a lib:OriginalPath ;
+  lib:id "original_path:docs/overview.md" ;
+  lib:label "docs/overview.md" ;
+  lib:properties "{\"path\": \"docs/overview.md\"}" .
+
+node:original_path_poetry.lock a lib:OriginalPath ;
+  lib:id "original_path:poetry.lock" ;
+  lib:label "poetry.lock" ;
+  lib:properties "{\"path\": \"poetry.lock\"}" .
+
+node:original_path_pyproject.toml a lib:OriginalPath ;
+  lib:id "original_path:pyproject.toml" ;
+  lib:label "pyproject.toml" ;
+  lib:properties "{\"path\": \"pyproject.toml\"}" .
+
+node:original_path_src a lib:OriginalPath ;
+  lib:id "original_path:src" ;
+  lib:label "src" ;
+  lib:properties "{\"path\": \"src\"}" .
+
+node:original_path_src_graph_fixture_app a lib:OriginalPath ;
+  lib:id "original_path:src/graph_fixture_app" ;
+  lib:label "src/graph_fixture_app" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app\"}" .
+
+node:original_path_src_graph_fixture_app___init__.py a lib:OriginalPath ;
+  lib:id "original_path:src/graph_fixture_app/__init__.py" ;
+  lib:label "src/graph_fixture_app/__init__.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/__init__.py\"}" .
+
+node:original_path_src_graph_fixture_app_main.py a lib:OriginalPath ;
+  lib:id "original_path:src/graph_fixture_app/main.py" ;
+  lib:label "src/graph_fixture_app/main.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/main.py\"}" .
+
+node:original_path_src_graph_fixture_app_utils.py a lib:OriginalPath ;
+  lib:id "original_path:src/graph_fixture_app/utils.py" ;
+  lib:label "src/graph_fixture_app/utils.py" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app/utils.py\"}" .
+
+node:original_path_tests a lib:OriginalPath ;
+  lib:id "original_path:tests" ;
+  lib:label "tests" ;
+  lib:properties "{\"path\": \"tests\"}" .
+
+node:original_path_tests_test_main.py a lib:OriginalPath ;
+  lib:id "original_path:tests/test_main.py" ;
+  lib:label "tests/test_main.py" ;
+  lib:properties "{\"path\": \"tests/test_main.py\"}" .
+
+node:original_path_vendor a lib:OriginalPath ;
+  lib:id "original_path:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"path\": \"vendor\"}" .
+
+node:original_path_vendor_library.py a lib:OriginalPath ;
+  lib:id "original_path:vendor/library.py" ;
+  lib:label "vendor/library.py" ;
+  lib:properties "{\"path\": \"vendor/library.py\"}" .
+
+node:package_build a lib:Package ;
+  lib:id "package:build" ;
+  lib:label "build" ;
+  lib:properties "{\"package_name\": \"build\"}" .
+
+node:package_src.graph_fixture_app a lib:Package ;
+  lib:id "package:src.graph_fixture_app" ;
+  lib:label "src.graph_fixture_app" ;
+  lib:properties "{\"package_name\": \"src.graph_fixture_app\"}" .
+
+node:package_tests a lib:Package ;
+  lib:id "package:tests" ;
+  lib:label "tests" ;
+  lib:properties "{\"package_name\": \"tests\"}" .
+
+node:package_vendor a lib:Package ;
+  lib:id "package:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"package_name\": \"vendor\"}" .
+
+node:place_rome a lib:Place ;
+  lib:id "place:rome" ;
+  lib:label "Rome" ;
+  lib:properties "{\"value\": \"Rome\"}" .
+
+node:project_workspace a lib:Project ;
+  lib:id "project:workspace" ;
+  lib:label "graph_fixture" ;
+  lib:properties "{\"workspace_root\": \"C:\\\\Users\\\\batti\\\\Documents\\\\Codex\\\\2026-05-27\\\\apri-la-repository-antonioincalza09-ux-thelibrarian\\\\examples\\\\graph_fixture\"}" .
+
+node:prompt_pack_default a lib:PromptPack ;
+  lib:id "prompt_pack:default" ;
+  lib:label "default prompt pack" ;
+  lib:properties "{\"purpose\": \"agent navigation prompts and runbooks\"}" .
+
+node:proposed_path_. a lib:ProposedPath ;
+  lib:id "proposed_path:." ;
+  lib:label "." ;
+  lib:properties "{\"path\": \".\"}" .
+
+node:proposed_path_build a lib:ProposedPath ;
+  lib:id "proposed_path:build" ;
+  lib:label "build" ;
+  lib:properties "{\"path\": \"build\"}" .
+
+node:proposed_path_docs_documents_data a lib:ProposedPath ;
+  lib:id "proposed_path:docs/documents/data" ;
+  lib:label "docs/documents/data" ;
+  lib:properties "{\"path\": \"docs/documents/data\"}" .
+
+node:proposed_path_docs_documents_data_duplicate_a.txt a lib:ProposedPath ;
+  lib:id "proposed_path:docs/documents/data/duplicate_a.txt" ;
+  lib:label "docs/documents/data/duplicate_a.txt" ;
+  lib:properties "{\"path\": \"docs/documents/data/duplicate_a.txt\"}" .
+
+node:proposed_path_docs_documents_data_duplicate_b.txt a lib:ProposedPath ;
+  lib:id "proposed_path:docs/documents/data/duplicate_b.txt" ;
+  lib:label "docs/documents/data/duplicate_b.txt" ;
+  lib:properties "{\"path\": \"docs/documents/data/duplicate_b.txt\"}" .
+
+node:proposed_path_docs_documents_readme.md a lib:ProposedPath ;
+  lib:id "proposed_path:docs/documents/readme.md" ;
+  lib:label "docs/documents/readme.md" ;
+  lib:properties "{\"path\": \"docs/documents/readme.md\"}" .
+
+node:proposed_path_organized_documents_docs a lib:ProposedPath ;
+  lib:id "proposed_path:organized/documents/docs" ;
+  lib:label "organized/documents/docs" ;
+  lib:properties "{\"path\": \"organized/documents/docs\"}" .
+
+node:proposed_path_organized_documents_docs_overview.md a lib:ProposedPath ;
+  lib:id "proposed_path:organized/documents/docs/overview.md" ;
+  lib:label "organized/documents/docs/overview.md" ;
+  lib:properties "{\"path\": \"organized/documents/docs/overview.md\"}" .
+
+node:proposed_path_review_project_generated.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/project/generated.py" ;
+  lib:label "review/project/generated.py" ;
+  lib:properties "{\"path\": \"review/project/generated.py\"}" .
+
+node:proposed_path_review_project_init.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/project/init.py" ;
+  lib:label "review/project/init.py" ;
+  lib:properties "{\"path\": \"review/project/init.py\"}" .
+
+node:proposed_path_review_project_library.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/project/library.py" ;
+  lib:label "review/project/library.py" ;
+  lib:properties "{\"path\": \"review/project/library.py\"}" .
+
+node:proposed_path_review_project_main.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/project/main.py" ;
+  lib:label "review/project/main.py" ;
+  lib:properties "{\"path\": \"review/project/main.py\"}" .
+
+node:proposed_path_review_project_utils.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/project/utils.py" ;
+  lib:label "review/project/utils.py" ;
+  lib:properties "{\"path\": \"review/project/utils.py\"}" .
+
+node:proposed_path_review_projectconfig_poetry.lock a lib:ProposedPath ;
+  lib:id "proposed_path:review/projectconfig/poetry.lock" ;
+  lib:label "review/projectconfig/poetry.lock" ;
+  lib:properties "{\"path\": \"review/projectconfig/poetry.lock\"}" .
+
+node:proposed_path_review_projectconfig_pyproject.toml a lib:ProposedPath ;
+  lib:id "proposed_path:review/projectconfig/pyproject.toml" ;
+  lib:label "review/projectconfig/pyproject.toml" ;
+  lib:properties "{\"path\": \"review/projectconfig/pyproject.toml\"}" .
+
+node:proposed_path_review_tests_test-main.py a lib:ProposedPath ;
+  lib:id "proposed_path:review/tests/test-main.py" ;
+  lib:label "review/tests/test-main.py" ;
+  lib:properties "{\"path\": \"review/tests/test-main.py\"}" .
+
+node:proposed_path_src a lib:ProposedPath ;
+  lib:id "proposed_path:src" ;
+  lib:label "src" ;
+  lib:properties "{\"path\": \"src\"}" .
+
+node:proposed_path_src_graph_fixture_app a lib:ProposedPath ;
+  lib:id "proposed_path:src/graph_fixture_app" ;
+  lib:label "src/graph_fixture_app" ;
+  lib:properties "{\"path\": \"src/graph_fixture_app\"}" .
+
+node:proposed_path_tests a lib:ProposedPath ;
+  lib:id "proposed_path:tests" ;
+  lib:label "tests" ;
+  lib:properties "{\"path\": \"tests\"}" .
+
+node:proposed_path_vendor a lib:ProposedPath ;
+  lib:id "proposed_path:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"path\": \"vendor\"}" .
+
+node:risk_high a lib:Risk ;
+  lib:id "risk:high" ;
+  lib:label "high risk" ;
+  lib:properties "{\"risk_level\": \"high\"}" .
+
+node:risk_medium a lib:Risk ;
+  lib:id "risk:medium" ;
+  lib:label "medium risk" ;
+  lib:properties "{\"risk_level\": \"medium\"}" .
+
+node:risk_should-not-modify a lib:Risk ;
+  lib:id "risk:should-not-modify" ;
+  lib:label "should not modify" ;
+  lib:properties "{\"policy\": \"read-only unless explicitly requested\"}" .
+
+node:runbook_.librarian_runbooks_agent_start_here.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/agent_start_here.md" ;
+  lib:label "agent_start_here.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/agent_start_here.md\"}" .
+
+node:runbook_.librarian_runbooks_developer_start_here.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/developer_start_here.md" ;
+  lib:label "developer_start_here.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/developer_start_here.md\"}" .
+
+node:runbook_.librarian_runbooks_how_to_extend_classifiers.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/how_to_extend_classifiers.md" ;
+  lib:label "how_to_extend_classifiers.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/how_to_extend_classifiers.md\"}" .
+
+node:runbook_.librarian_runbooks_how_to_inspect.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/how_to_inspect.md" ;
+  lib:label "how_to_inspect.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/how_to_inspect.md\"}" .
+
+node:runbook_.librarian_runbooks_how_to_query_graph.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/how_to_query_graph.md" ;
+  lib:label "how_to_query_graph.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/how_to_query_graph.md\"}" .
+
+node:runbook_.librarian_runbooks_how_to_run_python_tools.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/how_to_run_python_tools.md" ;
+  lib:label "how_to_run_python_tools.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/how_to_run_python_tools.md\"}" .
+
+node:runbook_.librarian_runbooks_how_to_use_runnable_scripts.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/how_to_use_runnable_scripts.md" ;
+  lib:label "how_to_use_runnable_scripts.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/how_to_use_runnable_scripts.md\"}" .
+
+node:runbook_.librarian_runbooks_index.md a lib:Runbook ;
+  lib:id "runbook:.librarian/runbooks/index.md" ;
+  lib:label "index.md" ;
+  lib:properties "{\"path\": \".librarian/runbooks/index.md\"}" .
+
+node:script_.librarian_graph_scripts_query_dependencies.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_dependencies.py" ;
+  lib:label "query_dependencies.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_dependencies.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_entrypoints.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_entrypoints.py" ;
+  lib:label "query_entrypoints.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_entrypoints.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_files_by_tag.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_files_by_tag.py" ;
+  lib:label "query_files_by_tag.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_files_by_tag.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_graph_summary.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_graph_summary.py" ;
+  lib:label "query_graph_summary.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_graph_summary.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_orphans.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_orphans.py" ;
+  lib:label "query_orphans.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_orphans.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_risks.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_risks.py" ;
+  lib:label "query_risks.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_risks.py\", \"read_only\": true}" .
+
+node:script_.librarian_graph_scripts_query_tests.py a lib:RunnableScript ;
+  lib:id "script:.librarian/graph_scripts/query_tests.py" ;
+  lib:label "query_tests.py" ;
+  lib:properties "{\"path\": \".librarian/graph_scripts/query_tests.py\", \"read_only\": true}" .
+
+node:script_.librarian_scripts_find_entrypoints.py a lib:RunnableScript ;
+  lib:id "script:.librarian/scripts/find_entrypoints.py" ;
+  lib:label "find_entrypoints.py" ;
+  lib:properties "{\"path\": \".librarian/scripts/find_entrypoints.py\", \"read_only\": true}" .
+
+node:script_.librarian_scripts_find_unmarked.py a lib:RunnableScript ;
+  lib:id "script:.librarian/scripts/find_unmarked.py" ;
+  lib:label "find_unmarked.py" ;
+  lib:properties "{\"path\": \".librarian/scripts/find_unmarked.py\", \"read_only\": true}" .
+
+node:script_.librarian_scripts_inspect_workspace.py a lib:RunnableScript ;
+  lib:id "script:.librarian/scripts/inspect_workspace.py" ;
+  lib:label "inspect_workspace.py" ;
+  lib:properties "{\"path\": \".librarian/scripts/inspect_workspace.py\", \"read_only\": true}" .
+
+node:script_.librarian_scripts_print_manifest_summary.py a lib:RunnableScript ;
+  lib:id "script:.librarian/scripts/print_manifest_summary.py" ;
+  lib:label "print_manifest_summary.py" ;
+  lib:properties "{\"path\": \".librarian/scripts/print_manifest_summary.py\", \"read_only\": true}" .
+
+node:artifact_sidecars a lib:SidecarCollection ;
+  lib:id "artifact:sidecars" ;
+  lib:label "sidecars" ;
+  lib:properties "{\"pattern\": \"*.librarian.yaml\"}" .
+
+node:tag_code a lib:Tag ;
+  lib:id "tag:code" ;
+  lib:label "Code" ;
+  lib:properties "{\"value\": \"Code\"}" .
+
+node:tag_configuration a lib:Tag ;
+  lib:id "tag:configuration" ;
+  lib:label "Configuration" ;
+  lib:properties "{\"value\": \"Configuration\"}" .
+
+node:tag_docs a lib:Tag ;
+  lib:id "tag:docs" ;
+  lib:label "docs" ;
+  lib:properties "{\"value\": \"docs\"}" .
+
+node:tag_documentation a lib:Tag ;
+  lib:id "tag:documentation" ;
+  lib:label "Documentation" ;
+  lib:properties "{\"value\": \"Documentation\"}" .
+
+node:tag_documents a lib:Tag ;
+  lib:id "tag:documents" ;
+  lib:label "Documents" ;
+  lib:properties "{\"value\": \"Documents\"}" .
+
+node:tag_general a lib:Tag ;
+  lib:id "tag:general" ;
+  lib:label "general" ;
+  lib:properties "{\"value\": \"general\"}" .
+
+node:tag_generated a lib:Tag ;
+  lib:id "tag:generated" ;
+  lib:label "generated" ;
+  lib:properties "{\"value\": \"generated\"}" .
+
+node:tag_project a lib:Tag ;
+  lib:id "tag:project" ;
+  lib:label "Project" ;
+  lib:properties "{\"value\": \"Project\"}" .
+
+node:tag_projectconfig a lib:Tag ;
+  lib:id "tag:projectconfig" ;
+  lib:label "ProjectConfig" ;
+  lib:properties "{\"value\": \"ProjectConfig\"}" .
+
+node:tag_source a lib:Tag ;
+  lib:id "tag:source" ;
+  lib:label "source" ;
+  lib:properties "{\"value\": \"source\"}" .
+
+node:tag_tests a lib:Tag ;
+  lib:id "tag:tests" ;
+  lib:label "Tests" ;
+  lib:properties "{\"value\": \"Tests\"}" .
+
+node:tag_vendor a lib:Tag ;
+  lib:id "tag:vendor" ;
+  lib:label "vendor" ;
+  lib:properties "{\"value\": \"vendor\"}" .
+
+node:test_39f531939c26c939 a lib:Test ;
+  lib:id "test:39f531939c26c939" ;
+  lib:label "tests/test_main.py" ;
+  lib:properties "{\"file\": \"tests/test_main.py\", \"test_hints\": [\"test_main\"]}" .
+
+node:2bbf49ed22545db1 a lib:VendorFile ;
+  lib:id "2bbf49ed22545db1" ;
+  lib:label "library.py" ;
+  lib:properties "{\"classification\": {\"category\": \"Project\", \"confidence\": 0.9, \"domain\": \"Code\", \"reason\": \"Recognized source code.\"}, \"code_metadata\": {\"config_hints\": [], \"docstrings\": {\"classes\": {}, \"functions\": {}, \"module\": null}, \"entrypoints\": [], \"framework_hints\": [], \"generated_file\": false, \"imports\": {\"external\": [], \"internal\": [], \"standard_library\": []}, \"language\": \"Python\", \"lock_file\": false, \"module_name\": \"library\", \"package_name\": \"vendor.library\", \"reason\": \"Python AST analysis completed.\", \"risk_level\": \"high\", \"should_modify\": false, \"should_move\": false, \"symbols\": {\"classes\": [], \"functions\": [{\"line_end\": 2, \"line_start\": 1, \"name\": \"vendored\"}], \"methods\": []}, \"test_hints\": [], \"vendor_file\": true}, \"content_hash\": \"901e4a2b807319d69a6918d6f9760789892936950cf95922a7837c80c118ec06\", \"created_at\": \"2026-05-27T08:23:08.784212+00:00\", \"current_path\": \"vendor/library.py\", \"depth\": 2, \"detected_language\": \"Python\", \"developer_notes\": [\"Python AST analysis completed.\"], \"directory_analysis\": null, \"entities\": {\"dates\": [], \"organizations\": [], \"people\": [], \"places\": []}, \"errors\": [], \"extension\": \".py\", \"file_kind\": \"source_code\", \"generated_file\": false, \"human_description\": \"File vendor/library.py classified as Code/Project.\", \"indexed_at\": \"2026-05-27T08:25:28.874736+00:00\", \"librarian_id\": \"2bbf49ed22545db1\", \"lock_file\": false, \"mime_type\": \"text/x-python\", \"modified_at\": \"2026-05-27T08:23:08.784212+00:00\", \"name\": \"library.py\", \"name_hash\": \"28a6639936adbe82d553956fda9862c21d26e9ea1a4463e376c3777a4229ab48\", \"original_path\": \"vendor/library.py\", \"parent_path\": \"vendor\", \"proposed_path\": \"review/project/library.py\", \"read_error\": null, \"readable\": true, \"relations\": [], \"risk_level\": \"high\", \"should_modify\": false, \"should_move\": false, \"size_bytes\": 43, \"status\": [], \"summary\": \"Recognized source code.\", \"tags\": [\"Code\", \"Project\"], \"title\": \"library\", \"type\": \"file\", \"vendor_file\": true}" .
+
+node:workspace a lib:Workspace ;
+  lib:id "workspace" ;
+  lib:label "graph_fixture" ;
+  lib:properties "{\"path\": \"C:\\\\Users\\\\batti\\\\Documents\\\\Codex\\\\2026-05-27\\\\apri-la-repository-antonioincalza09-ux-thelibrarian\\\\examples\\\\graph_fixture\"}" .
+
+node:edge_0 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:0b27d7de365e6dfa ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_1 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_2 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:42c59af8a4bae559 ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_3 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:69e2c19e4c0eb2ff ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_4 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:d9656e43f9068e5f ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_5 a lib:AGENT_SHOULD_START_FROM ;
+  lib:source node:agent_context_default ;
+  lib:target node:f4fbc015ac0e0132 ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recommended first read for fast workspace orientation." ;
+  lib:properties "{}" .
+
+node:edge_6 a lib:BELONGS_TO_DOMAIN ;
+  lib:source node:category_documents ;
+  lib:target node:domain_documentation ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "Category domain comes from classification metadata." ;
+  lib:properties "{}" .
+
+node:edge_7 a lib:BELONGS_TO_DOMAIN ;
+  lib:source node:category_project ;
+  lib:target node:domain_code ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Category domain comes from classification metadata." ;
+  lib:properties "{}" .
+
+node:edge_8 a lib:BELONGS_TO_DOMAIN ;
+  lib:source node:category_projectconfig ;
+  lib:target node:domain_configuration ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Category domain comes from classification metadata." ;
+  lib:properties "{}" .
+
+node:edge_9 a lib:BELONGS_TO_DOMAIN ;
+  lib:source node:category_tests ;
+  lib:target node:domain_code ;
+  lib:confidence "0.96"^^xsd:decimal ;
+  lib:reason "Category domain comes from classification metadata." ;
+  lib:properties "{}" .
+
+node:edge_10 a lib:CLASSIFIED_AS ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_11 a lib:CLASSIFIED_AS ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:component_general ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_12 a lib:CLASSIFIED_AS ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_13 a lib:CLASSIFIED_AS ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:component_source ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_14 a lib:CLASSIFIED_AS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_15 a lib:CLASSIFIED_AS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:component_general ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_16 a lib:CLASSIFIED_AS ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:category_project ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recognized source code." ;
+  lib:properties "{}" .
+
+node:edge_17 a lib:CLASSIFIED_AS ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_18 a lib:CLASSIFIED_AS ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:component_generated ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_19 a lib:CLASSIFIED_AS ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:category_tests ;
+  lib:confidence "0.96"^^xsd:decimal ;
+  lib:reason "Looks like a test file." ;
+  lib:properties "{}" .
+
+node:edge_20 a lib:CLASSIFIED_AS ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_21 a lib:CLASSIFIED_AS ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:category_documents ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "Recognized document type." ;
+  lib:properties "{}" .
+
+node:edge_22 a lib:CLASSIFIED_AS ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_23 a lib:CLASSIFIED_AS ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:component_vendor ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_24 a lib:CLASSIFIED_AS ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_25 a lib:CLASSIFIED_AS ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:component_docs ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_26 a lib:CLASSIFIED_AS ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:category_documents ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "Recognized document type." ;
+  lib:properties "{}" .
+
+node:edge_27 a lib:CLASSIFIED_AS ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:category_documents ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "Recognized document type." ;
+  lib:properties "{}" .
+
+node:edge_28 a lib:CLASSIFIED_AS ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:category_project ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recognized source code." ;
+  lib:properties "{}" .
+
+node:edge_29 a lib:CLASSIFIED_AS ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_30 a lib:CLASSIFIED_AS ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:category_documents ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "Recognized document type." ;
+  lib:properties "{}" .
+
+node:edge_31 a lib:CLASSIFIED_AS ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:category_project ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recognized source code." ;
+  lib:properties "{}" .
+
+node:edge_32 a lib:CLASSIFIED_AS ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:category_project ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recognized source code." ;
+  lib:properties "{}" .
+
+node:edge_33 a lib:CLASSIFIED_AS ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:category_project ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Recognized source code." ;
+  lib:properties "{}" .
+
+node:edge_34 a lib:CLASSIFIED_AS ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_35 a lib:CLASSIFIED_AS ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:component_general ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_36 a lib:CLASSIFIED_AS ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:category_projectconfig ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Recognized config file." ;
+  lib:properties "{}" .
+
+node:edge_37 a lib:CLASSIFIED_AS ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:component_tests ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Directory role inferred by offline analysis." ;
+  lib:properties "{}" .
+
+node:edge_38 a lib:CONTAINS ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:a82d493196e52d64 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_39 a lib:CONTAINS ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:bb695538ea8ba10a ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_40 a lib:CONTAINS ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:d9656e43f9068e5f ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_41 a lib:CONTAINS ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:05d33df776ab85ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_42 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:0b27d7de365e6dfa ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_43 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:325f20910680c21b ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_44 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:41412bcc86bd18f3 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_45 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:5df2d1f509df03a8 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_46 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:69e2c19e4c0eb2ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_47 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:90d5d08d3a6b3fd1 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_48 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:ed6fb5e73a88929c ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_49 a lib:CONTAINS ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:f4fbc015ac0e0132 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_50 a lib:CONTAINS ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:76e98e6cca982c82 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_51 a lib:CONTAINS ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_52 a lib:CONTAINS ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:6ed4ab48d02451d6 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_53 a lib:CONTAINS ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:a409cae4453813f9 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_54 a lib:CONTAINS ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:39f531939c26c939 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Parent path comes from manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_55 a lib:DEFINES ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:function_2bbf49ed22545db1_vendored ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_56 a lib:DEFINES ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:function_39f531939c26c939_test_main ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_57 a lib:DEFINES ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:function_76e98e6cca982c82_generated ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_58 a lib:DEFINES ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:function_bb695538ea8ba10a_normalize ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_59 a lib:DEFINES ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:function_bb695538ea8ba10a_to_json ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_60 a lib:DEFINES ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:class_d9656e43f9068e5f_Greeter ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_61 a lib:DEFINES ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:function_d9656e43f9068e5f_greet ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_62 a lib:DEFINES ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:function_d9656e43f9068e5f_main ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_63 a lib:DEFINES ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:method_d9656e43f9068e5f_Greeter.greet ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Symbol found by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_64 a lib:DOCUMENTED_BY ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:42c59af8a4bae559 ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "README/docs file is near the directory it documents." ;
+  lib:properties "{}" .
+
+node:edge_65 a lib:DOCUMENTED_BY ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:6afa18c42ded2eac ;
+  lib:confidence "0.7"^^xsd:decimal ;
+  lib:reason "README/docs file is near the directory it documents." ;
+  lib:properties "{}" .
+
+node:edge_66 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_README.librarian.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runtime README documents the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_67 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_code.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_68 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_directories.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_69 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_entrypoints.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_70 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_files.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_71 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_index.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_72 a lib:DOCUMENTED_BY ;
+  lib:source node:project_workspace ;
+  lib:target node:note_.librarian_notes_risks.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Markdown note generated by The Librarian runtime." ;
+  lib:properties "{}" .
+
+node:edge_73 a lib:DOCUMENTED_BY ;
+  lib:source node:workspace ;
+  lib:target node:agent_context_default ;
+  lib:confidence "0.8"^^xsd:decimal ;
+  lib:reason "Agent context summarizes the graph and runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_74 a lib:EXPLAINED_IN ;
+  lib:source node:agent_context_default ;
+  lib:target node:prompt_pack_default ;
+  lib:confidence "0.75"^^xsd:decimal ;
+  lib:reason "Prompt pack documents how an agent should use the graph." ;
+  lib:properties "{}" .
+
+node:edge_75 a lib:HAS_CONFIG ;
+  lib:source node:project_workspace ;
+  lib:target node:90d5d08d3a6b3fd1 ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Configuration file detected in the workspace." ;
+  lib:properties "{}" .
+
+node:edge_76 a lib:HAS_ENTRYPOINT ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:entrypoint_d9656e43f9068e5f_function_main ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Entrypoint detected by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_77 a lib:HAS_ENTRYPOINT ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:entrypoint_d9656e43f9068e5f_guard_if-__name__-__main__ ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Entrypoint detected by static code analysis." ;
+  lib:properties "{}" .
+
+node:edge_78 a lib:HAS_EXTENSION ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_79 a lib:HAS_EXTENSION ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_80 a lib:HAS_EXTENSION ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:extension_lock ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_81 a lib:HAS_EXTENSION ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:extension_md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_82 a lib:HAS_EXTENSION ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:extension_md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_83 a lib:HAS_EXTENSION ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:extension_txt ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_84 a lib:HAS_EXTENSION ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_85 a lib:HAS_EXTENSION ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:extension_toml ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_86 a lib:HAS_EXTENSION ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:extension_txt ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_87 a lib:HAS_EXTENSION ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_88 a lib:HAS_EXTENSION ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_89 a lib:HAS_EXTENSION ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:extension_py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Extension detected from file name." ;
+  lib:properties "{}" .
+
+node:edge_90 a lib:HAS_MIME_TYPE ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_91 a lib:HAS_MIME_TYPE ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_92 a lib:HAS_MIME_TYPE ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:mime_application-octet-stream ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_93 a lib:HAS_MIME_TYPE ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:mime_text-markdown ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_94 a lib:HAS_MIME_TYPE ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:mime_text-markdown ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_95 a lib:HAS_MIME_TYPE ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:mime_text-plain ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_96 a lib:HAS_MIME_TYPE ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_97 a lib:HAS_MIME_TYPE ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:mime_application-octet-stream ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_98 a lib:HAS_MIME_TYPE ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:mime_text-plain ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_99 a lib:HAS_MIME_TYPE ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_100 a lib:HAS_MIME_TYPE ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_101 a lib:HAS_MIME_TYPE ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:mime_text-x-python ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "MIME type detected during scan." ;
+  lib:properties "{}" .
+
+node:edge_102 a lib:HAS_RISK ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:risk_high ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Risk level is recorded on the workspace node." ;
+  lib:properties "{}" .
+
+node:edge_103 a lib:HAS_RISK ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:risk_high ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Risk level is recorded on the workspace node." ;
+  lib:properties "{}" .
+
+node:edge_104 a lib:HAS_RISK ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:risk_medium ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Risk level is recorded on the workspace node." ;
+  lib:properties "{}" .
+
+node:edge_105 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_agent_start_here.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_106 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_developer_start_here.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_107 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_how_to_extend_classifiers.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_108 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_how_to_inspect.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_109 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_how_to_query_graph.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_110 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_how_to_run_python_tools.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_111 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_how_to_use_runnable_scripts.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_112 a lib:HAS_RUNBOOK ;
+  lib:source node:project_workspace ;
+  lib:target node:runbook_.librarian_runbooks_index.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runbook exists in the developer runtime." ;
+  lib:properties "{}" .
+
+node:edge_113 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_dependencies.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_114 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_entrypoints.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_115 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_files_by_tag.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_116 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_graph_summary.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_117 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_orphans.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_118 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_risks.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_119 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_graph_scripts_query_tests.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_120 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_scripts_find_entrypoints.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_121 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_scripts_find_unmarked.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_122 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_scripts_inspect_workspace.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_123 a lib:HAS_RUNNABLE_HELPER ;
+  lib:source node:workspace ;
+  lib:target node:script_.librarian_scripts_print_manifest_summary.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Runnable helper script exists under .librarian." ;
+  lib:properties "{}" .
+
+node:edge_124 a lib:HAS_TAG ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:tag_general ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_125 a lib:HAS_TAG ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:tag_source ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_126 a lib:HAS_TAG ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:tag_general ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_127 a lib:HAS_TAG ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_128 a lib:HAS_TAG ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:tag_project ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_129 a lib:HAS_TAG ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:tag_generated ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_130 a lib:HAS_TAG ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_131 a lib:HAS_TAG ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:tag_tests ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_132 a lib:HAS_TAG ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:tag_configuration ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_133 a lib:HAS_TAG ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:tag_projectconfig ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_134 a lib:HAS_TAG ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:tag_documentation ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_135 a lib:HAS_TAG ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:tag_documents ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_136 a lib:HAS_TAG ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:tag_vendor ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_137 a lib:HAS_TAG ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:tag_docs ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_138 a lib:HAS_TAG ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:tag_documentation ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_139 a lib:HAS_TAG ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:tag_documents ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_140 a lib:HAS_TAG ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:tag_documentation ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_141 a lib:HAS_TAG ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:tag_documents ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_142 a lib:HAS_TAG ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_143 a lib:HAS_TAG ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:tag_project ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_144 a lib:HAS_TAG ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:tag_configuration ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_145 a lib:HAS_TAG ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:tag_projectconfig ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_146 a lib:HAS_TAG ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:tag_documentation ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_147 a lib:HAS_TAG ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:tag_documents ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_148 a lib:HAS_TAG ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_149 a lib:HAS_TAG ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:tag_project ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_150 a lib:HAS_TAG ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_151 a lib:HAS_TAG ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:tag_project ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_152 a lib:HAS_TAG ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:tag_code ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_153 a lib:HAS_TAG ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:tag_project ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_154 a lib:HAS_TAG ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:tag_general ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_155 a lib:HAS_TAG ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:tag_tests ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Tag declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_156 a lib:IMPORTS ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:module_src.graph_fixture_app.main ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Internal import detected statically." ;
+  lib:properties "{\"kind\": \"internal\", \"module\": \"src.graph_fixture_app.main\", \"resolved_path\": \"src/graph_fixture_app/main.py\"}" .
+
+node:edge_157 a lib:IMPORTS ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:import_json ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Standard Library import detected statically." ;
+  lib:properties "{\"kind\": \"standard_library\", \"module\": \"json\"}" .
+
+node:edge_158 a lib:IMPORTS ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:module_src.graph_fixture_app.utils ;
+  lib:confidence "0.9"^^xsd:decimal ;
+  lib:reason "Internal import detected statically." ;
+  lib:properties "{\"kind\": \"internal\", \"module\": \"utils\", \"resolved_path\": \"src/graph_fixture_app/utils.py\"}" .
+
+node:edge_159 a lib:MENTIONS_DATE ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:date_2026-05-27 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Entity declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_160 a lib:MENTIONS_ORGANIZATION ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:organization_openai ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Entity declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_161 a lib:MENTIONS_PLACE ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:place_rome ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Entity declared in sidecar or manifest metadata." ;
+  lib:properties "{}" .
+
+node:edge_162 a lib:MOVED_TO ;
+  lib:source node:original_path_. ;
+  lib:target node:current_path_. ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_163 a lib:MOVED_TO ;
+  lib:source node:original_path_README.md ;
+  lib:target node:current_path_README.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_164 a lib:MOVED_TO ;
+  lib:source node:original_path_build ;
+  lib:target node:current_path_build ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_165 a lib:MOVED_TO ;
+  lib:source node:original_path_build_generated.py ;
+  lib:target node:current_path_build_generated.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_166 a lib:MOVED_TO ;
+  lib:source node:original_path_data ;
+  lib:target node:current_path_data ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_167 a lib:MOVED_TO ;
+  lib:source node:original_path_data_duplicate_a.txt ;
+  lib:target node:current_path_data_duplicate_a.txt ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_168 a lib:MOVED_TO ;
+  lib:source node:original_path_data_duplicate_b.txt ;
+  lib:target node:current_path_data_duplicate_b.txt ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_169 a lib:MOVED_TO ;
+  lib:source node:original_path_docs ;
+  lib:target node:current_path_docs ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_170 a lib:MOVED_TO ;
+  lib:source node:original_path_docs_overview.md ;
+  lib:target node:current_path_docs_overview.md ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_171 a lib:MOVED_TO ;
+  lib:source node:original_path_poetry.lock ;
+  lib:target node:current_path_poetry.lock ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_172 a lib:MOVED_TO ;
+  lib:source node:original_path_pyproject.toml ;
+  lib:target node:current_path_pyproject.toml ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_173 a lib:MOVED_TO ;
+  lib:source node:original_path_src ;
+  lib:target node:current_path_src ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_174 a lib:MOVED_TO ;
+  lib:source node:original_path_src_graph_fixture_app ;
+  lib:target node:current_path_src_graph_fixture_app ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_175 a lib:MOVED_TO ;
+  lib:source node:original_path_src_graph_fixture_app___init__.py ;
+  lib:target node:current_path_src_graph_fixture_app___init__.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_176 a lib:MOVED_TO ;
+  lib:source node:original_path_src_graph_fixture_app_main.py ;
+  lib:target node:current_path_src_graph_fixture_app_main.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_177 a lib:MOVED_TO ;
+  lib:source node:original_path_src_graph_fixture_app_utils.py ;
+  lib:target node:current_path_src_graph_fixture_app_utils.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_178 a lib:MOVED_TO ;
+  lib:source node:original_path_tests ;
+  lib:target node:current_path_tests ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_179 a lib:MOVED_TO ;
+  lib:source node:original_path_tests_test_main.py ;
+  lib:target node:current_path_tests_test_main.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_180 a lib:MOVED_TO ;
+  lib:source node:original_path_vendor ;
+  lib:target node:current_path_vendor ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_181 a lib:MOVED_TO ;
+  lib:source node:original_path_vendor_library.py ;
+  lib:target node:current_path_vendor_library.py ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original and current path mapping." ;
+  lib:properties "{}" .
+
+node:edge_182 a lib:ORIGINAL_PARENT ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:5df2d1f509df03a8 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_183 a lib:ORIGINAL_PARENT ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:f4fbc015ac0e0132 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_184 a lib:ORIGINAL_PARENT ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_185 a lib:ORIGINAL_PARENT ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_186 a lib:ORIGINAL_PARENT ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_187 a lib:ORIGINAL_PARENT ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:69e2c19e4c0eb2ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_188 a lib:ORIGINAL_PARENT ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:ed6fb5e73a88929c ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_189 a lib:ORIGINAL_PARENT ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:325f20910680c21b ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_190 a lib:ORIGINAL_PARENT ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_191 a lib:ORIGINAL_PARENT ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:ed6fb5e73a88929c ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_192 a lib:ORIGINAL_PARENT ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:05d33df776ab85ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_193 a lib:ORIGINAL_PARENT ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:05d33df776ab85ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_194 a lib:ORIGINAL_PARENT ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:05d33df776ab85ff ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_195 a lib:ORIGINAL_PARENT ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_196 a lib:PART_OF_PACKAGE ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:module_vendor.library ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_197 a lib:PART_OF_PACKAGE ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:module_tests.test_main ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_198 a lib:PART_OF_PACKAGE ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:module_build.generated ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_199 a lib:PART_OF_PACKAGE ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:module_src.graph_fixture_app.__init__ ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_200 a lib:PART_OF_PACKAGE ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:module_src.graph_fixture_app.utils ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_201 a lib:PART_OF_PACKAGE ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:module_src.graph_fixture_app.main ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Code file module metadata was detected statically." ;
+  lib:properties "{}" .
+
+node:edge_202 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_build.generated ;
+  lib:target node:package_build ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_203 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_src.graph_fixture_app.__init__ ;
+  lib:target node:package_src.graph_fixture_app ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_204 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_src.graph_fixture_app.main ;
+  lib:target node:package_src.graph_fixture_app ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_205 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_src.graph_fixture_app.utils ;
+  lib:target node:package_src.graph_fixture_app ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_206 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_tests.test_main ;
+  lib:target node:package_tests ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_207 a lib:PART_OF_PACKAGE ;
+  lib:source node:module_vendor.library ;
+  lib:target node:package_vendor ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Package inferred from module path." ;
+  lib:properties "{}" .
+
+node:edge_208 a lib:PART_OF_PROJECT ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_209 a lib:PART_OF_PROJECT ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_210 a lib:PART_OF_PROJECT ;
+  lib:source node:1ebc26f279153617 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_211 a lib:PART_OF_PROJECT ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_212 a lib:PART_OF_PROJECT ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_213 a lib:PART_OF_PROJECT ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_214 a lib:PART_OF_PROJECT ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_215 a lib:PART_OF_PROJECT ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_216 a lib:PART_OF_PROJECT ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_217 a lib:PART_OF_PROJECT ;
+  lib:source node:69e2c19e4c0eb2ff ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_218 a lib:PART_OF_PROJECT ;
+  lib:source node:6afa18c42ded2eac ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_219 a lib:PART_OF_PROJECT ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_220 a lib:PART_OF_PROJECT ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_221 a lib:PART_OF_PROJECT ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_222 a lib:PART_OF_PROJECT ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_223 a lib:PART_OF_PROJECT ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_224 a lib:PART_OF_PROJECT ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_225 a lib:PART_OF_PROJECT ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "File belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_226 a lib:PART_OF_PROJECT ;
+  lib:source node:ed6fb5e73a88929c ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_227 a lib:PART_OF_PROJECT ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Directory belongs to the indexed workspace." ;
+  lib:properties "{}" .
+
+node:edge_228 a lib:PART_OF_PROJECT ;
+  lib:source node:workspace ;
+  lib:target node:project_workspace ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Workspace root is represented as the project." ;
+  lib:properties "{}" .
+
+node:edge_229 a lib:PROPOSED_PARENT ;
+  lib:source node:05d33df776ab85ff ;
+  lib:target node:0b27d7de365e6dfa ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Proposed parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_230 a lib:PROPOSED_PARENT ;
+  lib:source node:0b27d7de365e6dfa ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Proposed parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_231 a lib:PROPOSED_PARENT ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:cluster_review_project ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_232 a lib:PROPOSED_PARENT ;
+  lib:source node:325f20910680c21b ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Proposed parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_233 a lib:PROPOSED_PARENT ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:cluster_review_projectconfig ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_234 a lib:PROPOSED_PARENT ;
+  lib:source node:5df2d1f509df03a8 ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Proposed parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_235 a lib:PROPOSED_PARENT ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:cluster_docs_documents_data ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_236 a lib:PROPOSED_PARENT ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:cluster_review_project ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_237 a lib:PROPOSED_PARENT ;
+  lib:source node:90d5d08d3a6b3fd1 ;
+  lib:target node:cluster_review_projectconfig ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_238 a lib:PROPOSED_PARENT ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:cluster_docs_documents_data ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_239 a lib:PROPOSED_PARENT ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:cluster_review_project ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_240 a lib:PROPOSED_PARENT ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:cluster_review_project ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_241 a lib:PROPOSED_PARENT ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:cluster_review_project ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Files cluster under the same proposed parent." ;
+  lib:properties "{}" .
+
+node:edge_242 a lib:PROPOSED_PARENT ;
+  lib:source node:f4fbc015ac0e0132 ;
+  lib:target node:1ebc26f279153617 ;
+  lib:confidence "0.95"^^xsd:decimal ;
+  lib:reason "Proposed parent path is known." ;
+  lib:properties "{}" .
+
+node:edge_243 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_dependencies.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_244 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_dependencies.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_245 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_dependencies.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_246 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_entrypoints.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_247 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_entrypoints.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_248 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_entrypoints.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_249 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_files_by_tag.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_250 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_files_by_tag.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_251 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_files_by_tag.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_252 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_graph_summary.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_253 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_graph_summary.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_254 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_graph_summary.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_255 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_orphans.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_256 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_orphans.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_257 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_orphans.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_258 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_risks.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_259 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_risks.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_260 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_risks.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_261 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_tests.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_262 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_tests.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_263 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_graph_scripts_query_tests.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_264 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_entrypoints.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_265 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_entrypoints.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_266 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_entrypoints.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_267 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_unmarked.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_268 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_unmarked.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_269 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_find_unmarked.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_270 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_inspect_workspace.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_271 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_inspect_workspace.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_272 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_inspect_workspace.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_273 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_print_manifest_summary.py ;
+  lib:target node:artifact_graph ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Graph helper scripts read graph.json when present." ;
+  lib:properties "{}" .
+
+node:edge_274 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_print_manifest_summary.py ;
+  lib:target node:artifact_manifest ;
+  lib:confidence "0.85"^^xsd:decimal ;
+  lib:reason "Helper scripts read Librarian runtime artifacts." ;
+  lib:properties "{}" .
+
+node:edge_275 a lib:SCRIPT_READS ;
+  lib:source node:script_.librarian_scripts_print_manifest_summary.py ;
+  lib:target node:artifact_sidecars ;
+  lib:confidence "0.6"^^xsd:decimal ;
+  lib:reason "Some helpers inspect sidecar coverage." ;
+  lib:properties "{}" .
+
+node:edge_276 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:2bbf49ed22545db1 ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_277 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_278 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_279 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_280 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_281 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_282 a lib:SHOULD_NOT_MODIFY ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:risk_should-not-modify ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Original source and protected files are read-only by default." ;
+  lib:properties "{}" .
+
+node:edge_283 a lib:SIMILAR_TO ;
+  lib:source node:39f531939c26c939 ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Code." ;
+  lib:properties "{\"shared_tag\": \"Code\"}" .
+
+node:edge_284 a lib:SIMILAR_TO ;
+  lib:source node:41412bcc86bd18f3 ;
+  lib:target node:90d5d08d3a6b3fd1 ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent .." ;
+  lib:properties "{\"original_parent\": \".\"}" .
+
+node:edge_285 a lib:SIMILAR_TO ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:41412bcc86bd18f3 ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent .." ;
+  lib:properties "{\"original_parent\": \".\"}" .
+
+node:edge_286 a lib:SIMILAR_TO ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:6afa18c42ded2eac ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Documents." ;
+  lib:properties "{\"shared_tag\": \"Documents\"}" .
+
+node:edge_287 a lib:SIMILAR_TO ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:6ed4ab48d02451d6 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Documents." ;
+  lib:properties "{\"shared_tag\": \"Documents\"}" .
+
+node:edge_288 a lib:SIMILAR_TO ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:90d5d08d3a6b3fd1 ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent .." ;
+  lib:properties "{\"original_parent\": \".\"}" .
+
+node:edge_289 a lib:SIMILAR_TO ;
+  lib:source node:42c59af8a4bae559 ;
+  lib:target node:a409cae4453813f9 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Documents." ;
+  lib:properties "{\"shared_tag\": \"Documents\"}" .
+
+node:edge_290 a lib:SIMILAR_TO ;
+  lib:source node:6ed4ab48d02451d6 ;
+  lib:target node:6afa18c42ded2eac ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Documents." ;
+  lib:properties "{\"shared_tag\": \"Documents\"}" .
+
+node:edge_291 a lib:SIMILAR_TO ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_292 a lib:SIMILAR_TO ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:39f531939c26c939 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Code." ;
+  lib:properties "{\"shared_tag\": \"Code\"}" .
+
+node:edge_293 a lib:SIMILAR_TO ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:a82d493196e52d64 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_294 a lib:SIMILAR_TO ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:bb695538ea8ba10a ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_295 a lib:SIMILAR_TO ;
+  lib:source node:76e98e6cca982c82 ;
+  lib:target node:d9656e43f9068e5f ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_296 a lib:SIMILAR_TO ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:6afa18c42ded2eac ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Documents." ;
+  lib:properties "{\"shared_tag\": \"Documents\"}" .
+
+node:edge_297 a lib:SIMILAR_TO ;
+  lib:source node:a409cae4453813f9 ;
+  lib:target node:6ed4ab48d02451d6 ;
+  lib:confidence "1.0"^^xsd:decimal ;
+  lib:reason "Files share the same content hash." ;
+  lib:properties "{\"duplicate\": true}" .
+
+node:edge_298 a lib:SIMILAR_TO ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_299 a lib:SIMILAR_TO ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:39f531939c26c939 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Code." ;
+  lib:properties "{\"shared_tag\": \"Code\"}" .
+
+node:edge_300 a lib:SIMILAR_TO ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:bb695538ea8ba10a ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent src/graph_fixture_app." ;
+  lib:properties "{\"original_parent\": \"src/graph_fixture_app\"}" .
+
+node:edge_301 a lib:SIMILAR_TO ;
+  lib:source node:a82d493196e52d64 ;
+  lib:target node:d9656e43f9068e5f ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent src/graph_fixture_app." ;
+  lib:properties "{\"original_parent\": \"src/graph_fixture_app\"}" .
+
+node:edge_302 a lib:SIMILAR_TO ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_303 a lib:SIMILAR_TO ;
+  lib:source node:bb695538ea8ba10a ;
+  lib:target node:39f531939c26c939 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Code." ;
+  lib:properties "{\"shared_tag\": \"Code\"}" .
+
+node:edge_304 a lib:SIMILAR_TO ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:2bbf49ed22545db1 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Project." ;
+  lib:properties "{\"shared_tag\": \"Project\"}" .
+
+node:edge_305 a lib:SIMILAR_TO ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:39f531939c26c939 ;
+  lib:confidence "0.45"^^xsd:decimal ;
+  lib:reason "Files share tag Code." ;
+  lib:properties "{\"shared_tag\": \"Code\"}" .
+
+node:edge_306 a lib:SIMILAR_TO ;
+  lib:source node:d9656e43f9068e5f ;
+  lib:target node:bb695538ea8ba10a ;
+  lib:confidence "0.35"^^xsd:decimal ;
+  lib:reason "Files share original parent src/graph_fixture_app." ;
+  lib:properties "{\"original_parent\": \"src/graph_fixture_app\"}" .
+
+node:edge_307 a lib:TESTS ;
+  lib:source node:test_39f531939c26c939 ;
+  lib:target node:d9656e43f9068e5f ;
+  lib:confidence "0.65"^^xsd:decimal ;
+  lib:reason "Test target inferred from nearby source path and filename." ;
+  lib:properties "{}" .

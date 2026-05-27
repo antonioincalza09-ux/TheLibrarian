@@ -1,0 +1,48 @@
+librarian_id: 6ed4ab48d02451d6
+type: file
+original_path: data/duplicate_b.txt
+current_path: data/duplicate_b.txt
+proposed_path: docs/documents/data/duplicate_b.txt
+name: duplicate_b.txt
+extension: .txt
+size_bytes: 23
+created_at: '2026-05-27T08:23:07.517098+00:00'
+modified_at: '2026-05-27T08:23:07.517098+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: text/plain
+content_hash: 205d0c35c0fb8f0f032e773a23e321ab7eb51b47d2b0dd8de086b60eb24f9661
+name_hash: 0f3cb63ac51a467a044765dc9528fd65da895558b3ec791cbe9de7ef884c7635
+readable: true
+read_error: null
+file_kind: document
+detected_language: null
+title: duplicate_b
+summary: Recognized document type.
+human_description: File data/duplicate_b.txt classified as Documentation/Documents.
+developer_notes: []
+tags:
+- Documentation
+- Documents
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Documentation
+  category: Documents
+  confidence: 0.7
+  reason: Recognized document type.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 2
+parent_path: data
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: true
+risk_level: low

@@ -1,0 +1,75 @@
+librarian_id: a82d493196e52d64
+type: file
+original_path: src/graph_fixture_app/__init__.py
+current_path: src/graph_fixture_app/__init__.py
+proposed_path: review/project/init.py
+name: __init__.py
+extension: .py
+size_bytes: 25
+created_at: '2026-05-27T08:23:04.373531+00:00'
+modified_at: '2026-05-27T08:23:04.373531+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: text/x-python
+content_hash: bb37a0a2fd31bc10676d972b1fa1c232a752ac6fa72e0bd55a7aab08da44fc9b
+name_hash: 8e2c1f727276d30ced72fa67cb848772a9802162bec39b42a8df5359fd063a4c
+readable: true
+read_error: null
+file_kind: source_code
+detected_language: Python
+title: __init__
+summary: Recognized source code.
+human_description: File src/graph_fixture_app/__init__.py classified as Code/Project.
+developer_notes:
+- Python AST analysis completed.
+tags:
+- Code
+- Project
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Code
+  category: Project
+  confidence: 0.9
+  reason: Recognized source code.
+code_metadata:
+  language: Python
+  module_name: __init__
+  package_name: src.graph_fixture_app.__init__
+  imports:
+    internal: []
+    external: []
+    standard_library: []
+  symbols:
+    functions: []
+    classes: []
+    methods: []
+  docstrings:
+    module: Graph fixture app.
+    functions: {}
+    classes: {}
+  entrypoints: []
+  framework_hints: []
+  test_hints: []
+  config_hints: []
+  risk_level: low
+  generated_file: false
+  vendor_file: false
+  lock_file: false
+  should_modify: false
+  should_move: false
+  reason: Python AST analysis completed.
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 3
+parent_path: src/graph_fixture_app
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: low

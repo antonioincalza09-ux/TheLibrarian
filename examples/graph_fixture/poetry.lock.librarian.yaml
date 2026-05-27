@@ -1,0 +1,48 @@
+librarian_id: 41412bcc86bd18f3
+type: file
+original_path: poetry.lock
+current_path: poetry.lock
+proposed_path: review/projectconfig/poetry.lock
+name: poetry.lock
+extension: .lock
+size_bytes: 15
+created_at: '2026-05-27T08:23:09.158912+00:00'
+modified_at: '2026-05-27T08:23:09.158912+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: application/octet-stream
+content_hash: 1f92ef7e33a2ac29f43fe27b389eeed9dd0e585ee200c9754d1c96ca06dbe926
+name_hash: f53a023eedfa3fbf2925ec7dc76eecdc954ea94b7e47065393dbad519613dc89
+readable: true
+read_error: null
+file_kind: config
+detected_language: null
+title: poetry
+summary: Recognized config file.
+human_description: File poetry.lock classified as Configuration/ProjectConfig.
+developer_notes: []
+tags:
+- Configuration
+- ProjectConfig
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Configuration
+  category: ProjectConfig
+  confidence: 0.85
+  reason: Recognized config file.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 1
+parent_path: .
+generated_file: false
+vendor_file: false
+lock_file: true
+should_modify: false
+should_move: false
+risk_level: high

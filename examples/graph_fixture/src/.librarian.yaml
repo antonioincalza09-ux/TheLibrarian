@@ -1,0 +1,60 @@
+librarian_id: 0b27d7de365e6dfa
+type: directory
+original_path: src
+current_path: src
+proposed_path: src
+name: src
+extension: null
+size_bytes: null
+created_at: null
+modified_at: null
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: null
+content_hash: null
+name_hash: null
+readable: true
+read_error: null
+file_kind: unknown
+detected_language: null
+title: src
+summary: Default conservative directory analysis.
+human_description: Directory src analyzed for structure and role.
+developer_notes:
+- 'Roles: source'
+tags:
+- source
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Configuration
+  category: ProjectConfig
+  confidence: 0.85
+  reason: Recognized config file.
+code_metadata: null
+directory_analysis:
+  direct_file_count: 0
+  direct_subdirectory_count: 1
+  total_file_count: 0
+  dominant_extensions: []
+  dominant_languages: []
+  recurring_name_tokens: []
+  possible_roles:
+  - source
+  theme: Source
+  should_reorganize: true
+  should_modify: false
+  reason: Default conservative directory analysis.
+relations: []
+status: []
+errors: []
+depth: 1
+parent_path: .
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: true
+risk_level: low

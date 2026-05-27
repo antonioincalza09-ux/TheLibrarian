@@ -1,0 +1,48 @@
+librarian_id: 90d5d08d3a6b3fd1
+type: file
+original_path: pyproject.toml
+current_path: pyproject.toml
+proposed_path: review/projectconfig/pyproject.toml
+name: pyproject.toml
+extension: .toml
+size_bytes: 77
+created_at: '2026-05-27T08:23:03.297606+00:00'
+modified_at: '2026-05-27T08:23:03.297606+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: application/octet-stream
+content_hash: 39e51fcc377f15324cee081110793c818f096e6f30fc85c2dc59f89b6eae6190
+name_hash: 50c86b7ed8ac2cf95bd48334961bf0530cdc77b5a56f852c5c61b89d735fd711
+readable: true
+read_error: null
+file_kind: config
+detected_language: null
+title: pyproject
+summary: Recognized config file.
+human_description: File pyproject.toml classified as Configuration/ProjectConfig.
+developer_notes: []
+tags:
+- Configuration
+- ProjectConfig
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Configuration
+  category: ProjectConfig
+  confidence: 0.85
+  reason: Recognized config file.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 1
+parent_path: .
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: low

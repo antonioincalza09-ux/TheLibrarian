@@ -27,6 +27,27 @@ librarian dev init <path>
 librarian dev index <path>
 librarian dev explain <path>
 librarian dev runbook <path>
+librarian graph validate <path>
+librarian graph build <path>
+librarian graph export <path> --format json
+librarian graph export <path> --format graphml
+librarian graph export <path> --format cypher
+librarian graph export <path> --format markdown
+librarian graph export <path> --format turtle
+librarian graph export <path> --format sqlite
+librarian graph report <path>
+librarian graph index <path>
+librarian graph query <path> --kind entrypoints
+librarian graph query <path> --kind risks
+librarian graph query <path> --kind modules
+librarian graph query <path> --kind tags
+librarian graph query <path> --kind dependencies
+librarian graph query <path> --kind tests
+librarian graph query <path> --kind duplicates
+librarian graph query <path> --kind orphans
+librarian agent context <path>
+librarian agent runbook <path>
+librarian agent scripts <path>
 ```
 
 ## Expected Outputs
@@ -56,6 +77,36 @@ python .librarian/scripts/find_entrypoints.py
 python .librarian/scripts/find_unmarked.py
 ```
 
+## Knowledge Graph
+
+The Librarian can build an offline knowledge graph from the manifest, sidecar YAML, plan, notes, runbooks, and helper scripts.
+
+```powershell
+librarian graph validate .\examples\graph_fixture
+librarian graph build .\examples\graph_fixture
+librarian graph export .\examples\graph_fixture --format json
+librarian graph export .\examples\graph_fixture --format graphml
+librarian graph export .\examples\graph_fixture --format cypher
+librarian graph export .\examples\graph_fixture --format markdown
+librarian graph export .\examples\graph_fixture --format turtle
+librarian graph index .\examples\graph_fixture
+librarian graph report .\examples\graph_fixture
+```
+
+Generated graph artifacts live under `.librarian/`: `graph.json`, `graph.graphml`, `graph.cypher`, `graph.ttl`, `graph_index.sqlite`, `graph_notes/*.md`, `graph_report.md`, `validation_report.json`, and `validation_report.md`.
+
+## Agent Runtime
+
+The agent runtime gives developers and AI agents a compact starting point:
+
+```powershell
+librarian agent context .\examples\graph_fixture
+librarian agent runbook .\examples\graph_fixture
+librarian agent scripts .\examples\graph_fixture
+```
+
+It writes `.librarian/agent_context.md`, `.librarian/agent_context.json`, agent/developer runbooks, and standard-library-only scripts under `.librarian/graph_scripts/`.
+
 ## Quickstart
 
 ```powershell
@@ -82,6 +133,8 @@ librarian status .\examples\sample_data
 
 - [docs/metadata_schema.md](docs/metadata_schema.md)
 - [docs/developer_runtime.md](docs/developer_runtime.md)
+- [docs/graph_schema.md](docs/graph_schema.md)
+- [docs/agent_runtime.md](docs/agent_runtime.md)
 
 ## Compatibility
 

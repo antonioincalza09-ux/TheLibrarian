@@ -1,0 +1,217 @@
+{
+  "workspace_root": "C:\\Users\\batti\\Documents\\Codex\\2026-05-27\\apri-la-repository-antonioincalza09-ux-thelibrarian\\examples\\graph_fixture",
+  "generated_at": "2026-05-27T08:25:42.101511+00:00",
+  "entries": [
+    {
+      "source": "build",
+      "destination": "build",
+      "node_type": "directory",
+      "reason": "Directory role is not safe for physical reorganization.",
+      "confidence": 0.0,
+      "safe_to_move": false,
+      "logical_only": true,
+      "collision": false,
+      "status": "logical_only"
+    },
+    {
+      "source": "data",
+      "destination": "docs/documents/data",
+      "node_type": "directory",
+      "reason": "All descendant files are safe to move together as one directory.",
+      "confidence": 0.95,
+      "safe_to_move": true,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "docs",
+      "destination": "organized/documents/docs",
+      "node_type": "directory",
+      "reason": "All descendant files are safe to move together as one directory.",
+      "confidence": 0.95,
+      "safe_to_move": true,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "src",
+      "destination": "src",
+      "node_type": "directory",
+      "reason": "Directory role is not safe for physical reorganization.",
+      "confidence": 0.0,
+      "safe_to_move": false,
+      "logical_only": true,
+      "collision": false,
+      "status": "logical_only"
+    },
+    {
+      "source": "tests",
+      "destination": "tests",
+      "node_type": "directory",
+      "reason": "Directory role is not safe for physical reorganization.",
+      "confidence": 0.0,
+      "safe_to_move": false,
+      "logical_only": true,
+      "collision": false,
+      "status": "logical_only"
+    },
+    {
+      "source": "vendor",
+      "destination": "vendor",
+      "node_type": "directory",
+      "reason": "Directory role is not safe for physical reorganization.",
+      "confidence": 0.0,
+      "safe_to_move": false,
+      "logical_only": true,
+      "collision": false,
+      "status": "logical_only"
+    },
+    {
+      "source": "src/graph_fixture_app",
+      "destination": "src/graph_fixture_app",
+      "node_type": "directory",
+      "reason": "Directory contains mixed or protected files; using logical view only.",
+      "confidence": 0.0,
+      "safe_to_move": false,
+      "logical_only": true,
+      "collision": false,
+      "status": "logical_only"
+    },
+    {
+      "source": "README.md",
+      "destination": "docs/documents/readme.md",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket docs/documents.",
+      "confidence": 0.7,
+      "safe_to_move": true,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "poetry.lock",
+      "destination": "review/projectconfig/poetry.lock",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/projectconfig.",
+      "confidence": 0.85,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "pyproject.toml",
+      "destination": "review/projectconfig/pyproject.toml",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/projectconfig.",
+      "confidence": 0.85,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "build/generated.py",
+      "destination": "review/project/generated.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "data/duplicate_a.txt",
+      "destination": "docs/documents/data/duplicate_a.txt",
+      "node_type": "file",
+      "reason": "Covered by planned directory move.",
+      "confidence": 0.7,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "covered_by_directory"
+    },
+    {
+      "source": "data/duplicate_b.txt",
+      "destination": "docs/documents/data/duplicate_b.txt",
+      "node_type": "file",
+      "reason": "Covered by planned directory move.",
+      "confidence": 0.7,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "covered_by_directory"
+    },
+    {
+      "source": "docs/overview.md",
+      "destination": "organized/documents/docs/overview.md",
+      "node_type": "file",
+      "reason": "Covered by planned directory move.",
+      "confidence": 0.7,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "covered_by_directory"
+    },
+    {
+      "source": "src/graph_fixture_app/__init__.py",
+      "destination": "review/project/init.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "src/graph_fixture_app/main.py",
+      "destination": "review/project/main.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "src/graph_fixture_app/utils.py",
+      "destination": "review/project/utils.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "tests/test_main.py",
+      "destination": "review/tests/test-main.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/tests.",
+      "confidence": 0.96,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    },
+    {
+      "source": "vendor/library.py",
+      "destination": "review/project/library.py",
+      "node_type": "file",
+      "reason": "Offline classification suggests bucket review/project.",
+      "confidence": 0.9,
+      "safe_to_move": false,
+      "logical_only": false,
+      "collision": false,
+      "status": "planned"
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}

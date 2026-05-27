@@ -1,0 +1,357 @@
+{
+  "workspace_summary": {
+    "workspace_root": "C:\\Users\\batti\\Documents\\Codex\\2026-05-27\\apri-la-repository-antonioincalza09-ux-thelibrarian\\examples\\graph_fixture",
+    "files": 12,
+    "directories": 8,
+    "languages": [
+      "Python"
+    ],
+    "domains": [
+      "Code",
+      "Configuration",
+      "Documentation"
+    ]
+  },
+  "top_files": [
+    {
+      "path": "src/graph_fixture_app/main.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "low",
+      "summary": "Recognized source code."
+    },
+    {
+      "path": "README.md",
+      "type": "document",
+      "language": null,
+      "risk": "low",
+      "summary": "Recognized document type."
+    },
+    {
+      "path": "poetry.lock",
+      "type": "config",
+      "language": null,
+      "risk": "high",
+      "summary": "Recognized config file."
+    },
+    {
+      "path": "pyproject.toml",
+      "type": "config",
+      "language": null,
+      "risk": "low",
+      "summary": "Recognized config file."
+    },
+    {
+      "path": "build/generated.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "medium",
+      "summary": "Recognized source code."
+    },
+    {
+      "path": "data/duplicate_a.txt",
+      "type": "document",
+      "language": null,
+      "risk": "low",
+      "summary": "Recognized document type."
+    },
+    {
+      "path": "data/duplicate_b.txt",
+      "type": "document",
+      "language": null,
+      "risk": "low",
+      "summary": "Recognized document type."
+    },
+    {
+      "path": "docs/overview.md",
+      "type": "document",
+      "language": null,
+      "risk": "low",
+      "summary": "Recognized document type."
+    },
+    {
+      "path": "tests/test_main.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "low",
+      "summary": "Looks like a test file."
+    },
+    {
+      "path": "vendor/library.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "high",
+      "summary": "Recognized source code."
+    },
+    {
+      "path": "src/graph_fixture_app/__init__.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "low",
+      "summary": "Recognized source code."
+    },
+    {
+      "path": "src/graph_fixture_app/utils.py",
+      "type": "source_code",
+      "language": "Python",
+      "risk": "low",
+      "summary": "Recognized source code."
+    }
+  ],
+  "top_directories": [
+    {
+      "path": ".",
+      "roles": [
+        "general"
+      ],
+      "summary": "Default conservative directory analysis."
+    },
+    {
+      "path": "build",
+      "roles": [
+        "generated"
+      ],
+      "summary": "Generated directory."
+    },
+    {
+      "path": "data",
+      "roles": [
+        "general"
+      ],
+      "summary": "Default conservative directory analysis."
+    },
+    {
+      "path": "docs",
+      "roles": [
+        "docs"
+      ],
+      "summary": "Default conservative directory analysis."
+    },
+    {
+      "path": "src",
+      "roles": [
+        "source"
+      ],
+      "summary": "Default conservative directory analysis."
+    },
+    {
+      "path": "tests",
+      "roles": [
+        "tests"
+      ],
+      "summary": "Default conservative directory analysis."
+    },
+    {
+      "path": "vendor",
+      "roles": [
+        "vendor"
+      ],
+      "summary": "Vendor directory."
+    },
+    {
+      "path": "src/graph_fixture_app",
+      "roles": [
+        "general"
+      ],
+      "summary": "Default conservative directory analysis."
+    }
+  ],
+  "entrypoints": [
+    {
+      "file": "src/graph_fixture_app/main.py",
+      "entrypoint": "function:main",
+      "confidence": 1.0
+    },
+    {
+      "file": "src/graph_fixture_app/main.py",
+      "entrypoint": "guard:if __name__ == \"__main__\"",
+      "confidence": 1.0
+    }
+  ],
+  "risks": [
+    {
+      "path": "vendor/library.py",
+      "risk": "high risk",
+      "type": "HAS_RISK",
+      "reason": "Risk level is recorded on the workspace node."
+    },
+    {
+      "path": "poetry.lock",
+      "risk": "high risk",
+      "type": "HAS_RISK",
+      "reason": "Risk level is recorded on the workspace node."
+    },
+    {
+      "path": "build/generated.py",
+      "risk": "medium risk",
+      "type": "HAS_RISK",
+      "reason": "Risk level is recorded on the workspace node."
+    },
+    {
+      "path": "vendor/library.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "tests/test_main.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "poetry.lock",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "build/generated.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "src/graph_fixture_app/__init__.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "src/graph_fixture_app/utils.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    },
+    {
+      "path": "src/graph_fixture_app/main.py",
+      "risk": "should not modify",
+      "type": "SHOULD_NOT_MODIFY",
+      "reason": "Original source and protected files are read-only by default."
+    }
+  ],
+  "runnable_scripts": [
+    ".librarian/scripts/find_entrypoints.py",
+    ".librarian/scripts/find_unmarked.py",
+    ".librarian/scripts/inspect_workspace.py",
+    ".librarian/scripts/print_manifest_summary.py",
+    ".librarian/graph_scripts/query_dependencies.py",
+    ".librarian/graph_scripts/query_entrypoints.py",
+    ".librarian/graph_scripts/query_files_by_tag.py",
+    ".librarian/graph_scripts/query_graph_summary.py",
+    ".librarian/graph_scripts/query_orphans.py",
+    ".librarian/graph_scripts/query_risks.py",
+    ".librarian/graph_scripts/query_tests.py"
+  ],
+  "graph_files": {
+    "manifest": ".librarian/manifest.json",
+    "graph_json": ".librarian/graph.json",
+    "graph_notes": ".librarian/graph_notes",
+    "validation_report": ".librarian/validation_report.json"
+  },
+  "recommended_first_reads": [
+    "src/graph_fixture_app/main.py",
+    "src/graph_fixture_app/main.py",
+    "README.md",
+    "poetry.lock",
+    "pyproject.toml",
+    "build/generated.py",
+    "data/duplicate_a.txt",
+    "data/duplicate_b.txt",
+    "docs/overview.md",
+    "tests/test_main.py",
+    "vendor/library.py",
+    "src/graph_fixture_app/__init__.py",
+    "src/graph_fixture_app/utils.py",
+    ".librarian/manifest.json",
+    ".librarian/graph_notes/agent_start_here.md",
+    ".librarian/graph_notes/risks.md"
+  ],
+  "warnings": [
+    "Review risks before modifying source, generated, vendor, or lock files."
+  ],
+  "suggested_queries": [
+    "librarian graph query <path> --kind entrypoints",
+    "librarian graph query <path> --kind risks",
+    "librarian graph query <path> --kind modules",
+    "librarian graph query <path> --kind tags"
+  ],
+  "important_modules": [
+    {
+      "id": "import:json",
+      "type": "Import",
+      "label": "json",
+      "import_count": 1
+    },
+    {
+      "id": "module:src.graph_fixture_app.main",
+      "type": "Module",
+      "label": "src.graph_fixture_app.main",
+      "import_count": 1
+    },
+    {
+      "id": "module:src.graph_fixture_app.utils",
+      "type": "Module",
+      "label": "src.graph_fixture_app.utils",
+      "import_count": 1
+    },
+    {
+      "id": "module:build.generated",
+      "type": "Module",
+      "label": "build.generated",
+      "import_count": 0
+    },
+    {
+      "id": "module:src.graph_fixture_app.__init__",
+      "type": "Module",
+      "label": "src.graph_fixture_app.__init__",
+      "import_count": 0
+    },
+    {
+      "id": "module:tests.test_main",
+      "type": "Module",
+      "label": "tests.test_main",
+      "import_count": 0
+    },
+    {
+      "id": "module:vendor.library",
+      "type": "Module",
+      "label": "vendor.library",
+      "import_count": 0
+    },
+    {
+      "id": "package:build",
+      "type": "Package",
+      "label": "build",
+      "import_count": 0
+    },
+    {
+      "id": "package:src.graph_fixture_app",
+      "type": "Package",
+      "label": "src.graph_fixture_app",
+      "import_count": 0
+    },
+    {
+      "id": "package:tests",
+      "type": "Package",
+      "label": "tests",
+      "import_count": 0
+    },
+    {
+      "id": "package:vendor",
+      "type": "Package",
+      "label": "vendor",
+      "import_count": 0
+    }
+  ],
+  "runbooks": [
+    ".librarian/runbooks/agent_start_here.md",
+    ".librarian/runbooks/developer_start_here.md",
+    ".librarian/runbooks/how_to_extend_classifiers.md",
+    ".librarian/runbooks/how_to_inspect.md",
+    ".librarian/runbooks/how_to_query_graph.md",
+    ".librarian/runbooks/how_to_run_python_tools.md",
+    ".librarian/runbooks/how_to_use_runnable_scripts.md",
+    ".librarian/runbooks/index.md"
+  ]
+}

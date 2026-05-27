@@ -1,0 +1,51 @@
+librarian_id: 6afa18c42ded2eac
+type: file
+original_path: docs/overview.md
+current_path: docs/overview.md
+proposed_path: organized/documents/docs/overview.md
+name: overview.md
+extension: .md
+size_bytes: 99
+created_at: '2026-05-27T08:23:06.465827+00:00'
+modified_at: '2026-05-27T08:23:06.481454+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: text/markdown
+content_hash: eb16660bf30c09a2b3826c48b771eba2358514557761a778319a7d94f81decc0
+name_hash: 7a7987404e86a043b133f56a86fd282421f207557d254dc43ac4bb0bae8e7915
+readable: true
+read_error: null
+file_kind: document
+detected_language: null
+title: overview
+summary: Recognized document type.
+human_description: File docs/overview.md classified as Documentation/Documents.
+developer_notes: []
+tags:
+- Documentation
+- Documents
+entities:
+  people: []
+  organizations:
+  - OpenAI
+  places:
+  - Rome
+  dates:
+  - '2026-05-27'
+classification:
+  domain: Documentation
+  category: Documents
+  confidence: 0.7
+  reason: Recognized document type.
+code_metadata: null
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 2
+parent_path: docs
+generated_file: false
+vendor_file: false
+lock_file: false
+should_modify: false
+should_move: true
+risk_level: low

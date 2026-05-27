@@ -1,0 +1,78 @@
+librarian_id: 2bbf49ed22545db1
+type: file
+original_path: vendor/library.py
+current_path: vendor/library.py
+proposed_path: review/project/library.py
+name: library.py
+extension: .py
+size_bytes: 43
+created_at: '2026-05-27T08:23:08.784212+00:00'
+modified_at: '2026-05-27T08:23:08.784212+00:00'
+indexed_at: '2026-05-27T08:25:28.874736+00:00'
+mime_type: text/x-python
+content_hash: 901e4a2b807319d69a6918d6f9760789892936950cf95922a7837c80c118ec06
+name_hash: 28a6639936adbe82d553956fda9862c21d26e9ea1a4463e376c3777a4229ab48
+readable: true
+read_error: null
+file_kind: source_code
+detected_language: Python
+title: library
+summary: Recognized source code.
+human_description: File vendor/library.py classified as Code/Project.
+developer_notes:
+- Python AST analysis completed.
+tags:
+- Code
+- Project
+entities:
+  people: []
+  organizations: []
+  places: []
+  dates: []
+classification:
+  domain: Code
+  category: Project
+  confidence: 0.9
+  reason: Recognized source code.
+code_metadata:
+  language: Python
+  module_name: library
+  package_name: vendor.library
+  imports:
+    internal: []
+    external: []
+    standard_library: []
+  symbols:
+    functions:
+    - name: vendored
+      line_start: 1
+      line_end: 2
+    classes: []
+    methods: []
+  docstrings:
+    module: null
+    functions: {}
+    classes: {}
+  entrypoints: []
+  framework_hints: []
+  test_hints: []
+  config_hints: []
+  risk_level: high
+  generated_file: false
+  vendor_file: true
+  lock_file: false
+  should_modify: false
+  should_move: false
+  reason: Python AST analysis completed.
+directory_analysis: null
+relations: []
+status: []
+errors: []
+depth: 2
+parent_path: vendor
+generated_file: false
+vendor_file: true
+lock_file: false
+should_modify: false
+should_move: false
+risk_level: high
