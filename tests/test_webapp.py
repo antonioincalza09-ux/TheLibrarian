@@ -13,6 +13,105 @@ from src.webapp import create_server
 
 
 class WebAppTests(unittest.TestCase):
+    def _write_librarian_manifest(self, root: Path, *, include_graph: bool = False) -> None:
+        runtime = root / ".librarian"
+        (runtime / "notes").mkdir(parents=True, exist_ok=True)
+        (runtime / "runbooks").mkdir(parents=True, exist_ok=True)
+        (runtime / "scripts").mkdir(parents=True, exist_ok=True)
+        (runtime / "notes" / "index.md").write_text("# Notes\n", encoding="utf-8")
+        (runtime / "runbooks" / "index.md").write_text("# Runbooks\n", encoding="utf-8")
+        (runtime / "scripts" / "print_manifest_summary.py").write_text("print('ok')\n", encoding="utf-8")
+        manifest = {
+            "workspace_root": str(root),
+            "generated_at": "2026-05-26T20:57:33+00:00",
+            "librarian_version": "0.2.0",
+            "files": [
+                {
+                    "name": "main.py",
+                    "current_path": "src/app/main.py",
+                    "original_path": "src/app/main.py",
+                    "file_kind": "source_code",
+                    "detected_language": "Python",
+                    "summary": "Main app entrypoint.",
+                    "risk_level": "low",
+                    "size_bytes": 120,
+                    "readable": True,
+                    "generated_file": False,
+                    "vendor_file": False,
+                    "lock_file": False,
+                    "should_modify": False,
+                    "should_move": False,
+                    "tags": ["Code", "Project"],
+                    "classification": {"domain": "Code", "category": "Project", "confidence": 0.92},
+                    "code_metadata": {
+                        "language": "Python",
+                        "entrypoints": ["function:main", 'guard:if __name__ == "__main__"'],
+                        "framework_hints": ["Typer"],
+                        "test_hints": [],
+                        "imports": {"internal": ["src.app.utils"], "external": []},
+                        "symbols": {"functions": [{"name": "main"}], "classes": [], "methods": []},
+                    },
+                },
+                {
+                    "name": "test_main.py",
+                    "current_path": "tests/test_main.py",
+                    "original_path": "tests/test_main.py",
+                    "file_kind": "source_code",
+                    "detected_language": "Python",
+                    "summary": "Pytest entry.",
+                    "risk_level": "medium",
+                    "size_bytes": 90,
+                    "readable": True,
+                    "generated_file": False,
+                    "vendor_file": False,
+                    "lock_file": False,
+                    "should_modify": False,
+                    "should_move": False,
+                    "tags": ["Code", "Tests"],
+                    "classification": {"domain": "Code", "category": "Tests", "confidence": 0.7},
+                    "code_metadata": {
+                        "language": "Python",
+                        "entrypoints": [],
+                        "framework_hints": ["pytest"],
+                        "test_hints": ["pytest"],
+                        "imports": {"internal": ["src.app.main"], "external": []},
+                        "symbols": {"functions": [{"name": "test_main"}], "classes": [], "methods": []},
+                    },
+                },
+            ],
+            "directories": [
+                {
+                    "name": "src",
+                    "current_path": "src",
+                    "human_description": "Source tree",
+                    "directory_analysis": {
+                        "possible_roles": ["source", "project_root"],
+                        "direct_file_count": 0,
+                        "direct_subdirectory_count": 1,
+                        "total_file_count": 1,
+                        "dominant_languages": ["Python"],
+                        "dominant_extensions": [".py"],
+                        "should_reorganize": False,
+                    },
+                }
+            ],
+            "entrypoints": ["src/app/main.py:function:main"],
+            "warnings": [],
+            "errors": [],
+        }
+        (runtime / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+        if include_graph:
+            graph = {
+                "nodes": [
+                    {"id": "src/app/main.py", "label": "main.py", "type": "file", "confidence": 0.9},
+                    {"id": "tests/test_main.py", "label": "test_main.py", "type": "file", "confidence": 0.8},
+                ],
+                "edges": [
+                    {"source": "src/app/main.py", "target": "tests/test_main.py", "type": "tested_by", "confidence": 0.8}
+                ],
+            }
+            (runtime / "graph.json").write_text(json.dumps(graph), encoding="utf-8")
+
     def test_server_exposes_inventory_and_plan(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
@@ -37,6 +136,7 @@ class WebAppTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_directory:
             root = Path(temp_directory)
             (root / "report.pdf").write_text("content", encoding="utf-8")
+            self._write_librarian_manifest(root, include_graph=True)
             server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
             thread = threading.Thread(target=server.serve_forever, daemon=True)
             thread.start()
@@ -51,24 +151,67 @@ class WebAppTests(unittest.TestCase):
                 thread.join(timeout=5)
 
             self.assertIn('data-app="thelibrarian-dashboard"', html)
-            self.assertIn("Operations Dashboard", html)
-            self.assertIn("Privacy-first file organization copilot", html)
-            self.assertIn("Safe workflow", html)
-            self.assertIn("Before / After Tree", html)
-            self.assertIn("Chat Review", html)
-            self.assertIn("Pack Detail", html)
-            self.assertIn("Client Report Preview", html)
+            self.assertIn('data-shell="librarian-dev-dashboard"', html)
+            self.assertIn("Developer-first workspace dashboard", html)
+            self.assertIn("Copy Agent Brief", html)
+            self.assertIn("Overview", html)
+            self.assertIn("Start Here", html)
+            self.assertIn("Entrypoints", html)
+            self.assertIn("Diagnostics", html)
             self.assertIn('id="downloadPlanBtn"', html)
-            self.assertIn('id="chatInput"', html)
-            self.assertIn('id="managedKpiCards"', html)
-            self.assertIn('id="beforeTreePreview"', html)
-            self.assertIn('id="packDetails"', html)
-            self.assertIn('id="managedReportPreview"', html)
-            self.assertIn('id="planSearchInput"', html)
-            self.assertIn('id="reviewCategoryFilter"', html)
-            self.assertEqual(dashboard["inventory"]["summary"]["total_files"], 1)
+            self.assertIn('id="workspaceName"', html)
+            self.assertIn('id="page-overview"', html)
+            self.assertIn('id="page-files"', html)
+            self.assertIn('id="page-graph"', html)
+            self.assertGreaterEqual(dashboard["inventory"]["summary"]["total_files"], 1)
+            self.assertIn("librarian", dashboard)
+            self.assertEqual(dashboard["librarian"]["overview"]["metrics"][0]["label"], "Files")
             self.assertIn("jobs", dashboard)
             self.assertIn("chat", dashboard)
+
+    def test_librarian_dashboard_handles_missing_runtime_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                payload = json.loads(urlopen(f"http://{host}:{port}/api/librarian/dashboard", timeout=5).read())
+                graph = json.loads(urlopen(f"http://{host}:{port}/api/librarian/graph-summary", timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            self.assertEqual(payload["workspace"]["status"], "Needs Index")
+            self.assertFalse(graph["available"])
+            self.assertIn("missing", graph["empty_message"].lower())
+
+    def test_librarian_dashboard_exposes_overview_and_filtered_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_directory:
+            root = Path(temp_directory)
+            self._write_librarian_manifest(root, include_graph=True)
+            server = create_server(root, host="127.0.0.1", port=0, config=RuntimeConfig())
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            host, port = server.server_address
+
+            try:
+                payload = json.loads(urlopen(f"http://{host}:{port}/api/librarian/dashboard", timeout=5).read())
+                filtered = json.loads(urlopen(f"http://{host}:{port}/api/librarian/files?language=Python&risk=medium", timeout=5).read())
+                scripts = json.loads(urlopen(f"http://{host}:{port}/api/librarian/scripts", timeout=5).read())
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+            self.assertEqual(payload["overview"]["status"], "Warnings")
+            self.assertEqual(payload["overview"]["metrics"][0]["value"], 2)
+            self.assertEqual(len(filtered["files"]), 1)
+            self.assertEqual(filtered["files"][0]["path"], "tests/test_main.py")
+            self.assertEqual(scripts["scripts"][0]["name"], "print_manifest_summary.py")
 
     def test_job_run_endpoint_creates_artifacts_without_moving_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_directory:
